@@ -9,28 +9,132 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from sympy import sympify, symbols
+#from sympy.abc import x, y
+from sympy import is_increasing, is_strictly_increasing
+from sympy import oo, Interval
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import numpy as np
+
+class Canvas(FigureCanvas):
+    def __init__(self, parent):
+        fig, self.ax = plt.subplots(figsize=(5, 4), dpi=100)
+        super().__init__(fig)
+        self.setParent(parent)
+
+    def plot_function(self, func_str, interval):
+        self.ax.clear()
+
+        x = symbols('x')
+        func = sympify(func_str)
+
+        x_vals = np.linspace(interval[0], interval[1], 500)
+        y_vals = [func.subs(x, val) for val in x_vals]
+
+        self.ax.plot(x_vals, y_vals)
+        self.ax.set_title('Függvény')
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.grid(True)
+
+        self.draw()
+
 
 
 class Ui_Calculus(object):
-    def AlapWindow(self, main_w, calc_w):
-        calc_w.hide()
-        main_w.show()
+    def combobox_selector(self):
+        felso = sympify(self.lineEdit_2.text())
+        also = sympify(self.lineEdit_3.text())
+
+        if sympify(self.lineEdit_2.text()) == -oo:
+            also = -1000000000
+        
+        if sympify(self.lineEdit_3.text()) == oo:
+            also = 1000000000
+
+        input = self.comboBox.currentText()
+
+        if input == "Növekvő":
+            text = self.lineEdit.text()
+            res = is_increasing(sympify(text), Interval(also,felso))
+            if res == True:
+                self.label_2.setText(text + " növekvő")
+            else:
+                self.label_2.setText(text + " nem növekvő") 
+        
+        if input == "Szigorúan növekvő":
+            text = self.lineEdit.text()
+            res = is_strictly_increasing(sympify(text), Interval(also,felso))
+            if res == True:
+                self.label_2.setText(text + " szigorúan növekvő")
+            else:
+                self.label_2.setText(text + " szigorúan nem növekvő")
+        
+        interval = (float(felso), float(also))
+        self.canvas.plot_function(text, interval)
 
     def setupUi(self, Calculus, MainWindow):
         Calculus.setObjectName("Calculus")
         Calculus.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(Calculus)
         self.centralwidget.setObjectName("centralwidget")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(100, 90, 521, 171))
+        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox.setGeometry(QtCore.QRect(10, 70, 231, 51))
         font = QtGui.QFont()
-        font.setPointSize(48)
+        font.setPointSize(12)
+
+        self.canvas = Canvas(self.centralwidget)
+        self.canvas.setGeometry(QtCore.QRect(10, 200, 780, 360))
+
+        self.comboBox.setFont(font)
+        self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(10, 10, 231, 41))
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(12)
         self.label.setFont(font)
-        self.label.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.AlapWindow(MainWindow, Calculus))
-        self.pushButton.setGeometry(QtCore.QRect(80, 260, 251, 91))
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(10, 130, 780, 70))
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.label_2.setFont(font)
+        self.label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_2.setObjectName("label_2")
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(250, 70, 451, 51))
+        self.lineEdit.setObjectName("lineEdit")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(250, 10, 91, 41))
+        font = QtGui.QFont()
+        font.setFamily("Times New Roman")
+        font.setPointSize(12)
+        self.label_3.setFont(font)
+        self.label_3.setObjectName("label_3")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.combobox_selector())
+        self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
         self.pushButton.setObjectName("pushButton")
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_2.setGeometry(QtCore.QRect(310, 10, 61, 51))
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_3.setGeometry(QtCore.QRect(380, 10, 61, 51))
+        self.lineEdit_3.setObjectName("lineEdit_3")
         Calculus.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Calculus)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -46,8 +150,23 @@ class Ui_Calculus(object):
     def retranslateUi(self, Calculus):
         _translate = QtCore.QCoreApplication.translate
         Calculus.setWindowTitle(_translate("Calculus", "MainWindow"))
-        self.label.setText(_translate("Calculus", "Kalkulus"))
-        self.pushButton.setText(_translate("Calculus", "Main"))
+        self.comboBox.setItemText(0, _translate("Calculus", "Növekvő"))
+        self.comboBox.setItemText(1, _translate("Calculus", "Szigorúan növekvő"))
+        self.comboBox.setItemText(2, _translate("Calculus", "Csökkenő"))
+        self.comboBox.setItemText(3, _translate("Calculus", "Monoton"))
+        self.comboBox.setItemText(4, _translate("Calculus", "Divergens"))
+        self.comboBox.setItemText(5, _translate("Calculus", "Határérték"))
+        self.comboBox.setItemText(6, _translate("Calculus", "Konvergens"))
+        self.comboBox.setItemText(7, _translate("Calculus", "Deriválás"))
+        self.comboBox.setItemText(8, _translate("Calculus", "Integrálás"))
+        self.comboBox.setItemText(9, _translate("Calculus", "Summa"))
+        self.comboBox.setItemText(10, _translate("Calculus", "Függvény"))
+        self.label.setText(_translate("Calculus", "Válaszd ki a végrahajtandó műveletet"))
+        self.label_2.setText(_translate("Calculus", "Erdemény"))
+        self.label_3.setText(_translate("Calculus", "Határok:"))
+        self.lineEdit_2.setText(_translate("Calculus", "-oo"))
+        self.lineEdit_3.setText(_translate("Calculus", "oo"))
+        self.pushButton.setText(_translate("Calculus", "Enter"))
 
 
 if __name__ == "__main__":

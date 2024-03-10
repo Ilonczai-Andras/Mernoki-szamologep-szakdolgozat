@@ -13,7 +13,9 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QComboBox
 import math
 import re
-
+import pyqtgraph as pg
+from sympy import sympify
+from sympy.plotting import plot
 
 class Ui_MainWindow(object):
     def generateWindow(self, index):

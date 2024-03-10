@@ -14,64 +14,179 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>90</y>
-      <width>521</width>
-      <height>171</height>
+      <x>10</x>
+      <y>70</y>
+      <width>231</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>48</pointsize>
+      <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
+    <item>
+     <property name="text">
+      <string>Növekvő</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Szigorúan növekvő</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Csökkenő</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Monoton</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Divergens</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Határérték</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Konvergens</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Deriválás</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Integrálás</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Summa</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Függvény</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>231</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
-     <string>Kalkulus</string>
+     <string>Válaszd ki a végrahajtandó műveletet</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>781</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Erdemény</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>70</y>
+      <width>451</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Határok:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>260</y>
-      <width>251</width>
-      <height>91</height>
+      <x>710</x>
+      <y>70</y>
+      <width>75</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>HideMain</string>
+     <string>Enter</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QLineEdit" name="lineEdit_2">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>260</y>
-      <width>251</width>
-      <height>91</height>
+      <x>310</x>
+      <y>10</y>
+      <width>61</width>
+      <height>51</height>
      </rect>
-    </property>
-    <property name="text">
-     <string>ShowMain</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QLineEdit" name="lineEdit_3">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>360</y>
-      <width>251</width>
-      <height>91</height>
+      <x>380</x>
+      <y>10</y>
+      <width>61</width>
+      <height>51</height>
      </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
     </property>
    </widget>
   </widget>
