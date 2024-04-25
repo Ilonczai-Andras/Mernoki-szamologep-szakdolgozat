@@ -1,18 +1,14 @@
-from sympy import symbols, diff, integrate, sin
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Szimbolikus változók definiálása
-x, y = symbols('x y')
+# Define the expression
+x = np.linspace(0.1, 3*np.pi, 1000)  # Restricting x to avoid complex values
+expression = -np.log10(np.sin(x) - 1)/2 + np.log10(np.sin(x) + 1)/2
 
-# Példa egy egyszerű függvény definiálására és deriválására
-f = x**2 + 3*x + 2
-f_derivative = diff(f, x)
-print("Függvény: ", f)
-print("Függvény deriváltja: ", f_derivative)
-
-# Példa integrálásra
-integral = integrate(f, x)
-print("Függvény integrálja: ", integral)
-
-# Példa szinuszfüggvény integrálására
-sin_integral = integrate(sin(x), x)
-print("Sinus függvény integrálja: ", sin_integral)
+# Plot the expression
+plt.plot(x, expression)
+plt.xlabel('x')
+plt.ylabel('Expression Value')
+plt.title('Plot of Expression')
+plt.grid(True)
+plt.show()
