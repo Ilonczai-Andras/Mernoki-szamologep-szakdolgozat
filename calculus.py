@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from Canvas_for_plot import Canvas
 from sympy import oo, Sum, Symbol, Interval, sympify, limit, integrate, is_increasing, is_strictly_increasing, is_decreasing, is_monotonic, is_strictly_decreasing, diff
 from sympy import sin,cos,tan,log,atan,asin,acos,asinh,acosh,atanh,sinh,cosh,tanh,exp,Abs,sign,sqrt,sec,csc
+from sympy import pretty
 import re
 from math import pi
 
@@ -196,8 +197,14 @@ class Ui_Calculus(object):
                 self.canvas.plot_function(res_str, interval)
             except Exception as e:
                 print(e)
+    def back_to_mainwindow(self, Egyenlet, MainWindow):
+        Egyenlet.close()
+        MainWindow.show()
         
     def setupUi(self, Calculus, MainWindow):
+
+        self.applyStylesheet(Calculus)
+
         Calculus.setObjectName("Calculus")
         Calculus.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(Calculus)
@@ -215,8 +222,12 @@ class Ui_Calculus(object):
         self.lineEdit_3.setGeometry(QtCore.QRect(380, 10, 61, 51))
         self.lineEdit_3.setObjectName("lineEdit_3")
 
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda:self.back_to_mainwindow(Calculus, MainWindow))
+        self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
+        self.pushButton_2.setObjectName("pushButton_2")
+
         self.canvas = Canvas(self.centralwidget)
-        self.canvas.setGeometry(QtCore.QRect(10, 200, 780, 360))
+        self.canvas.setGeometry(QtCore.QRect(10, 200, 780, 290))
 
         self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
@@ -243,8 +254,9 @@ class Ui_Calculus(object):
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
-        self.label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
+        self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(250, 70, 451, 51))
         self.lineEdit.setObjectName("lineEdit")
@@ -271,6 +283,51 @@ class Ui_Calculus(object):
         self.retranslateUi(Calculus)
         QtCore.QMetaObject.connectSlotsByName(Calculus)
 
+    def applyStylesheet(self, Calculus):
+        stylesheet = """
+        QMainWindow {
+            background-color: #2E2E2E;
+        }
+        QLabel#label_2 {
+            background-color: #1C1C1C;
+            color: #FFFFFF;
+            border: 2px solid #555555;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        QPushButton {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: #5E5E5E;
+        }
+        QPushButton:pressed {
+            background-color: #6E6E6E;
+        }
+        QComboBox {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        QComboBox QAbstractItemView {
+            background-color: #4E4E4E;
+            selection-background-color: #5E5E5E;
+            color: #FFFFFF;
+        }
+        QToolBar {
+            background-color: #3E3E3E;
+            border: none;
+        }
+        """
+        Calculus.setStyleSheet(stylesheet)
+
+
     def retranslateUi(self, Calculus):
         _translate = QtCore.QCoreApplication.translate
         Calculus.setWindowTitle(_translate("Calculus", "MainWindow"))
@@ -290,6 +347,7 @@ class Ui_Calculus(object):
         self.lineEdit_2.setText(_translate("Calculus", "-10"))
         self.lineEdit_3.setText(_translate("Calculus", "10"))
         self.pushButton.setText(_translate("Calculus", "Enter"))
+        self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
 
 
 if __name__ == "__main__":

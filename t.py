@@ -1,14 +1,19 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from sympy.stats import Normal, P, E, variance
+from sympy import symbols
 
-# Define the expression
-x = np.linspace(0.1, 3*np.pi, 1000)  # Restricting x to avoid complex values
-expression = -np.log10(np.sin(x) - 1)/2 + np.log10(np.sin(x) + 1)/2
+# Definiáljuk a normál eloszlású változót
+mu = 10
+sigma = 2
+X = Normal('X', mu, sigma)
 
-# Plot the expression
-plt.plot(x, expression)
-plt.xlabel('x')
-plt.ylabel('Expression Value')
-plt.title('Plot of Expression')
-plt.grid(True)
-plt.show()
+# Várható érték (átlag)
+expected_value = E(X)
+print(f"Várható érték: {expected_value}")
+
+# Variancia
+var = variance(X)
+print(f"Variancia: {var}")
+
+# Valószínűség számítása, hogy X kisebb mint 12
+prob = P(X < 12)
+print(f"P(X < 12) = {prob}")

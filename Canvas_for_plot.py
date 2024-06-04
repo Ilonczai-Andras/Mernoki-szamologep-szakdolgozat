@@ -74,27 +74,29 @@ class Canvas(FigureCanvas):
         self.text = func_str
         print("self: " + self.text)
         print(interval)
+        try:
+            x_vals = np.linspace(interval[0], interval[1], 10000)
 
-        x_vals = np.linspace(interval[0], interval[1], 10000)
+            if func_str.isdigit():  # Handle static function like 4
+                y_vals = np.full_like(x_vals, int(func_str))
+            else:
+                y_vals = self.f(x_vals)
 
-        if func_str.isdigit():  # Handle static function like 4
-            y_vals = np.full_like(x_vals, int(func_str))
-        else:
-            y_vals = self.f(x_vals)
+            threshold = 10
+            if "tan" in func_str or "sec" in func_str or "csc" in func_str:
+                large_jumps = self.check_for_large_jumps(y_vals, threshold)
+                for idx in large_jumps:
+                    y_vals[idx] = np.nan
+                self.ax.set_ylim(-10, 10)
+            else:
+                pass  # You can add specific handling for other types of functions if needed
 
-        threshold = 10
-        if "tan" in func_str or "sec" in func_str or "csc" in func_str:
-            large_jumps = self.check_for_large_jumps(y_vals, threshold)
-            for idx in large_jumps:
-                y_vals[idx] = np.nan
-            self.ax.set_ylim(-10, 10)
-        else:
-            pass  # You can add specific handling for other types of functions if needed
-
-        self.ax.plot(x_vals, y_vals, label=f'y = {self.func}')
-        self.ax.set_xlabel('x') 
-        self.ax.set_xlim(interval[0], interval[1])
-        self.ax.set_ylabel('f(x)') 
-        self.ax.grid(True) 
-        self.ax.legend()  
-        self.fig.savefig('plot.png')
+            self.ax.plot(x_vals, y_vals, label=f'y = {self.func}')
+            self.ax.set_xlabel('x') 
+            self.ax.set_xlim(interval[0], interval[1])
+            self.ax.set_ylabel('f(x)') 
+            self.ax.grid(True) 
+            self.ax.legend()  
+            self.fig.savefig('plot.png')
+        except:
+            print("Error plotting function")

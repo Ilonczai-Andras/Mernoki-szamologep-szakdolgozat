@@ -13,9 +13,50 @@ from PyQt5.QtWidgets import QTextEdit
 from sympy import *
 from numpy import *
 import sys
+import re
 
 
 class Ui_Egyenlet(object):
+
+    def replace_trigonometric_funcs(self, func_str):
+        replacements = {
+            # log
+            r'\blog\b': '',
+            r'\bln\b': '',
+            # Inverse
+            r'\barctan\b': '',
+            r'\barcsin\b': '',
+            r'\barccos\b': '',
+            # Inverse hyperbolic
+            r'\barcsinh\b': '',
+            r'\barccosh\b': '',
+            r'\barctanh\b': '',
+            # trig
+            r'\bsin\b': '',
+            r'\bcos\b': '',
+            r'\btan\b': '',
+            # hyperbolic
+            r'\bsinh\b': '',
+            r'\bcosh\b': '',
+            r'\btanh\b': '',
+            # exp
+            r'\bexp\b': '',
+            # abs
+            r'\babs\b': '',
+            # sign(x)
+            r'\bsign\b': '',
+            #gyok
+            r'\bsqrt\b': '',
+            #szekánsok
+            r'\bsec\b': '',
+            r'\bcsc\b': ''
+        }
+
+        for pattern, replacement in replacements.items():
+            func_str = re.sub(pattern, replacement, func_str)
+
+        return func_str
+
     def extract_variable(self, expression):
         valtozok = []
 
@@ -37,57 +78,57 @@ class Ui_Egyenlet(object):
         res.append(number)
         return res
     
-    def write_res(self, res):
-        result = "y = "
-        for i in res:
-            for j in i:
-                if not len(str(j)) == 1:
-                    expression = str(j).replace('I', '1j')
-                    
-                    result += str(round(eval(expression), 2)) + " "
-                    print(str(eval(expression)))
+    def system_of_equations(self, funcs):
+        number_of_rows = funcs.pop()  # Remove the last element which is the number of equations
+        symbols_set = set()
+        equations = []
 
-        return result.strip()
-    
-    def write_res_list(self, res):
-        result = ""
-        for i in res:
-            expression = str(i).replace('I', '1j')
-            
-            result += str(round(eval(expression), 2)) + " "
-            print(str(round(eval(expression), 2)))
+        for eq_str in funcs:
+            lhs, rhs = eq_str.split('=')
+            lhs_sympy = sympify(lhs.strip())
+            rhs_sympy = sympify(rhs.strip())
+            symbols_in_eq = self.extract_variable(self.replace_trigonometric_funcs(lhs)) + self.extract_variable(self.replace_trigonometric_funcs(rhs))
+            symbols_set.update(symbols_in_eq)
+            equations.append(Eq(lhs_sympy, rhs_sympy))
 
-        #print("'{}'".format(result))
-        #print("'{}'".format(result.rstrip(" | ")))
-        return result.strip()
+        symbols_list = list(symbols_set)
+        symbol_objects = symbols(' '.join(symbols_list))
 
-    def is_fractional_equation(self, equation):
-        if '/' in equation or '.' in equation:
-            return True
-        else:
-            return False
+        # Solve the system of equations
+        solution = solve(equations, symbol_objects)
+        
+        # Format the solution to have each result on a new line
+        formatted_solution = '\n'.join([str(sol) for sol in solution])
+        print("for_sol: ", formatted_solution)
+        
+        return formatted_solution
 
     def one_func(self, one_func, replaced_func):
         try:
-                splitted_func = one_func.replace(" ", "").split("=")
-                symbs = self.extract_variable(replaced_func)
-                print(symbs)
+            splitted_func = one_func.replace(" ", "").split("=")
+            symbs = self.extract_variable(replaced_func)
+            #print(symbs)
 
-                equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]) )
+            equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
 
-                rearranged_equation = equation.lhs - equation.rhs
-                result = solve(rearranged_equation, tuple(symbs))
-                
-                if len(symbs) == 1:
-                    if (len(result) >= 2 ):
-                        self.label_2.setText(self.write_res_list(result))
-                    else:
-                        self.label_2.setText(self.write_res_list(result).replace("**", "^"))
-                else:
-                    self.label_2.setText(self.write_res(result).replace("**", "^"))
+            rearranged_equation = equation.lhs - equation.rhs
+            result = solve(rearranged_equation, tuple(symbs))
+            
+            numerical_results = [sol.evalf() for sol in result]
+            rounded_results = [complex(round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)) for sol in numerical_results]
+
+            formatted_results = [f"{sol.real:.2f} + {sol.imag:.2f}i" if sol.imag >= 0 else f"{sol.real:.2f} - {abs(sol.imag):.2f}i" for sol in rounded_results]
+            
+            result_text = "\n".join(formatted_results)
+
+            self.label_2.setText(result_text.replace("**", "^"))
+
+        except SympifyError as e:
+            print("Sympify error:", e)
+            self.label_2.setText("Invalid equation!")
         except Exception as x:
             print(x)
-            self.label_2.setText("Helytelen egyenlet!")     
+            self.label_2.setText("An error occurred!")
 
     def combobox_selector(self):
         input_text = self.comboBox.currentText()
@@ -96,12 +137,73 @@ class Ui_Egyenlet(object):
 
         if input_text == "Egyenlet":
             if len(number_of_rows) == 2 :
-                self.one_func(function_text, function_text.replace("sqrt", ""))
+                self.one_func(function_text, self.replace_trigonometric_funcs(function_text).replace("sqrt", ""))
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
+        if input_text == "Egyenletrendszerek":
+            if len(number_of_rows) >= 2:
+                formatted_solution = self.system_of_equations(number_of_rows)
+                self.label_2.setText(formatted_solution)
+            else:
+                self.label_2.setText("Egy sort adj meg")
+                self.text_edit.setText("")
+    
+    def back_to_mainwindow(self, Egyenlet, MainWindow):
+        Egyenlet.close()
+        MainWindow.show()
+
+    def applyStylesheet(self, Egyenlet):
+        stylesheet = """
+        QMainWindow {
+            background-color: #2E2E2E;
+        }
+        QWidget#centralwidget {
+            background-color: #2E2E2E;
+        }
+        QLabel {
+            color: #FFFFFF;
+        }
+        QComboBox, QTextEdit {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        QComboBox QAbstractItemView {
+            background-color: #4E4E4E;
+            selection-background-color: #5E5E5E;
+            color: #FFFFFF;
+        }
+        QLabel#label {
+            font-family: Times New Roman;
+            font-size: 12pt;
+            text-align: center;
+        }
+        QLabel#label_2 {
+            font-size: 14pt;
+            qproperty-alignment: 'AlignRight | AlignTrailing | AlignVCenter';
+        }
+        QPushButton {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: #5E5E5E;
+        }
+        QPushButton:pressed {
+            background-color: #6E6E6E;
+        }
+        """
+        Egyenlet.setStyleSheet(stylesheet)
+
 
     def setupUi(self, Egyenlet, MainWindow):
+        self.applyStylesheet(Egyenlet)
         Egyenlet.setObjectName("Egyenlet")
         Egyenlet.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(Egyenlet)
@@ -114,9 +216,6 @@ class Ui_Egyenlet(object):
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 231, 41))
         font = QtGui.QFont()
@@ -126,17 +225,22 @@ class Ui_Egyenlet(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 130, 781, 421))
+        self.label_2.setGeometry(QtCore.QRect(10, 200, 780, 290))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_2.setObjectName("label_2")
+        self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
 
         self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.combobox_selector())
         self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
         self.pushButton.setObjectName("pushButton")
+
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda:self.back_to_mainwindow(Egyenlet, MainWindow))
+        self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
+        self.pushButton_2.setObjectName("pushButton_2")
 
         self.text_edit = QTextEdit(self.centralwidget)
         self.text_edit.setGeometry(310, 20, 391, 101)
@@ -165,13 +269,11 @@ class Ui_Egyenlet(object):
         _translate = QtCore.QCoreApplication.translate
         Egyenlet.setWindowTitle(_translate("Egyenlet", "Egyenlet"))
         self.comboBox.setItemText(0, _translate("Egyenlet", "Egyenlet"))
-        self.comboBox.setItemText(1, _translate("Egyenlet", "Trigonometrikus"))
-        self.comboBox.setItemText(2, _translate("Egyenlet", "Paraméteres"))
-        self.comboBox.setItemText(3, _translate("Egyenlet", "Lineáris egyenletrendszerek"))
-        self.comboBox.setItemText(4, _translate("Egyenlet", "Nem lineáris egyenletrendszerek"))
+        self.comboBox.setItemText(1, _translate("Egyenlet", "Egyenletrendszerek"))
         self.label.setText(_translate("Egyenlet", "Válaszd ki a végrahajtandó műveletet"))
         self.label_2.setText(_translate("Egyenlet", "Eredmény"))
         self.pushButton.setText(_translate("Egyenlet", "Enter"))
+        self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
         self.label_3.setText(_translate("Egyenlet", "Egyenlet"))
 
 

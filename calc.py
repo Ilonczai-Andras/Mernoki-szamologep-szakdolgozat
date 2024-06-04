@@ -9,6 +9,9 @@
 
 from calculus import Ui_Calculus
 from egyenlet import Ui_Egyenlet
+from diff_egyenlet import Ui_Diff_Egyenlet
+from prob_and_stat import Ui_Prob_and_Stat
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QComboBox
@@ -21,9 +24,17 @@ class Ui_MainWindow(object):
         if window_type == "Kalkulus":
             self.generateKalkulus()
             MainWindow.hide()
-        if window_type == "Egyenletek":
+        elif window_type == "Egyenletek":
             self.generateEgyenlet()
             MainWindow.hide()
+        elif window_type == "Differnciál számitás":
+            self.generateDiff_Egyenlet()
+            MainWindow.hide()
+        elif window_type == "Valószínűségszámitás és statisztika":
+            self.generateProb_and_Stat()
+            MainWindow.hide()
+        
+        self.comboBox.setCurrentIndex(0)
 
     def generateKalkulus(self):
         self.window = QtWidgets.QMainWindow()
@@ -37,21 +48,31 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.window, MainWindow)
         self.window.show()
 
+    def generateDiff_Egyenlet(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Diff_Egyenlet()
+        self.ui.setupUi(self.window, MainWindow)
+        self.window.show()
+    
+    def generateProb_and_Stat(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Prob_and_Stat()
+        self.ui.setupUi(self.window, MainWindow)
+        self.window.show()
+
     def setupUi(self, MainWindow):
 
-        #toolbar combobox
         self.toolbar = MainWindow.addToolBar("My Toolbar")
+        self.applyStylesheet(MainWindow)
 
-        # Create a combobox
         font = QFont()
         font.setPointSize(12)  # Set the desired font size
 
         self.comboBox = QComboBox()
         self.comboBox.setFont(font)
-        self.comboBox.addItems(["Válasz egyet:", "Kalkulus", "Egyenletek", "Differnciál számitás"])
+        self.comboBox.addItems(["Válasz egyet:", "Kalkulus", "Egyenletek", "Differnciál számitás", "Valószínűségszámitás és statisztika"])
         self.comboBox.currentIndexChanged.connect(self.generateWindow)
 
-        # Add the combobox to the toolbar
         self.toolbar.addWidget(self.comboBox)
 
         MainWindow.setObjectName("MainWindow")
@@ -229,6 +250,50 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+    def applyStylesheet(self, MainWindow):
+        stylesheet = """
+        QMainWindow {
+            background-color: #2E2E2E;
+        }
+        QLabel#outputLabel {
+            background-color: #1C1C1C;
+            color: #FFFFFF;
+            border: 2px solid #555555;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        QPushButton {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        QPushButton:hover {
+            background-color: #5E5E5E;
+        }
+        QPushButton:pressed {
+            background-color: #6E6E6E;
+        }
+        QComboBox {
+            background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        QComboBox QAbstractItemView {
+            background-color: #4E4E4E;
+            selection-background-color: #5E5E5E;
+            color: #FFFFFF;
+        }
+        QToolBar {
+            background-color: #3E3E3E;
+            border: none;
+        }
+        """
+        MainWindow.setStyleSheet(stylesheet)
+
     def press_it(self, pressed):
         if pressed == "C":
             self.outputLabel.setText("0")
@@ -301,6 +366,7 @@ class Ui_MainWindow(object):
     def one_per_x(self):
         original = float(self.outputLabel.text())
         self.outputLabel.setText(str(round((1 / original), 2)))
+
     
     def last_number(self, string):
         i = len(string) - 1
