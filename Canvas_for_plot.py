@@ -4,6 +4,7 @@ import re
 import numpy as np
 import math
 
+
 class Canvas(FigureCanvas):
 
     text = ""
@@ -17,11 +18,12 @@ class Canvas(FigureCanvas):
 
     def f(self, x):
         return eval(self.text)
-    
+
     def sec(self, x):
-        return (1/np.cos(x))
+        return 1 / np.cos(x)
+
     def csc(self, x):
-        return (1/np.sin(x))
+        return 1 / np.sin(x)
 
     def fact(self, x):
         if np.isscalar(x):
@@ -29,41 +31,40 @@ class Canvas(FigureCanvas):
         else:
             return np.array([math.factorial(int(i)) for i in x])
 
-
     def replace_numpy_funcs(self, func_str):
         replacements = {
             # log
-            r'\blog\b': 'np.log10',
-            r'\bln\b': 'np.log',
+            r"\blog\b": "np.log10",
+            r"\bln\b": "np.log",
             # Inverse
-            r'\barctan\b': 'np.arctan',
-            r'\barcsin\b': 'np.arcsin',
-            r'\barccos\b': 'np.arccos',
+            r"\barctan\b": "np.arctan",
+            r"\barcsin\b": "np.arcsin",
+            r"\barccos\b": "np.arccos",
             # Inverse hyperbolic
-            r'\barcsinh\b': 'np.arcsinh',
-            r'\barccosh\b': 'np.arccosh',
-            r'\barctanh\b': 'np.arctanh',
+            r"\barcsinh\b": "np.arcsinh",
+            r"\barccosh\b": "np.arccosh",
+            r"\barctanh\b": "np.arctanh",
             # trig
-            r'\bsin\b': 'np.sin',
-            r'\bcos\b': 'np.cos',
-            r'\btan\b': 'np.tan',
+            r"\bsin\b": "np.sin",
+            r"\bcos\b": "np.cos",
+            r"\btan\b": "np.tan",
             # hyperbolic
-            r'\bsinh\b': 'np.sinh',
-            r'\bcosh\b': 'np.cosh',
-            r'\btanh\b': 'np.tanh',
+            r"\bsinh\b": "np.sinh",
+            r"\bcosh\b": "np.cosh",
+            r"\btanh\b": "np.tanh",
             # exp
-            r'\bexp\(([^)]+)\)': r'np.exp(\1)',
+            r"\bexp\(([^)]+)\)": r"np.exp(\1)",
             # abs
-            r'\babs\b': 'np.absolute',
+            r"\babs\b": "np.absolute",
             # sign(x)
-            r'\bsign\b': 'np.sign',
-            #gyok
-            r'\bsqrt\b': 'np.sqrt',
-            #szekánsok
-            r'\bsec\b': 'self.sec',
-            r'\bcsc\b': 'self.csc',
-            r'\bpi\b': 'np.pi',
-            r'\bfactorial\b': 'self.fact'
+            r"\bsign\b": "np.sign",
+            # gyok
+            r"\bsqrt\b": "np.sqrt",
+            # szekánsok
+            r"\bsec\b": "self.sec",
+            r"\bcsc\b": "self.csc",
+            r"\bpi\b": "np.pi",
+            r"\bfactorial\b": "self.fact",
         }
 
         for pattern, replacement in replacements.items():
@@ -80,7 +81,9 @@ class Canvas(FigureCanvas):
         self.ax.clear()
 
         self.func = func_str.replace("A", "a")
-        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a")
+        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace(
+            "A", "a"
+        )
         print(func_str)
         self.text = func_str
 
@@ -103,10 +106,10 @@ class Canvas(FigureCanvas):
         else:
             pass
 
-        self.ax.plot(x_vals, y_vals, label=f'y = {self.func}')
-        self.ax.set_xlabel('x')
+        self.ax.plot(x_vals, y_vals, label=f"y = {self.func}")
+        self.ax.set_xlabel("x")
         self.ax.set_xlim(interval[0], interval[1])
-        self.ax.set_ylabel('f(x)')
+        self.ax.set_ylabel("f(x)")
         self.ax.grid(True)
         self.ax.legend()
-        self.fig.savefig('plot.png')
+        self.fig.savefig("plot.png")
