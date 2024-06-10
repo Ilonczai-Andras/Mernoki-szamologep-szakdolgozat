@@ -1,19 +1,27 @@
-from sympy.stats import Normal, P, E, variance
-from sympy import symbols
+import sympy as sp
+from sympy import pprint, symbols
+from sympy.stats import Poisson, density, E, variance, H
 
-# Definiáljuk a normál eloszlású változót
-mu = 10
-sigma = 2
-X = Normal('X', mu, sigma)
+# Lambda paraméter meghatározása
+lam = 50
 
-# Várható érték (átlag)
-expected_value = E(X)
-print(f"Várható érték: {expected_value}")
+# Poisson-eloszlás létrehozása
+X = Poisson('X', lam)
+x = symbols('x')
+
+# Valószínűségi tömegfüggvény (PMF)
+pmf = density(X)(x)
+
+# Várható érték
+mean = E(X)
 
 # Variancia
 var = variance(X)
-print(f"Variancia: {var}")
 
-# Valószínűség számítása, hogy X kisebb mint 12
-prob = P(X < 12)
-print(f"P(X < 12) = {prob}")
+# Entrópia
+entropy = H(X)
+
+print(pmf)
+print(mean)
+print(var)
+print(entropy)

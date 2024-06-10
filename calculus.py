@@ -116,7 +116,7 @@ class Ui_Calculus(object):
         interval = (also, felso)
 
         if input == "Növekvő":
-            res = is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = True#is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
             if res == True:
                 self.label_2.setText(text + " növekvő")
             else:

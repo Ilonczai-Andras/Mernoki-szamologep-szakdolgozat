@@ -2,6 +2,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import re
 import numpy as np
+import math
 
 class Canvas(FigureCanvas):
 
@@ -21,6 +22,13 @@ class Canvas(FigureCanvas):
         return (1/np.cos(x))
     def csc(self, x):
         return (1/np.sin(x))
+
+    def fact(self, x):
+        if np.isscalar(x):
+            return math.factorial(int(x))
+        else:
+            return np.array([math.factorial(int(i)) for i in x])
+
 
     def replace_numpy_funcs(self, func_str):
         replacements = {
@@ -44,7 +52,7 @@ class Canvas(FigureCanvas):
             r'\bcosh\b': 'np.cosh',
             r'\btanh\b': 'np.tanh',
             # exp
-            r'\bexp\b': 'np.exp',
+            r'\bexp\(([^)]+)\)': r'np.exp(\1)',
             # abs
             r'\babs\b': 'np.absolute',
             # sign(x)
@@ -53,7 +61,9 @@ class Canvas(FigureCanvas):
             r'\bsqrt\b': 'np.sqrt',
             #szekánsok
             r'\bsec\b': 'self.sec',
-            r'\bcsc\b': 'self.csc'
+            r'\bcsc\b': 'self.csc',
+            r'\bpi\b': 'np.pi',
+            r'\bfactorial\b': 'self.fact'
         }
 
         for pattern, replacement in replacements.items():
@@ -71,32 +81,32 @@ class Canvas(FigureCanvas):
 
         self.func = func_str.replace("A", "a")
         func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a")
+        print(func_str)
         self.text = func_str
-        print("self: " + self.text)
-        print(interval)
-        try:
-            x_vals = np.linspace(interval[0], interval[1], 10000)
 
-            if func_str.isdigit():  # Handle static function like 4
-                y_vals = np.full_like(x_vals, int(func_str))
-            else:
-                y_vals = self.f(x_vals)
+        x_vals = np.linspace(interval[0], interval[1], 10000)
 
-            threshold = 10
-            if "tan" in func_str or "sec" in func_str or "csc" in func_str:
-                large_jumps = self.check_for_large_jumps(y_vals, threshold)
-                for idx in large_jumps:
-                    y_vals[idx] = np.nan
-                self.ax.set_ylim(-10, 10)
-            else:
-                pass  # You can add specific handling for other types of functions if needed
+        if func_str.isdigit():
+            y_vals = np.full_like(x_vals, int(func_str))
+        else:
+            # Ensure that y_vals is a 1D array
+            y_vals = np.zeros_like(x_vals)
+            for i, x in enumerate(x_vals):
+                y_vals[i] = self.f(x)
 
-            self.ax.plot(x_vals, y_vals, label=f'y = {self.func}')
-            self.ax.set_xlabel('x') 
-            self.ax.set_xlim(interval[0], interval[1])
-            self.ax.set_ylabel('f(x)') 
-            self.ax.grid(True) 
-            self.ax.legend()  
-            self.fig.savefig('plot.png')
-        except:
-            print("Error plotting function")
+        threshold = 10
+        if "tan" in func_str or "sec" in func_str or "csc" in func_str:
+            large_jumps = self.check_for_large_jumps(y_vals, threshold)
+            for idx in large_jumps:
+                y_vals[idx] = np.nan
+            self.ax.set_ylim(-10, 10)
+        else:
+            pass
+
+        self.ax.plot(x_vals, y_vals, label=f'y = {self.func}')
+        self.ax.set_xlabel('x')
+        self.ax.set_xlim(interval[0], interval[1])
+        self.ax.set_ylabel('f(x)')
+        self.ax.grid(True)
+        self.ax.legend()
+        self.fig.savefig('plot.png')
