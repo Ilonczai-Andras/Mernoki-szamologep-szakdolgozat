@@ -1,28 +1,15 @@
-import sympy as sp
-from sympy import pprint, symbols
-from sympy.stats import Poisson, density, E, variance, H, P
+from sympy.stats import Pareto, entropy, density, E, variance, P, entropy
+from sympy import Symbol, S, sympify, gamma, log, digamma
 
-# Lambda paraméter meghatározása
-lam = 5
+x = Symbol("x")
 
-# Poisson-eloszlás létrehozása
-X = Poisson("X", lam)
-x = symbols("x")
+xm = 1
+alpha = 3
+X = Pareto("X", xm, alpha)
 
-# Valószínűségi tömegfüggvény (PMF)
-pmf = density(X)(x)
-
-# Várható érték
-mean = E(X)
-
-# Variancia
-var = variance(X)
-
-# Entrópia
-entropy = H(X)
-
-print(P(X < 3))
-print(pmf)
-print(mean)
-print(var)
-print(entropy)
+print("sűrűség fgv:", density(X)(x))
+print("várható ért: ", E(X).evalf())
+print("variancia: ", variance(X).evalf())
+print("entrópia: ", entropy(X).evalf())
+condition = sympify("X < 3", locals={"X": X})
+print("valség: ", str(P(condition).evalf()))
