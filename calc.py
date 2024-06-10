@@ -14,7 +14,7 @@ from prob_and_stat import Ui_Prob_and_Stat
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtWidgets import QComboBox, QMainWindow
 import math
 import re
 
@@ -85,7 +85,9 @@ class Ui_MainWindow(object):
         self.toolbar.addWidget(self.comboBox)
 
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(528, 635)
+        MainWindow.resize(528, 660)
+        MainWindow.setMinimumSize(QtCore.QSize(528, 660))
+        MainWindow.setMaximumSize(QtCore.QSize(528, 660))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.outputLabel = QtWidgets.QLabel(self.centralwidget)
