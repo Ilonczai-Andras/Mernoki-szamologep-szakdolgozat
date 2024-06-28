@@ -1,15 +1,23 @@
-from sympy.stats import Pareto, entropy, density, E, variance, P, entropy
-from sympy import Symbol, S, sympify, gamma, log, digamma
+import numpy as np
+import matplotlib.pyplot as plt
 
-x = Symbol("x")
+def direction_field(f):
 
-xm = 1
-alpha = 3
-X = Pareto("X", xm, alpha)
+    nt, nv = 0.5, 0.5
+    t = np.arange(-4, 4, nt)
+    v = np.arange(-4, 4, nv)
 
-print("sűrűség fgv:", density(X)(x))
-print("várható ért: ", E(X).evalf())
-print("variancia: ", variance(X).evalf())
-print("entrópia: ", entropy(X).evalf())
-condition = sympify("X < 3", locals={"X": X})
-print("valség: ", str(P(condition).evalf()))
+    # rectangular grid with points
+    x, t = np.meshgrid(t, v)
+
+    # derivative
+    func = f.split("=")[1]
+    print(func)
+    dv = eval(func)
+    dt = np.ones(dv.shape)
+
+    plt.quiver(x, t, dt, dv, color='black')
+    plt.title('Direction Field for ' + func)
+    plt.show()
+
+direction_field("x'(t)=np.sin(t)")

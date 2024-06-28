@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTextEdit
 from sympy import pretty, symbols, Function, Eq, diff, dsolve
 from sympy.parsing.sympy_parser import parse_expr
+from Canvas_for_plot import Canvas
 
 
 class Ui_Diff_Egyenlet(object):
@@ -13,8 +14,11 @@ class Ui_Diff_Egyenlet(object):
             latex_solution = pretty(solution)
             self.label_2.setText(f"{latex_solution}")
             self.label_2.setAlignment(QtCore.Qt.AlignCenter)  # Center the text
+            self.canvas.direction_field(replaced)
         except Exception as e:
-            self.label_2.setText("Hiba történt! Ellenőrizze a beírt differenciél egyenletet")
+            self.label_2.setText(
+                "Hiba történt! Ellenőrizze a beírt differenciél egyenletet"
+            )
             print(e)  # Print the exception for debugging
 
     def replace_nth_derivative(self, eq_string):
@@ -27,26 +31,26 @@ class Ui_Diff_Egyenlet(object):
         # Handle first-order derivatives last
         if "x'(t)" in eq_string:
             eq_string = eq_string.replace("x'(t)", "x(t).diff(t)")
-        return eq_string 
-        
+        return eq_string
+
     def solve_diff_eq_from_string(self, eq_string):
         # Splitting the equation string into left-hand side and right-hand side
-        lhs_str, rhs_str = eq_string.split('=')
-        
+        lhs_str, rhs_str = eq_string.split("=")
+
         # Parsing the variables and functions from the equation string
-        t = symbols('t')
-        x = Function('x')(t)
-        
+        t = symbols("t")
+        x = Function("x")(t)
+
         # Parsing the left-hand side and right-hand side of the equation
         lhs = parse_expr(lhs_str)
         rhs = parse_expr(rhs_str)
-        
+
         # Creating the differential equation
         diff_eq = Eq(lhs, rhs)
-        
+
         # Solving the differential equation
         solution = dsolve(diff_eq, x)
-        
+
         return solution
 
     def applyStylesheet(self, Diff_Egyenlet):
@@ -91,11 +95,11 @@ class Ui_Diff_Egyenlet(object):
     def setupUi(self, Diff_Egyenlet, MainWindow):
         self.applyStylesheet(Diff_Egyenlet)
         Diff_Egyenlet.setObjectName("Diff_Egyenlet")
-        Diff_Egyenlet.resize(800, 600)
+        Diff_Egyenlet.resize(800, 760)
         self.centralwidget = QtWidgets.QWidget(Diff_Egyenlet)
         self.centralwidget.setObjectName("centralwidget")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(250, 130, 540, 300))
+        self.label_2.setGeometry(QtCore.QRect(9, 130, 780, 250))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
@@ -103,15 +107,26 @@ class Ui_Diff_Egyenlet(object):
         self.label_2.setObjectName("label_2")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.show_diff_equation_result(self.text_edit.toPlainText().lower()))
+        self.pushButton = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.show_diff_equation_result(
+                self.text_edit.toPlainText().lower()
+            ),
+        )
         self.pushButton.setGeometry(QtCore.QRect(660, 60, 75, 51))
         self.pushButton.setObjectName("pushButton")
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda:self.back_to_mainwindow(Diff_Egyenlet, MainWindow))
-        self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
+        self.pushButton_2 = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.back_to_mainwindow(Diff_Egyenlet, MainWindow),
+        )
+        self.pushButton_2.setGeometry(QtCore.QRect(714, 690, 75, 51))
         self.pushButton_2.setObjectName("pushButton_2")
 
-        self.text_edit = QTextEdit(self.centralwidget)        
+        self.canvas = Canvas(self.centralwidget)
+        self.canvas.setGeometry(QtCore.QRect(9, 390, 781, 291))
+
+        self.text_edit = QTextEdit(self.centralwidget)
         self.text_edit.setGeometry(QtCore.QRect(250, 10, 391, 101))
         self.text_edit.setObjectName("text_edit")
 
@@ -145,4 +160,5 @@ class Ui_Diff_Egyenlet(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.Q

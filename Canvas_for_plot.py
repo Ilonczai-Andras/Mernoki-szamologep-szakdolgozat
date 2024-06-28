@@ -113,3 +113,28 @@ class Canvas(FigureCanvas):
         self.ax.grid(True)
         self.ax.legend()
         self.fig.savefig("plot.png")
+
+    def direction_field(self, func_str):
+        self.ax.clear()
+
+        text = func_str.split("=")[1]
+        func = func_str.split("=")[1]
+        func = self.replace_numpy_funcs(func)
+        print(func)
+
+        nt, nv = 0.5, 0.5
+        t = np.arange(-4, 4, nt)
+        v = np.arange(-4, 4, nv)
+        x, t = np.meshgrid(t, v)
+
+        print(func)
+        dv = eval(func)
+        dt = np.ones(dv.shape)
+
+        self.ax.quiver(x, t, dt, dv, color="b", label=f"dy/dx = {text}")
+        self.ax.set_xlabel("t")
+        self.ax.set_ylabel("y")
+        self.ax.set_title("Íránymező " + text)
+        self.ax.legend()
+        self.fig.canvas.draw()
+        self.draw_idle()
