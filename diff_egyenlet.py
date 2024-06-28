@@ -33,7 +33,7 @@ class Ui_Diff_Egyenlet(object):
             eq_string = eq_string.replace("x'(t)", "x(t).diff(t)")
         return eq_string
 
-    def solve_diff_eq_from_string(self, eq_string):
+    def solve_diff_eq_from_string(self, eq_string, initial_value=None):
         # Splitting the equation string into left-hand side and right-hand side
         lhs_str, rhs_str = eq_string.split("=")
 
@@ -48,8 +48,11 @@ class Ui_Diff_Egyenlet(object):
         # Creating the differential equation
         diff_eq = Eq(lhs, rhs)
 
-        # Solving the differential equation
-        solution = dsolve(diff_eq, x)
+        # Solving the differential equation with or without the initial condition
+        if initial_value is not None:
+            solution = dsolve(diff_eq, x, ics={x.subs(t, 0): initial_value})
+        else:
+            solution = dsolve(diff_eq, x)
 
         return solution
 
