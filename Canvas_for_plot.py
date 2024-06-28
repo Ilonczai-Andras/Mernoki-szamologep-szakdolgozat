@@ -131,7 +131,7 @@ class Canvas(FigureCanvas):
         dv = eval(func)
         dt = np.ones(dv.shape)
 
-        self.ax.quiver(x, t, dt, dv, color="b", label=f"dy/dx = {text}")
+        self.ax.quiver(x, t, dt, dv, color="b", label=f"x'(t) = {text}")
         self.ax.set_xlabel("t")
         self.ax.set_ylabel("y")
         self.ax.set_title("Íránymező " + text)
