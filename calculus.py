@@ -10,19 +10,54 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Canvas_for_plot import Canvas
-from sympy import oo, Sum, Symbol, Interval, sympify, limit, integrate, is_increasing, is_strictly_increasing, is_decreasing, is_monotonic, is_strictly_decreasing, diff
-from sympy import sin,cos,tan,log,atan,asin,acos,asinh,acosh,atanh,sinh,cosh,tanh,exp,Abs,sign,sqrt,sec,csc
+from sympy import (
+    oo,
+    Sum,
+    Symbol,
+    Interval,
+    sympify,
+    limit,
+    integrate,
+    is_increasing,
+    is_strictly_increasing,
+    is_decreasing,
+    is_monotonic,
+    is_strictly_decreasing,
+    diff,
+)
+from sympy import (
+    sin,
+    cos,
+    tan,
+    log,
+    atan,
+    asin,
+    acos,
+    asinh,
+    acosh,
+    atanh,
+    sinh,
+    cosh,
+    tanh,
+    exp,
+    Abs,
+    sign,
+    sqrt,
+    sec,
+    csc,
+)
 from sympy import pretty
 import re
 from math import pi
 
+
 class Ui_Calculus(object):
 
     def extract_variable(self, expression):
-        pattern = r'[a-zA-Z]+'
-        
+        pattern = r"[a-zA-Z]+"
+
         matches = re.findall(pattern, expression)
-        
+
         if matches:
             return matches[0]
         else:
@@ -30,7 +65,7 @@ class Ui_Calculus(object):
 
     def has_no_variables(self, func_str):
         # Define a regular expression pattern to match mathematical variables
-        var_pattern = r'[a-zA-Z]+'
+        var_pattern = r"[a-zA-Z]+"
         # Find all matches of variables in the function string
         variables = re.findall(var_pattern, func_str)
         # If no variables are found, return True
@@ -38,49 +73,49 @@ class Ui_Calculus(object):
 
     def replace_sympy_funcs(self, func_str):
         replacements = {
-            r'\b(ln)\b': 'log',
-            #trig
-            r'\bsin\b': 'sin',
-            r'\bcos\b': 'cos',
-            r'\btan\b': 'tan',
-            #Iverzek
-            r'\barctan\b': 'atan',
-            r'\barcsin\b': 'asin',
-            r'\barccos\b': 'acos',
-            #inverze hyperbolic
-            r'\barcsinh\b': 'asinh',
-            r'\barccosh\b': 'acosh',
-            r'\barctanh\b': 'atanh',
-            #hyperbolic
-            r'\bsinh\b': 'sinh',
-            r'\bcosh\b': 'cosh',
-            r'\btanh\b': 'tanh',
-            #exp
-            r'\bexp\b': 'exp',
-            #abs
-            r'\babs\b': 'Abs',
-            #sign(x)
-            r'\sign\b': 'sign',
-            #gyok
-            r'\bsqrt\b': 'sqrt',
-            #szekánsok
-            r'\bsec\b': 'sec',
-            r'\bcsc\b': 'csc'
+            r"\b(ln)\b": "log",
+            # trig
+            r"\bsin\b": "sin",
+            r"\bcos\b": "cos",
+            r"\btan\b": "tan",
+            # Iverzek
+            r"\barctan\b": "atan",
+            r"\barcsin\b": "asin",
+            r"\barccos\b": "acos",
+            # inverze hyperbolic
+            r"\barcsinh\b": "asinh",
+            r"\barccosh\b": "acosh",
+            r"\barctanh\b": "atanh",
+            # hyperbolic
+            r"\bsinh\b": "sinh",
+            r"\bcosh\b": "cosh",
+            r"\btanh\b": "tanh",
+            # exp
+            r"\bexp\b": "exp",
+            # abs
+            r"\babs\b": "Abs",
+            # sign(x)
+            r"\sign\b": "sign",
+            # gyok
+            r"\bsqrt\b": "sqrt",
+            # szekánsok
+            r"\bsec\b": "sec",
+            r"\bcsc\b": "csc",
         }
 
         for pattern, np_func in replacements.items():
             func_str = re.sub(pattern, np_func, func_str)
 
         func_str = func_str.replace("^", "**")
-        
+
         return func_str
 
     def combobox_selector(self):
         also = 0
         felso = 0
-        
-        #pi
-        if 'pi' in self.lineEdit_2.text() or 'pi' in self.lineEdit_3.text():
+
+        # pi
+        if "pi" in self.lineEdit_2.text() or "pi" in self.lineEdit_3.text():
             also = int(int(self.lineEdit_2.text().split(" ")[0]) * pi)
 
             felso = int(int(self.lineEdit_3.text().split(" ")[0]) * pi)
@@ -88,59 +123,65 @@ class Ui_Calculus(object):
         else:
             also = sympify(self.lineEdit_2.text())
             felso = sympify(self.lineEdit_3.text())
-            #inf
+            # inf
             if sympify(self.lineEdit_2.text()) == -oo:
                 also = -1000000000
-            
+
             if sympify(self.lineEdit_3.text()) == oo:
                 felso = 1000000000
 
-            #nulla
+            # nulla
             if sympify(self.lineEdit_2.text()) == 0:
                 also = 0
-            
+
             if sympify(self.lineEdit_3.text()) == 0:
                 felso = 0
 
-            #nem nulla
+            # nem nulla
             if sympify(self.lineEdit_2.text()) != 0:
                 also = float(also)
-            
+
             if sympify(self.lineEdit_3.text()) != 0:
                 felso = float(felso)
 
         text = self.lineEdit.text()
-        x = Symbol('x', real=True)
+        x = Symbol("x", real=True)
 
         input = self.comboBox.currentText()
         interval = (also, felso)
 
         if input == "Növekvő":
-            res = True#is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = True  # is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
             if res == True:
                 self.label_2.setText(text + " növekvő")
             else:
                 self.label_2.setText(text + " nem növekvő")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Szigorúan növekvő":
-            res = is_strictly_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = is_strictly_increasing(
+                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+            )
             if res == True:
                 self.label_2.setText(text + " szigorúan növekvő")
             else:
                 self.label_2.setText(text + " szigorúan nem növekvő")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Csökkenő":
-            res = is_decreasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = is_decreasing(
+                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+            )
             if res == True:
                 self.label_2.setText(text + " Csökkenő")
             else:
                 self.label_2.setText(text + " nem csökkenő")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Szigorúan csökkenő":
-            res = is_strictly_decreasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = is_strictly_decreasing(
+                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+            )
             if res == True:
                 self.label_2.setText(text + " szigorúan csökkenő")
             else:
@@ -148,13 +189,15 @@ class Ui_Calculus(object):
             self.canvas.plot_function(text, interval)
 
         if input == "Monoton":
-            res = is_monotonic(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+            res = is_monotonic(
+                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+            )
             if res == True:
                 self.label_2.setText(text + " Monoton")
             else:
                 self.label_2.setText(text + " nem monoton")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Divergens":
             res = limit(sympify(text), x, oo)
             if res == oo:
@@ -162,7 +205,7 @@ class Ui_Calculus(object):
             else:
                 self.label_2.setText(text + " Nem divergens")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Határérték":
             if self.has_no_variables(text):
                 self.label_2.setText(text + " -> " + str(eval(text)))
@@ -170,37 +213,38 @@ class Ui_Calculus(object):
                 res = limit(sympify(text), x, oo)
                 self.label_2.setText(text + " -> " + str(res))
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Konvergens":
 
-            res = (Sum(text, (x, also, felso)).is_convergent())
+            res = Sum(text, (x, also, felso)).is_convergent()
             if res:
                 self.label_2.setText(text + " a sorozat konvergál.")
             else:
                 self.label_2.setText(text + " a sorozat nem konvergál.")
             self.canvas.plot_function(text, interval)
-        
+
         if input == "Deriválás":
             tmp = eval(self.replace_sympy_funcs(text))
-            #print(tmp)
+            # print(tmp)
             res = diff((tmp), x)
             self.label_2.setText(str(res))
             res_str = str(res)
             self.canvas.plot_function(res_str, interval)
-        
+
         if input == "Integrálás":
-            x = Symbol('x')
+            x = Symbol("x")
             res = integrate(self.replace_sympy_funcs(text), x)
-            self.label_2.setText(str(res).replace("**", "^") +" + C")
+            self.label_2.setText(str(res).replace("**", "^") + " + C")
             res_str = str(res)
             try:
                 self.canvas.plot_function(res_str, interval)
             except Exception as e:
                 print(e)
+
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
-        
+
     def setupUi(self, Calculus, MainWindow):
 
         self.applyStylesheet(Calculus)
@@ -222,7 +266,10 @@ class Ui_Calculus(object):
         self.lineEdit_3.setGeometry(QtCore.QRect(380, 10, 61, 51))
         self.lineEdit_3.setObjectName("lineEdit_3")
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda:self.back_to_mainwindow(Calculus, MainWindow))
+        self.pushButton_2 = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.back_to_mainwindow(Calculus, MainWindow),
+        )
         self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
         self.pushButton_2.setObjectName("pushButton_2")
 
@@ -267,7 +314,9 @@ class Ui_Calculus(object):
         font.setPointSize(12)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.combobox_selector())
+        self.pushButton = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.combobox_selector()
+        )
         self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
         self.pushButton.setObjectName("pushButton")
 
@@ -327,7 +376,6 @@ class Ui_Calculus(object):
         """
         Calculus.setStyleSheet(stylesheet)
 
-
     def retranslateUi(self, Calculus):
         _translate = QtCore.QCoreApplication.translate
         Calculus.setWindowTitle(_translate("Calculus", "MainWindow"))
@@ -341,7 +389,9 @@ class Ui_Calculus(object):
         self.comboBox.setItemText(7, _translate("Calculus", "Konvergens"))
         self.comboBox.setItemText(8, _translate("Calculus", "Deriválás"))
         self.comboBox.setItemText(9, _translate("Calculus", "Integrálás"))
-        self.label.setText(_translate("Calculus", "Válaszd ki a végrahajtandó műveletet"))
+        self.label.setText(
+            _translate("Calculus", "Válaszd ki a végrahajtandó műveletet")
+        )
         self.label_2.setText(_translate("Calculus", "Erdemény"))
         self.label_3.setText(_translate("Calculus", "Határok:"))
         self.lineEdit_2.setText(_translate("Calculus", "-10"))
@@ -352,6 +402,7 @@ class Ui_Calculus(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Calculus = QtWidgets.QMainWindow()
     ui = Ui_Calculus()
