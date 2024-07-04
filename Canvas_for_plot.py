@@ -123,17 +123,21 @@ class Canvas(FigureCanvas):
         print(func)
 
         nt, nv = 0.5, 0.5
-        t = np.arange(-4, 4, nt)
-        v = np.arange(-4, 4, nv)
-        x, t = np.meshgrid(t, v)
+        t = np.arange(-2, 2, nt)
+        v = np.arange(-2, 2, nv)
+        y, x = np.meshgrid(t, v)
 
         print(func)
         dv = eval(func)
         dt = np.ones(dv.shape)
 
-        self.ax.quiver(x, t, dt, dv, color="b", label=f"x'(t) = {text}")
-        self.ax.set_xlabel("t")
-        self.ax.set_ylabel("y")
+        arrow_scale = 100  # Controls the length of the arrows
+        arrow_width = 0.002  # Controls the thickness of the arrows
+
+        self.ax.quiver(x, y, dt, dv, color="b", label=f"y'(t) = {text}", scale=arrow_scale, width=arrow_width)
+
+        self.ax.set_xlabel("x")
+        self.ax.set_ylabel("x")
         self.ax.set_title("Íránymező " + text)
         self.ax.legend()
         self.fig.canvas.draw()
