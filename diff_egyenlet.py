@@ -7,14 +7,59 @@ from Canvas_for_plot import Canvas
 
 class Ui_Diff_Egyenlet(object):
 
+    def is_first_order_ode(self, func):
+        lhs, rhs = func.split("=")
+        print(lhs, rhs)
+
+        return "y'(x)" in lhs and "y'(x)" not in rhs
+
+    def extract_number_from_string(self,s):
+        """
+        This function extracts and returns a number from a string.
+        The string is assumed to contain only one number.
+
+        :param s: The input string containing one number
+        :return: The extracted number as an integer
+        """
+        import re
+
+        # Use regular expression to find the number in the string
+        match = re.search(r'\d+', s)
+        
+        # If a match is found, return it as an integer
+        if match:
+            return int(match.group())
+        else:
+            raise ValueError("No number found in the string")
+
     def show_diff_equation_result(self, string):
         try:
             replaced = self.replace_nth_derivative(string)
-            solution = self.solve_diff_eq_from_string(replaced)
+            print(f"bemenet: {string} {self.is_first_order_ode(string)}")
+            
+            initial_value_problem = ""
+
+            if self.lineEdit.text() != "":
+                initial_value_problem = self.lineEdit.text().split("=")
+                initial_value_problem[0] = self.extract_number_from_string(initial_value_problem[0])
+                initial_value_problem[1] = int(initial_value_problem[1])
+
+                solution = self.solve_diff_eq_from_string(replaced, initial_value=initial_value_problem)
+                print(initial_value_problem)
+            else:
+                solution = self.solve_diff_eq_from_string(replaced)
+                
+            if self.is_first_order_ode(string):
+                self.canvas.show()
+                self.canvas.direction_field(replaced)
+            else:
+                self.canvas.hide()
+
             latex_solution = pretty(solution)
             self.label_2.setText(f"{latex_solution}")
-            self.label_2.setAlignment(QtCore.Qt.AlignCenter)  # Center the text
-            self.canvas.direction_field(replaced)
+            self.label_4.setText(f"{solution.rhs}")
+            self.label_2.setAlignment(QtCore.Qt.AlignCenter)
+
         except Exception as e:
             self.label_2.setText(
                 "Hiba történt! Ellenőrizze a beírt differenciél egyenletet"
@@ -23,23 +68,22 @@ class Ui_Diff_Egyenlet(object):
 
     def replace_nth_derivative(self, eq_string):
         # Handle third-order derivatives first
-        if "x'''(t)" in eq_string:
-            eq_string = eq_string.replace("x'''(t)", "x(t).diff(t, t, t)")
+        if "y'''(x)" in eq_string:
+            eq_string = eq_string.replace("y'''(x)", "y(x).diff(x,x,x)")
         # Handle second-order derivatives next
-        if "x''(t)" in eq_string:
-            eq_string = eq_string.replace("x''(t)", "x(t).diff(t, t)")
+        if "y''(x)" in eq_string:
+            eq_string = eq_string.replace("y''(x)", "y(x).diff(x,x)")
         # Handle first-order derivatives last
-        if "x'(t)" in eq_string:
-            eq_string = eq_string.replace("x'(t)", "x(t).diff(t)")
+        if "y'(x)" in eq_string:
+            eq_string = eq_string.replace("y'(x)", "y(x).diff(x)")
         return eq_string
 
     def solve_diff_eq_from_string(self, eq_string, initial_value=None):
         # Splitting the equation string into left-hand side and right-hand side
         lhs_str, rhs_str = eq_string.split("=")
-
-        # Parsing the variables and functions from the equation string
-        t = symbols("t")
-        x = Function("x")(t)
+    
+        x = symbols("x")
+        y = Function("y")(x)
 
         # Parsing the left-hand side and right-hand side of the equation
         lhs = parse_expr(lhs_str)
@@ -50,9 +94,9 @@ class Ui_Diff_Egyenlet(object):
 
         # Solving the differential equation with or without the initial condition
         if initial_value is not None:
-            solution = dsolve(diff_eq, x, ics={x.subs(t, 0): initial_value})
+            solution = dsolve(diff_eq, y, ics={y.subs(x, initial_value[0]): initial_value[1]})
         else:
-            solution = dsolve(diff_eq, x)
+            solution = dsolve(diff_eq, y)
 
         return solution
 
@@ -99,16 +143,25 @@ class Ui_Diff_Egyenlet(object):
         self.applyStylesheet(Diff_Egyenlet)
         Diff_Egyenlet.setObjectName("Diff_Egyenlet")
         Diff_Egyenlet.resize(800, 760)
+        Diff_Egyenlet.setMinimumSize(QtCore.QSize(800, 760))
+        Diff_Egyenlet.setMaximumSize(QtCore.QSize(800, 760))
         self.centralwidget = QtWidgets.QWidget(Diff_Egyenlet)
         self.centralwidget.setObjectName("centralwidget")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(9, 130, 780, 250))
+        self.label_2.setGeometry(QtCore.QRect(10, 130, 780, 141))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(10, 280, 781, 54))
+        self.label_4.setFont(font)
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName("label_4")
+        self.label_4.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.pushButton = QtWidgets.QPushButton(
             self.centralwidget,
@@ -127,11 +180,16 @@ class Ui_Diff_Egyenlet(object):
         self.pushButton_2.setObjectName("pushButton_2")
 
         self.canvas = Canvas(self.centralwidget)
-        self.canvas.setGeometry(QtCore.QRect(9, 390, 781, 291))
+        self.canvas.setGeometry(QtCore.QRect(9, 340, 781, 341))
 
         self.text_edit = QTextEdit(self.centralwidget)
         self.text_edit.setGeometry(QtCore.QRect(250, 10, 391, 101))
         self.text_edit.setObjectName("text_edit")
+
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(660, 10, 75, 51))
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setPlaceholderText("Kezdeti érték probléma")
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(10, 10, 231, 41))
