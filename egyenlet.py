@@ -105,23 +105,31 @@ class Ui_Egyenlet(object):
 
     def one_func(self, one_func, replaced_func):
         try:
-            splitted_func = one_func.replace(" ", "").split("=")
-            symbs = self.extract_variable(replaced_func)
-            #print(symbs)
+            inequality = ["<=", ">=", "<", ">"]
 
-            equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
+            if inequality[0] in one_func or inequality[1] in one_func:
+                symbs = self.extract_variable(replaced_func)
+                result = solve(one_func, tuple(symbs))
+                self.label_2.setText(pretty(result))
+            else:
 
-            rearranged_equation = equation.lhs - equation.rhs
-            result = solve(rearranged_equation, tuple(symbs))
-            
-            numerical_results = [sol.evalf() for sol in result]
-            rounded_results = [complex(round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)) for sol in numerical_results]
+                splitted_func = one_func.replace(" ", "").split("=")
+                symbs = self.extract_variable(replaced_func)
+                #print(symbs)
 
-            formatted_results = [f"{sol.real:.2f} + {sol.imag:.2f}i" if sol.imag >= 0 else f"{sol.real:.2f} - {abs(sol.imag):.2f}i" for sol in rounded_results]
-            
-            result_text = "\n".join(formatted_results)
+                equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
 
-            self.label_2.setText(result_text.replace("**", "^"))
+                rearranged_equation = equation.lhs - equation.rhs
+                result = solve(rearranged_equation, tuple(symbs))
+                
+                numerical_results = [sol.evalf() for sol in result]
+                rounded_results = [complex(round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)) for sol in numerical_results]
+
+                formatted_results = [f"{sol.real:.2f} + {sol.imag:.2f}i" if sol.imag >= 0 else f"{sol.real:.2f} - {abs(sol.imag):.2f}i" for sol in rounded_results]
+                
+                result_text = "\n".join(formatted_results)
+
+                self.label_2.setText(result_text.replace("**", "^"))
 
         except SympifyError as e:
             print("Sympify error:", e)
