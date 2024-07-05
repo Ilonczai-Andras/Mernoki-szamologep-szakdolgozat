@@ -1,15 +1,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTextEdit
-from sympy import pretty, symbols, Function, Eq, diff, dsolve
+from sympy import false, pretty, symbols, Function, Eq, diff, dsolve, sympify, pprint, true
 from sympy.parsing.sympy_parser import parse_expr
 from Canvas_for_plot import Canvas
 
 
 class Ui_Diff_Egyenlet(object):
 
+    direction_field_showed = true
+
     def is_first_order_ode(self, func):
         lhs, rhs = func.split("=")
-        print(lhs, rhs)
 
         return "y'(x)" in lhs and "y'(x)" not in rhs
 
@@ -33,38 +34,36 @@ class Ui_Diff_Egyenlet(object):
             raise ValueError("No number found in the string")
 
     def show_diff_equation_result(self, string):
-        try:
-            replaced = self.replace_nth_derivative(string)
-            print(f"bemenet: {string} {self.is_first_order_ode(string)}")
+        replaced = self.replace_nth_derivative(string)
+        
+        initial_value_problem = ""
+
+        if self.lineEdit.text() != "":
+            initial_value_problem = self.lineEdit.text().split("=")
+            initial_value_problem[0] = self.extract_number_from_string(initial_value_problem[0])
+            initial_value_problem[1] = int(initial_value_problem[1])
+
+            solution = self.solve_diff_eq_from_string(replaced, initial_value=initial_value_problem)
+        else:
+            solution = self.solve_diff_eq_from_string(replaced)
+
+        self.canvas.clear()
+
+        print(f"rhs: {str(solution.rhs)}")
+        print(f"replaced: {replaced}")
+        self.canvas.plot_function(str(solution.rhs), (-10,10), C=[1,1,1],clear=false, df=true, df_func=replaced)
+
+        # try:
             
-            initial_value_problem = ""
+        #     self.canvas.direction_field(replaced, clear=false)
+        # except Exception as e:
+        #     print(e)
 
-            if self.lineEdit.text() != "":
-                initial_value_problem = self.lineEdit.text().split("=")
-                initial_value_problem[0] = self.extract_number_from_string(initial_value_problem[0])
-                initial_value_problem[1] = int(initial_value_problem[1])
+        latex_solution = pretty(solution)
+        self.label_2.setText(f"{latex_solution}")
+        self.label_4.setText(f"{solution.rhs}")
+        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
 
-                solution = self.solve_diff_eq_from_string(replaced, initial_value=initial_value_problem)
-                print(initial_value_problem)
-            else:
-                solution = self.solve_diff_eq_from_string(replaced)
-                
-            if self.is_first_order_ode(string):
-                self.canvas.show()
-                self.canvas.direction_field(replaced)
-            else:
-                self.canvas.hide()
-
-            latex_solution = pretty(solution)
-            self.label_2.setText(f"{latex_solution}")
-            self.label_4.setText(f"{solution.rhs}")
-            self.label_2.setAlignment(QtCore.Qt.AlignCenter)
-
-        except Exception as e:
-            self.label_2.setText(
-                "Hiba történt! Ellenőrizze a beírt differenciél egyenletet"
-            )
-            print(e)  # Print the exception for debugging
 
     def replace_nth_derivative(self, eq_string):
         # Handle third-order derivatives first
@@ -79,25 +78,19 @@ class Ui_Diff_Egyenlet(object):
         return eq_string
 
     def solve_diff_eq_from_string(self, eq_string, initial_value=None):
-        # Splitting the equation string into left-hand side and right-hand side
-        lhs_str, rhs_str = eq_string.split("=")
-    
+
         x = symbols("x")
         y = Function("y")(x)
 
-        # Parsing the left-hand side and right-hand side of the equation
-        lhs = parse_expr(lhs_str)
-        rhs = parse_expr(rhs_str)
-
-        # Creating the differential equation
-        diff_eq = Eq(lhs, rhs)
+        eq1 = sympify(eq_string.split("=")[0])
+        eq2 = sympify(eq_string.split("=")[1])
+        rearranged_equation = eq1 - eq2
 
         # Solving the differential equation with or without the initial condition
         if initial_value is not None:
-            solution = dsolve(diff_eq, y, ics={y.subs(x, initial_value[0]): initial_value[1]})
+            solution = dsolve(rearranged_equation, y, ics={y.subs(x, initial_value[0]): initial_value[1]})
         else:
-            solution = dsolve(diff_eq, y)
-
+            solution = dsolve(rearranged_equation)
         return solution
 
     def applyStylesheet(self, Diff_Egyenlet):
