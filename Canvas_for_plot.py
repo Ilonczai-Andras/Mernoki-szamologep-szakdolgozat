@@ -1,12 +1,13 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import re
 import numpy as np
 import math
 
-
 class Canvas(FigureCanvas):
-
     text = ""
     func = ""
 
@@ -15,6 +16,12 @@ class Canvas(FigureCanvas):
         super().__init__(self.fig)
         self.setParent(parent)
         self.ax = self.fig.add_subplot(1, 1, 1)
+        
+        self.interval_x = [-10, 10]  # Initial x interval
+        self.interval_y = [-10, 10]  # Initial y interval
+        self.zoom_factor = 0.1  # Zoom factor
+        self.df = False
+        self.df_func = ""
 
     def f(self, x):
         return eval(self.text)
@@ -77,22 +84,32 @@ class Canvas(FigureCanvas):
         jumps = np.where(diff > threshold)[0]
         return jumps
 
-    def plot_function(self, func_str, interval):
+    def clear(self):
         self.ax.clear()
 
+    def plot_function(self, func_str, interval_x=None, interval_y=None, clear=True, C=None, df=False, df_func=""):
+        if interval_x is None:
+            interval_x = self.interval_x
+        if interval_y is None:
+            interval_y = self.interval_y
+        
         self.func = func_str.replace("A", "a")
-        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace(
-            "A", "a"
-        )
-        print(func_str)
+        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a")
         self.text = func_str
+        self.df = df
+        self.df_func = df_func
 
-        x_vals = np.linspace(interval[0], interval[1], 10000)
+        if C is not None:
+            self.text = self.text.replace("C1", str(C[0]))
+            self.text = self.text.replace("C2", str(C[1]))
+            self.text = self.text.replace("C3", str(C[2]))
+
+        x_vals = np.linspace(interval_x[0], interval_x[1], 10000)
+        y_vals = 0
 
         if func_str.isdigit():
             y_vals = np.full_like(x_vals, int(func_str))
         else:
-            # Ensure that y_vals is a 1D array
             y_vals = np.zeros_like(x_vals)
             for i, x in enumerate(x_vals):
                 y_vals[i] = self.f(x)
@@ -102,43 +119,65 @@ class Canvas(FigureCanvas):
             large_jumps = self.check_for_large_jumps(y_vals, threshold)
             for idx in large_jumps:
                 y_vals[idx] = np.nan
-            self.ax.set_ylim(-10, 10)
+            self.ax.set_ylim(interval_y[0], interval_y[1])
         else:
             pass
 
+        if clear:
+            self.ax.clear()
+
         self.ax.plot(x_vals, y_vals, label=f"y = {self.func}")
         self.ax.set_xlabel("x")
-        self.ax.set_xlim(interval[0], interval[1])
+        self.ax.set_xlim(interval_x[0], interval_x[1])
+        self.ax.set_ylim(interval_y[0], interval_y[1])
         self.ax.set_ylabel("f(x)")
         self.ax.grid(True)
         self.ax.legend()
         self.fig.savefig("plot.png")
 
-    def direction_field(self, func_str):
-        self.ax.clear()
+        if df:
+            self.direction_field(df_func, clear=False)
 
+    def direction_field(self, func_str, clear=True):
         text = func_str.split("=")[1]
         func = func_str.split("=")[1]
         func = self.replace_numpy_funcs(func)
-        print(func)
 
-        nt, nv = 0.5, 0.5
-        t = np.arange(-2, 2, nt)
-        v = np.arange(-2, 2, nv)
+        nt, nv = 3.5, 3.5
+        t = np.arange(-10, 10, nt)
+        v = np.arange(-10, 10, nv)
         y, x = np.meshgrid(t, v)
 
-        print(func)
         dv = eval(func)
         dt = np.ones(dv.shape)
 
         arrow_scale = 100  # Controls the length of the arrows
         arrow_width = 0.002  # Controls the thickness of the arrows
 
-        self.ax.quiver(x, y, dt, dv, color="b", label=f"y'(t) = {text}", scale=arrow_scale, width=arrow_width)
+        if clear:
+            self.ax.clear()
 
+        self.ax.quiver(x, y, dt, dv, color="b", label=f"y'(t) = {text}", scale=arrow_scale, width=arrow_width)
         self.ax.set_xlabel("x")
-        self.ax.set_ylabel("x")
+        self.ax.set_ylabel("y")
+        self.ax.set_ylim(self.interval_y[0], self.interval_y[1])
+        self.ax.set_xlim(self.interval_x[0], self.interval_x[1])
         self.ax.set_title("Íránymező " + text)
         self.ax.legend()
         self.fig.canvas.draw()
         self.draw_idle()
+
+    def wheelEvent(self, event):
+        
+        if event.angleDelta().y() > 0:  # Scroll up
+            self.interval_x[0] /= (1 + self.zoom_factor)
+            self.interval_x[1] /= (1 + self.zoom_factor)
+            self.interval_y[0] /= (1 + self.zoom_factor)
+            self.interval_y[1] /= (1 + self.zoom_factor)
+        else:  # Scroll down
+            self.interval_x[0] *= (1 + self.zoom_factor)
+            self.interval_x[1] *= (1 + self.zoom_factor)
+            self.interval_y[0] *= (1 + self.zoom_factor)
+            self.interval_y[1] *= (1 + self.zoom_factor)
+
+        self.plot_function(self.func, self.interval_x, self.interval_y, C=[1,1,1], df=self.df, df_func=self.df_func)
