@@ -117,7 +117,7 @@ class Ui_Prob_and_Stat(object):
             elif operation_type == "Sűrűség függvény":
                 self.label_2.setText(str(density(X)(x)))
                 func_str = self.label_2.text()
-                self.canvas.plot_function(func_str, (-15, 15))
+                self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
             #
 
         elif distribution == "Geometriai":
@@ -143,7 +143,7 @@ class Ui_Prob_and_Stat(object):
                 elif operation_type == "Sűrűség függvény":
                     self.label_2.setText(str(density(X)(x)))
                     func_str = self.label_2.text()
-                    self.canvas.plot_function(func_str, (-15, 15))
+                    self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
 
         elif distribution == "Poisson":
             self.label_2.setText("")
@@ -165,7 +165,7 @@ class Ui_Prob_and_Stat(object):
             elif operation_type == "Sűrűség függvény":
                 self.label_2.setText(str(density(X)(x)))
                 func_str = self.label_2.text()
-                self.canvas.plot_function(func_str, (0, 15))
+                self.canvas.plot_function(func_str, interval_x=(0, 15), interval_y=(0,1))
 
         elif distribution == "Logaritmikus":
             self.label_2.setText("")
