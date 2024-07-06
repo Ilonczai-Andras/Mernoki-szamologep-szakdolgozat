@@ -47,7 +47,7 @@ class Ui_Diff_Egyenlet(object):
         else:
             solution = self.solve_diff_eq_from_string(replaced)
 
-        self.canvas.clear()
+        self.canvas.clear((-100, 100), (-10, 10))
 
         print(f"rhs: {str(solution.rhs)}")
         print(f"replaced: {replaced}")
