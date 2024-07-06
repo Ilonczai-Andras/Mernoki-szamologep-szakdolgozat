@@ -214,10 +214,13 @@ class Ui_Egyenlet(object):
                         
                         # Separate real and complex numbers
                         real_common_area = [float(val) for val in self.common_area if val.is_real]
+                        complex_common_area = [val for val in self.common_area if not val.is_real]
 
                         print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
                         self.canvas.plot_area_between_functions(real_common_area)
-
+                        if complex_common_area:
+                            print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
+                        break
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
