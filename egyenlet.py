@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from Canvas_for_plot import Canvas
 from PyQt5.QtWidgets import QTextEdit
 from sympy import *
 from numpy import *
@@ -18,38 +19,40 @@ import re
 
 class Ui_Egyenlet(object):
 
+    common_area = []
+
     def replace_trigonometric_funcs(self, func_str):
         replacements = {
             # log
-            r'\blog\b': '',
-            r'\bln\b': '',
+            r"\blog\b": "",
+            r"\bln\b": "",
             # Inverse
-            r'\barctan\b': '',
-            r'\barcsin\b': '',
-            r'\barccos\b': '',
+            r"\barctan\b": "",
+            r"\barcsin\b": "",
+            r"\barccos\b": "",
             # Inverse hyperbolic
-            r'\barcsinh\b': '',
-            r'\barccosh\b': '',
-            r'\barctanh\b': '',
+            r"\barcsinh\b": "",
+            r"\barccosh\b": "",
+            r"\barctanh\b": "",
             # trig
-            r'\bsin\b': '',
-            r'\bcos\b': '',
-            r'\btan\b': '',
+            r"\bsin\b": "",
+            r"\bcos\b": "",
+            r"\btan\b": "",
             # hyperbolic
-            r'\bsinh\b': '',
-            r'\bcosh\b': '',
-            r'\btanh\b': '',
+            r"\bsinh\b": "",
+            r"\bcosh\b": "",
+            r"\btanh\b": "",
             # exp
-            r'\bexp\b': '',
+            r"\bexp\b": "",
             # abs
-            r'\babs\b': '',
+            r"\babs\b": "",
             # sign(x)
-            r'\bsign\b': '',
-            #gyok
-            r'\bsqrt\b': '',
-            #szekánsok
-            r'\bsec\b': '',
-            r'\bcsc\b': ''
+            r"\bsign\b": "",
+            # gyok
+            r"\bsqrt\b": "",
+            # szekánsok
+            r"\bsec\b": "",
+            r"\bcsc\b": "",
         }
 
         for pattern, replacement in replacements.items():
@@ -65,68 +68,121 @@ class Ui_Egyenlet(object):
                 valtozok.append(i.lower())
 
         return valtozok
-    
+
     def number_of_lines(self, expression):
         res = []
         number = 0
 
         for line in expression.splitlines():
-                if line.strip():
-                    number += 1
-                    res.append(line)
+            if line.strip():
+                number += 1
+                res.append(line)
 
         res.append(number)
         return res
-    
+
+    def from_OrAnd_to_set(self, expr):
+        numbers = set()
+        self._extract_numbers(expr, numbers)
+        return numbers
+
+    def _extract_numbers(self, expr, numbers):
+        # Ensure we are dealing with logical or relational expressions
+        if isinstance(expr, (Or, And)):
+            for arg in expr.args:
+                self._extract_numbers(arg, numbers)
+        elif expr.is_Relational:
+            lhs, rhs = expr.lhs, expr.rhs
+            # Check if lhs is a number and not -oo or oo
+            if lhs.is_number and lhs != -oo and lhs != oo:
+                numbers.add(lhs)
+            # Check if rhs is a number and not -oo or oo
+            if rhs.is_number and rhs != -oo and rhs != oo:
+                numbers.add(rhs)
     def system_of_equations(self, funcs):
-        number_of_rows = funcs.pop()  # Remove the last element which is the number of equations
+        number_of_rows = (
+            funcs.pop()
+        )  # Remove the last element which is the number of equations
         symbols_set = set()
         equations = []
 
         for eq_str in funcs:
-            lhs, rhs = eq_str.split('=')
+            lhs, rhs = eq_str.split("=")
             lhs_sympy = sympify(lhs.strip())
             rhs_sympy = sympify(rhs.strip())
-            symbols_in_eq = self.extract_variable(self.replace_trigonometric_funcs(lhs)) + self.extract_variable(self.replace_trigonometric_funcs(rhs))
+            symbols_in_eq = self.extract_variable(
+                self.replace_trigonometric_funcs(lhs)
+            ) + self.extract_variable(self.replace_trigonometric_funcs(rhs))
             symbols_set.update(symbols_in_eq)
             equations.append(Eq(lhs_sympy, rhs_sympy))
 
         symbols_list = list(symbols_set)
-        symbol_objects = symbols(' '.join(symbols_list))
+        symbol_objects = symbols(" ".join(symbols_list))
 
         # Solve the system of equations
         solution = solve(equations, symbol_objects)
-        
+
         # Format the solution to have each result on a new line
-        formatted_solution = '\n'.join([str(sol) for sol in solution])
+        formatted_solution = "\n".join([str(sol) for sol in solution])
         print("for_sol: ", formatted_solution)
-        
+
         return formatted_solution
 
     def one_func(self, one_func, replaced_func):
         try:
             inequality = ["<=", ">=", "<", ">"]
+            inequality_type = None
 
-            if inequality[0] in one_func or inequality[1] in one_func:
+            for ineq in inequality:
+                if ineq in one_func:
+                    inequality_type = ineq
+                    break
+
+            if inequality_type:
                 symbs = self.extract_variable(replaced_func)
                 result = solve(one_func, tuple(symbs))
-                self.label_2.setText(pretty(result))
-            else:
+                print(f"ineq: {result}")
+                print(f"type: {type(result)}")
 
+                inequality_results = self.from_OrAnd_to_set(result)
+                x_intervals = sorted(list(inequality_results))
+
+                for i in inequality_results:
+                    self.common_area.append(i)
+                print(f"vagyés: {self.from_OrAnd_to_set(result)}")
+
+                self.label_2.setText(pretty(result))
+
+                # Call plot_area_between_functions with intervals and inequality type
+                self.canvas.plot_area_between_functions(x_intervals, inequality_type)
+            else:
                 splitted_func = one_func.replace(" ", "").split("=")
                 symbs = self.extract_variable(replaced_func)
-                #print(symbs)
 
                 equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
 
                 rearranged_equation = equation.lhs - equation.rhs
                 result = solve(rearranged_equation, tuple(symbs))
-                
-                numerical_results = [sol.evalf() for sol in result]
-                rounded_results = [complex(round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)) for sol in numerical_results]
 
-                formatted_results = [f"{sol.real:.2f} + {sol.imag:.2f}i" if sol.imag >= 0 else f"{sol.real:.2f} - {abs(sol.imag):.2f}i" for sol in rounded_results]
-                
+                numerical_results = [sol.evalf() for sol in result]
+                rounded_results = [
+                    complex(
+                        round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)
+                    )
+                    for sol in numerical_results
+                ]
+
+                formatted_results = [
+                    (
+                        f"{sol.real:.2f} + {sol.imag:.2f}i"
+                        if sol.imag >= 0
+                        else f"{sol.real:.2f} - {abs(sol.imag):.2f}i"
+                    )
+                    for sol in rounded_results
+                ]
+                print(f"Numerical res: {numerical_results}")
+                for i in numerical_results:
+                    self.common_area.append(i)
                 result_text = "\n".join(formatted_results)
 
                 self.label_2.setText(result_text.replace("**", "^"))
@@ -138,14 +194,35 @@ class Ui_Egyenlet(object):
             print(x)
             self.label_2.setText("An error occurred!")
 
+
+
     def combobox_selector(self):
         input_text = self.comboBox.currentText()
         function_text = self.text_edit.toPlainText().lower()
         number_of_rows = self.number_of_lines(function_text)
+        inequality = ["<=", ">=", "<", ">", "="]
 
         if input_text == "Egyenlet":
-            if len(number_of_rows) == 2 :
+            if len(number_of_rows) == 2:
+                self.common_area = []
                 self.one_func(function_text, self.replace_trigonometric_funcs(function_text).replace("sqrt", ""))
+                for ineq in inequality:
+                    if ineq in function_text:
+                        self.canvas.clear((-100, 100), (-10, 10))
+                        self.canvas.plotted_functions = []
+                        lhs, rhs = function_text.split(ineq)
+                        print(lhs, rhs)
+                        self.canvas.plot_function(lhs, (-100, 100), clear=False)
+                        self.canvas.store_function(lhs, (-100, 100), self.canvas.interval_y, None, False, "")
+                        self.canvas.plot_function(rhs, (-100, 100), clear=False)
+                        self.canvas.store_function(rhs, (-100, 100), self.canvas.interval_y, None, False, "")
+                        
+                        # Convert sympy types to float
+                        self.common_area = [float(val) for val in self.common_area]
+                        
+                        print(f"Calling plot_area_between_functions with {self.common_area}")  # Debug statement
+                        self.canvas.plot_area_between_functions(self.common_area, ineq)
+                        break
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
@@ -156,7 +233,8 @@ class Ui_Egyenlet(object):
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
-    
+
+
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
@@ -209,11 +287,12 @@ class Ui_Egyenlet(object):
         """
         Egyenlet.setStyleSheet(stylesheet)
 
-
     def setupUi(self, Egyenlet, MainWindow):
         self.applyStylesheet(Egyenlet)
         Egyenlet.setObjectName("Egyenlet")
-        Egyenlet.resize(800, 600)
+        Egyenlet.resize(800, 760)
+        Egyenlet.setMinimumSize(QtCore.QSize(800, 760))
+        Egyenlet.setMaximumSize(QtCore.QSize(800, 760))
         self.centralwidget = QtWidgets.QWidget(Egyenlet)
         self.centralwidget.setObjectName("centralwidget")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
@@ -233,21 +312,30 @@ class Ui_Egyenlet(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 200, 780, 290))
+        self.label_2.setGeometry(QtCore.QRect(10, 130, 780, 200))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
-        self.label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_2.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter
+        )
         self.label_2.setObjectName("label_2")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
+        self.canvas = Canvas(self.centralwidget)
+        self.canvas.setGeometry(QtCore.QRect(9, 340, 781, 341))
 
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.combobox_selector())
+        self.pushButton = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.combobox_selector()
+        )
         self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
         self.pushButton.setObjectName("pushButton")
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda:self.back_to_mainwindow(Egyenlet, MainWindow))
-        self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
+        self.pushButton_2 = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.back_to_mainwindow(Egyenlet, MainWindow),
+        )
+        self.pushButton_2.setGeometry(QtCore.QRect(714, 690, 75, 51))
         self.pushButton_2.setObjectName("pushButton_2")
 
         self.text_edit = QTextEdit(self.centralwidget)
@@ -278,7 +366,9 @@ class Ui_Egyenlet(object):
         Egyenlet.setWindowTitle(_translate("Egyenlet", "Egyenlet"))
         self.comboBox.setItemText(0, _translate("Egyenlet", "Egyenlet"))
         self.comboBox.setItemText(1, _translate("Egyenlet", "Egyenletrendszerek"))
-        self.label.setText(_translate("Egyenlet", "Válaszd ki a végrahajtandó műveletet"))
+        self.label.setText(
+            _translate("Egyenlet", "Válaszd ki a végrahajtandó műveletet")
+        )
         self.label_2.setText(_translate("Egyenlet", "Eredmény"))
         self.pushButton.setText(_translate("Egyenlet", "Enter"))
         self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
@@ -287,6 +377,7 @@ class Ui_Egyenlet(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Egyenlet = QtWidgets.QMainWindow()
     ui = Ui_Egyenlet()
