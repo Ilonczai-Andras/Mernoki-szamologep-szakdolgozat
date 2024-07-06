@@ -234,7 +234,7 @@ class Canvas(FigureCanvas):
         if event.button() == Qt.LeftButton:
             self.is_panning = False
 
-    def plot_area_between_functions(self, x_intervals, inequality_type):
+    def plot_area_between_functions(self, x_intervals):
         if len(self.plotted_functions) < 2:
             print("Not enough functions to plot the area between them.")
             return
@@ -258,21 +258,13 @@ class Canvas(FigureCanvas):
 
         for i in range(0, len(x_intervals), 2):
             start = x_intervals[i]
-            end = x_intervals[i+1]
+            end = x_intervals[i + 1]
             mask = (x_vals >= start) & (x_vals <= end)
 
-            if inequality_type == "<":
-                mask = mask & (y_vals_func1 < y_vals_func2)
-            elif inequality_type == "<=":
-                mask = mask & (y_vals_func1 <= y_vals_func2)
-            elif inequality_type == ">":
-                mask = mask & (y_vals_func1 > y_vals_func2)
-            elif inequality_type == ">=":
-                mask = mask & (y_vals_func1 >= y_vals_func2)
-            
             self.ax.fill_between(x_vals, y_vals_func1, y_vals_func2, where=mask, color='red', alpha=0.5, label=f"Area between {func1_str} and {func2_str}")
 
         self.ax.legend(loc='lower right')
         self.fig.canvas.draw()
+
 
 
