@@ -141,15 +141,12 @@ class Ui_Egyenlet(object):
             if inequality_type:
                 symbs = self.extract_variable(replaced_func)
                 result = solve(one_func, tuple(symbs))
-                print(f"ineq: {result}")
-                print(f"type: {type(result)}")
 
                 inequality_results = self.from_OrAnd_to_set(result)
                 x_intervals = sorted(list(inequality_results))
 
                 for i in inequality_results:
                     self.common_area.append(i)
-                print(f"vagyés: {self.from_OrAnd_to_set(result)}")
 
                 self.label_2.setText(pretty(result))
 
@@ -180,7 +177,6 @@ class Ui_Egyenlet(object):
                     )
                     for sol in rounded_results
                 ]
-                print(f"Numerical res: {numerical_results}")
                 for i in numerical_results:
                     self.common_area.append(i)
                 result_text = "\n".join(formatted_results)
@@ -208,21 +204,20 @@ class Ui_Egyenlet(object):
                 self.one_func(function_text, self.replace_trigonometric_funcs(function_text).replace("sqrt", ""))
                 for ineq in inequality:
                     if ineq in function_text:
-                        self.canvas.clear((-100, 100), (-10, 10))
+                        self.canvas.clear((-10, 10), (-10, 10))
                         self.canvas.plotted_functions = []
                         lhs, rhs = function_text.split(ineq)
-                        print(lhs, rhs)
-                        self.canvas.plot_function(lhs, (-100, 100), clear=False)
-                        self.canvas.store_function(lhs, (-100, 100), self.canvas.interval_y, None, False, "")
-                        self.canvas.plot_function(rhs, (-100, 100), clear=False)
-                        self.canvas.store_function(rhs, (-100, 100), self.canvas.interval_y, None, False, "")
+                        self.canvas.plot_function(lhs, (-10, 10), clear=False)
+                        self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
+                        self.canvas.plot_function(rhs, (-10, 10), clear=False)
+                        self.canvas.store_function(rhs, (-10, 10), self.canvas.interval_y, None, False, "")
                         
-                        # Convert sympy types to float
-                        self.common_area = [float(val) for val in self.common_area]
-                        
-                        print(f"Calling plot_area_between_functions with {self.common_area}")  # Debug statement
-                        self.canvas.plot_area_between_functions(self.common_area, ineq)
-                        break
+                        # Separate real and complex numbers
+                        real_common_area = [float(val) for val in self.common_area if val.is_real]
+
+                        print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
+                        self.canvas.plot_area_between_functions(real_common_area)
+
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
@@ -233,7 +228,6 @@ class Ui_Egyenlet(object):
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
-
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
