@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Canvas_for_plot import Canvas
 from PyQt5.QtWidgets import QTextEdit
-from sympy import *
+from sympy import Or, And, sympify, fourier_transform, symbols, solve, Eq, SympifyError, oo, pretty, FourierTransform, fourier_series
 from numpy import *
 import sys
 import re
@@ -190,8 +190,6 @@ class Ui_Egyenlet(object):
             print(x)
             self.label_2.setText("An error occurred!")
 
-
-
     def combobox_selector(self):
         input_text = self.comboBox.currentText()
         function_text = self.text_edit.toPlainText().lower()
@@ -231,6 +229,49 @@ class Ui_Egyenlet(object):
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
+        if input_text == "Fourier transzformált":
+            if len(number_of_rows) == 2:
+                t, x = symbols('t x')
+                try:
+                    input_function = sympify(function_text)
+                    ft = fourier_transform(input_function, t, x)
+                    result = str(ft)
+                    print(result)
+                    if not isinstance(ft, FourierTransform):
+                        self.label_2.setText(result)
+                        self.label_2.setText(result )
+                        self.canvas.clear((-10, 10), (-10, 10))
+                        self.canvas.plotted_functions = []
+                        self.canvas.plot_function(result, (-10, 10), clear=False)
+                        self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
+                    else:
+                        self.label_2.setText("Nem számolható fourier")
+                except SympifyError as e:
+                    self.label_2.setText("Invalid function for Fourier transform")
+                    print(f"Sympify error: {e}")
+            else:
+                self.label_2.setText("Egy sort adj meg")
+                self.text_edit.setText("")
+        if input_text == "Fourier sor":
+            if len(number_of_rows) == 2:
+                try:
+                    input_function = sympify(function_text)
+                    series = fourier_series(input_function)
+                    result = str(series.truncate())
+                    print(result)
+                    self.label_2.setText(result )
+                    self.canvas.clear((-10, 10), (-10, 10))
+                    self.canvas.plotted_functions = []
+                    self.canvas.plot_function(result, (-10, 10), clear=False)
+                    # self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
+                        
+                except SympifyError as e:
+                    self.label_2.setText("Invalid function for Fourier transform")
+                    print(f"Sympify error: {e}")
+            else:
+                self.label_2.setText("Egy sort adj meg")
+                self.text_edit.setText("")
+        
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
@@ -300,6 +341,8 @@ class Ui_Egyenlet(object):
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 231, 41))
         font = QtGui.QFont()
@@ -346,6 +389,7 @@ class Ui_Egyenlet(object):
         font.setPointSize(12)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
+        
         Egyenlet.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Egyenlet)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -363,6 +407,8 @@ class Ui_Egyenlet(object):
         Egyenlet.setWindowTitle(_translate("Egyenlet", "Egyenlet"))
         self.comboBox.setItemText(0, _translate("Egyenlet", "Egyenlet"))
         self.comboBox.setItemText(1, _translate("Egyenlet", "Egyenletrendszerek"))
+        self.comboBox.setItemText(2, _translate("Egyenlet", "Fourier transzformált"))
+        self.comboBox.setItemText(3, _translate("Egyenlet", "Fourier sor"))
         self.label.setText(
             _translate("Egyenlet", "Válaszd ki a végrahajtandó műveletet")
         )
@@ -370,6 +416,7 @@ class Ui_Egyenlet(object):
         self.pushButton.setText(_translate("Egyenlet", "Enter"))
         self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
         self.label_3.setText(_translate("Egyenlet", "Egyenlet"))
+        self.label_2.setText(_translate("Egyenlet", "Eredmény"))
 
 
 if __name__ == "__main__":
