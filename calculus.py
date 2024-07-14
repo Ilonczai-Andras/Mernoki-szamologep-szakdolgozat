@@ -156,6 +156,7 @@ class Ui_Calculus(object):
                 self.label_2.setText(text + " növekvő")
             else:
                 self.label_2.setText(text + " nem növekvő")
+            self.canvas.clear((-10, 10), (-10, 10))
             self.canvas.plot_function(text, interval)
 
         if input == "Szigorúan növekvő":
