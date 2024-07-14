@@ -130,7 +130,10 @@ class Canvas(FigureCanvas):
         else:
             y_vals = np.zeros_like(x_vals)
             for i, x in enumerate(x_vals):
-                y_vals[i] = self.f(x)
+                try:
+                    y_vals[i] = self.f(x)
+                except:
+                    print(f"Canvas_for_plot: nem sikerült az y értékek számolása")
 
         threshold = 10
         if "tan" in func_str or "sec" in func_str or "csc" in func_str:
