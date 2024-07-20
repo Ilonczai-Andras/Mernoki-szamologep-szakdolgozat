@@ -78,11 +78,11 @@ class Ui_Calculus(object):
             r"\bsin\b": "sin",
             r"\bcos\b": "cos",
             r"\btan\b": "tan",
-            # Iverzek
+            # Inverse trig
             r"\barctan\b": "atan",
             r"\barcsin\b": "asin",
             r"\barccos\b": "acos",
-            # inverze hyperbolic
+            # Inverse hyperbolic
             r"\barcsinh\b": "asinh",
             r"\barccosh\b": "acosh",
             r"\barctanh\b": "atanh",
@@ -96,9 +96,9 @@ class Ui_Calculus(object):
             r"\babs\b": "Abs",
             # sign(x)
             r"\sign\b": "sign",
-            # gyok
+            # sqrt
             r"\bsqrt\b": "sqrt",
-            # szekánsok
+            # secant and cosecant
             r"\bsec\b": "sec",
             r"\bcsc\b": "csc",
         }
@@ -130,14 +130,14 @@ class Ui_Calculus(object):
             if sympify(self.lineEdit_3.text()) == oo:
                 felso = 1000000000
 
-            # nulla
+            # zero
             if sympify(self.lineEdit_2.text()) == 0:
                 also = 0
 
             if sympify(self.lineEdit_3.text()) == 0:
                 felso = 0
 
-            # nem nulla
+            # not zero
             if sympify(self.lineEdit_2.text()) != 0:
                 also = float(also)
 
@@ -254,72 +254,104 @@ class Ui_Calculus(object):
         Calculus.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(Calculus)
         self.centralwidget.setObjectName("centralwidget")
-        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox.setGeometry(QtCore.QRect(10, 70, 231, 51))
-        font = QtGui.QFont()
-        font.setPointSize(12)
 
         self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_2.setGeometry(QtCore.QRect(310, 10, 61, 51))
         self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_2.setText("-10")
 
         self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_3.setGeometry(QtCore.QRect(380, 10, 61, 51))
         self.lineEdit_3.setObjectName("lineEdit_3")
+        self.lineEdit_3.setText("10")
 
         self.pushButton_2 = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.back_to_mainwindow(Calculus, MainWindow),
         )
-        self.pushButton_2.setGeometry(QtCore.QRect(720, 500, 75, 51))
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setText("Vissza")
 
         self.canvas = Canvas(self.centralwidget)
-        self.canvas.setGeometry(QtCore.QRect(10, 200, 780, 290))
 
+        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(12)
         self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
+        self.comboBox.addItem("Növekvő")
+        self.comboBox.addItem("Szigorúan növekvő")
+        self.comboBox.addItem("Csökkenő")
+        self.comboBox.addItem("Szigorúan csökkenő")
+        self.comboBox.addItem("Monoton")
+        self.comboBox.addItem("Divergens")
+        self.comboBox.addItem("Határérték")
+        self.comboBox.addItem("Konvergens")
+        self.comboBox.addItem("Deriválás")
+        self.comboBox.addItem("Integrálás")
+
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(10, 10, 231, 41))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(12)
         self.label.setFont(font)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
+        self.label.setText("Válaszd ki a végrehajtandó műveletet")
+
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 130, 780, 70))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
+        self.label_2.setText("Erdemény")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(250, 70, 451, 51))
         self.lineEdit.setObjectName("lineEdit")
+
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(250, 10, 91, 41))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(12)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
+        self.label_3.setText("Határok:")
+
         self.pushButton = QtWidgets.QPushButton(
             self.centralwidget, clicked=lambda: self.combobox_selector()
         )
-        self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.setText("Enter")
+
+        # Create layouts
+        main_layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        form_layout = QtWidgets.QHBoxLayout()
+        form_layout.addWidget(self.label)
+        form_layout.addWidget(self.label_3)
+        form_layout.addWidget(self.lineEdit_2)
+        form_layout.addWidget(self.lineEdit_3)
+
+        input_layout = QtWidgets.QHBoxLayout()
+        input_layout.addWidget(self.comboBox)
+        input_layout.addWidget(self.lineEdit)
+        input_layout.addWidget(self.pushButton)
+
+        result_layout = QtWidgets.QVBoxLayout()
+        result_layout.addWidget(self.label_2)
+
+        canvas_layout = QtWidgets.QVBoxLayout()
+        canvas_layout.addWidget(self.canvas)
+
+        button_layout = QtWidgets.QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(self.pushButton_2)
+
+        # Add layouts to main layout
+        main_layout.addLayout(form_layout)
+        main_layout.addLayout(input_layout)
+        main_layout.addLayout(result_layout)
+        main_layout.addLayout(canvas_layout)
+        main_layout.addLayout(button_layout)
 
         Calculus.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Calculus)
@@ -380,25 +412,6 @@ class Ui_Calculus(object):
     def retranslateUi(self, Calculus):
         _translate = QtCore.QCoreApplication.translate
         Calculus.setWindowTitle(_translate("Calculus", "MainWindow"))
-        self.comboBox.setItemText(0, _translate("Calculus", "Növekvő"))
-        self.comboBox.setItemText(1, _translate("Calculus", "Szigorúan növekvő"))
-        self.comboBox.setItemText(2, _translate("Calculus", "Csökkenő"))
-        self.comboBox.setItemText(3, _translate("Calculus", "Szigorúan csökkenő"))
-        self.comboBox.setItemText(4, _translate("Calculus", "Monoton"))
-        self.comboBox.setItemText(5, _translate("Calculus", "Divergens"))
-        self.comboBox.setItemText(6, _translate("Calculus", "Határérték"))
-        self.comboBox.setItemText(7, _translate("Calculus", "Konvergens"))
-        self.comboBox.setItemText(8, _translate("Calculus", "Deriválás"))
-        self.comboBox.setItemText(9, _translate("Calculus", "Integrálás"))
-        self.label.setText(
-            _translate("Calculus", "Válaszd ki a végrahajtandó műveletet")
-        )
-        self.label_2.setText(_translate("Calculus", "Erdemény"))
-        self.label_3.setText(_translate("Calculus", "Határok:"))
-        self.lineEdit_2.setText(_translate("Calculus", "-10"))
-        self.lineEdit_3.setText(_translate("Calculus", "10"))
-        self.pushButton.setText(_translate("Calculus", "Enter"))
-        self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
 
 
 if __name__ == "__main__":
