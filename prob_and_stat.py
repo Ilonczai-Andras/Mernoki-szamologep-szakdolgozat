@@ -11,7 +11,10 @@ from matplotlib.pylab import pareto
 import numpy as np
 from Canvas_for_plot import Canvas
 from PyQt5 import QtCore, QtGui, QtWidgets
-from sympy import pretty, sympify, symbols, gamma, log, digamma
+from PyQt5.QtWidgets import QTextEdit
+from scipy import stats
+import statistics
+from sympy import pretty, sympify, symbols, gamma, log, digamma, sqrt
 from sympy.stats import (
     Normal,
     Geometric,
@@ -76,6 +79,96 @@ class Ui_Prob_and_Stat(object):
     def string_to_S(self, string):
 
         return string.replace(" ", "").replace("1/", "S.One/")
+    
+    def number_of_lines(self, expression):
+        res = []
+        number = 0
+
+        for line in expression.splitlines():
+            if line.strip():
+                number += 1
+                res.append(line)
+
+        return res
+
+    def str_to_list(self, list_string):
+        return [float(num) for num in list_string.split(",")]
+
+    def t_test(self=None, mu=None, alpha=None, x=None, y=None, paired=None):
+
+        if x is not None and mu is not None and alpha is not None:
+            print("egymintás t")
+            result_string = ""
+
+            avg = statistics.mean(x)
+            stan_dev = statistics.stdev(x)
+            m = mu
+            n = len(x)
+
+            Alpha = 1 - alpha
+            df = n - 1
+
+
+            t = (avg - m) / (stan_dev / sqrt(n)) 
+            t = float(t)  # Ensure numerical evaluation
+
+            t_p = stats.t.ppf(q= Alpha/2,df= df)
+            p_value = 2 * (1 - stats.t.sf(abs(float(t)), df))
+
+            if abs(t) >= t_p:
+                
+                result_string += f"\nA nullhipotézist elvetjük t: {t} p: {2 - p_value}\n"
+                result_string += f"two tail  p:{stats.t.ppf(q= Alpha/2,df= df)}" +"\n"
+                result_string += f"one tail  p:{stats.t.ppf(q= Alpha,df= df)}" +"\n"
+            elif abs(t) < t_p:
+                result_string += f"\nA nullhipotézist elfogadjuk t: {t} p: {2 - p_value}\n"
+                result_string += f"two tail  p:{stats.t.ppf(q= Alpha/2,df= df)}" +"\n"
+                result_string += f"one tail  p:{stats.t.ppf(q= Alpha,df= df)}" +"\n"
+
+            return result_string
+        elif x is not None and y is not None and paired is True and alpha is not None:
+            print("kétmintás párosított t próba")
+            result_string = ""
+            
+            x = np.array(x)
+            y = np.array(y)
+            z = y - x
+            N = len(z)
+            korr_sz = np.std(z, ddof=1)
+            Alpha = 1 - alpha
+            atlag = np.mean(z)
+            t_critical = stats.t.ppf(1 - Alpha, N - 1)
+
+            if atlag > t_critical * korr_sz / np.sqrt(N):
+                result_string += 'H0-t elutasítjuk\n'
+            else:
+                result_string += 'H0-t elfogadjuk\n'
+
+            H, P_ertek = stats.ttest_1samp(z, 0)
+            print(H, P_ertek)
+
+            result_string += f"t: {H} p: {P_ertek}\n"
+            result_string += f"two tail p: {stats.t.ppf(q=Alpha/2, df=N-1)}\n"
+            result_string += f"one tail p: {stats.t.ppf(q=Alpha, df=N-1)}\n"
+
+            return result_string
+        elif (x is not None and y is not None and alpha is not None):
+            print("kétmintás t")
+            result_string = ""
+            
+            t_statistic, p_value = stats.ttest_ind(x, y)
+
+            Alpha = 1 - alpha
+            if p_value < Alpha:
+                result_string += "H0-t elvetjük\n"
+            else:
+                result_string += "H0-t elfogadjuk\n"
+
+            result_string += f"P: {p_value} T: {t_statistic}\n"
+            result_string += f"two tail p: {stats.t.ppf(q=Alpha/2, df=(len(x) + len(y) - 2))}\n"
+            result_string += f"one tail p: {stats.t.ppf(q=Alpha, df=(len(x) + len(y) - 2))}\n"
+
+            return result_string
 
     def combobox_selector(self):
         distribution = self.comboBox_2.currentText()
@@ -83,6 +176,55 @@ class Ui_Prob_and_Stat(object):
 
         m = 0
         s = 0
+
+        text = self.lineEdit_2.toPlainText()
+        lines = self.number_of_lines(text)
+        t = ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]
+    
+        if operation_type in ["T próba", "U próba"]:
+            if operation_type == "T próba":
+                if distribution == "Egymintás t próba":
+                    if len(lines) == 1:
+                        try:
+                            x = self.str_to_list(lines[0])
+                            mu = int(self.mu.toPlainText())
+                            alpha = float(self.sigma.toPlainText())
+                        except:
+                            self.label_2.setText("Hiányzik valamelyik érték!")
+                        else:
+                            res = self.t_test(x=x, mu=mu, alpha=alpha)
+                            self.label_2.setText(res)
+                    else:
+                        self.label_2.setText("Egy listát adj meg!")
+                elif distribution == "Kétmintás párosított t próba":
+                    if len(lines) == 2:
+                        try:
+                            x = self.str_to_list(lines[0])
+                            y = self.str_to_list(lines[1])
+                            alpha = float(self.sigma.toPlainText())
+                        except:
+                            self.label_2.setText("Hiányzik valamelyik érték!")
+                        else:
+                            res = self.t_test(x=x, y=y, alpha=alpha, paired=True)
+                            self.label_2.setText(res)
+                    else:
+                        self.label_2.setText("Két listát adj meg!")
+                elif distribution == "Kétmintás t próba":
+                    if len(lines) == 2:
+                        try:
+                            x = self.str_to_list(lines[0])
+                            y = self.str_to_list(lines[1])
+                            alpha = float(self.sigma.toPlainText())
+                        except:
+                            self.label_2.setText("Hiányzik valamelyik érték!")
+                        else:
+                            res = self.t_test(x=x, y=y, alpha=alpha)
+                            self.label_2.setText(res)
+                    else:
+                        self.label_2.setText("Két listát adj meg!")
+
+            if operation_type == "U próba":
+                pass
 
         if distribution == "Normál":
 
@@ -288,11 +430,41 @@ class Ui_Prob_and_Stat(object):
             self.mu.setPlaceholderText("mu")
             self.sigma.setPlaceholderText("sigma")
 
-    def handle_combobox(self):
-        if self.comboBox.currentText() == "Sűrűség függvény":
+        if distribution in ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]:
+            self.sigma.setPlaceholderText("alpha")
+                
+            if distribution == "Egymintás t próba":
+                self.mu.show()
+            else:
+                self.mu.hide()
+        
+    def handle_combobox_change(self):
+        text = self.comboBox.currentText()
+        eloszlások = ["Normál","Geometriai","Poisson","Logaritmikus","Erlang","Pareto"]
+
+        t = ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]
+        u = ["Egymintás u próba","Kétmintás u próba"]
+
+        if text == "Sűrűség függvény":
             self.canvas.show()
         else:
             self.canvas.hide()
+        #
+        if text in ["T próba", "U próba"]:
+            if text == "T próba":
+                self.label.hide()
+                self.comboBox_2.clear()
+                self.comboBox_2.addItems(t)
+                self.sigma.setPlaceholderText("alpha")
+            if text == "U próba":
+                self.label.hide()
+                self.comboBox_2.clear()
+                self.comboBox_2.addItems(u)
+        else:
+            self.label.show()
+            self.comboBox_2.clear()
+            self.comboBox_2.addItems(eloszlások)
+            self.sigma.setPlaceholderText("sigma")
 
     def setupUi(self, Ui_Prob_and_Stat, MainWindow):
         self.applyStylesheet(Ui_Prob_and_Stat)
@@ -315,10 +487,12 @@ class Ui_Prob_and_Stat(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
-        self.comboBox.currentTextChanged.connect(self.handle_combobox)
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.currentTextChanged.connect(self.handle_combobox_change)
 
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 190, 781, 71))
+        self.label_2.setGeometry(QtCore.QRect(10, 190, 781, 100))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
@@ -343,7 +517,7 @@ class Ui_Prob_and_Stat(object):
         self.canvas.setGeometry(QtCore.QRect(10, 270, 781, 221))
         self.canvas.hide()
 
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_2 = QTextEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(410, 40, 281, 100))
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.lineEdit_2.setPlaceholderText("Felétetel: X < 12")
@@ -398,6 +572,8 @@ class Ui_Prob_and_Stat(object):
         self.comboBox.setItemText(2, _translate("Ui_Prob_and_Stat", "Entrópia"))
         self.comboBox.setItemText(3, _translate("Ui_Prob_and_Stat", "Variancia"))
         self.comboBox.setItemText(4, _translate("Ui_Prob_and_Stat", "Sűrűség függvény"))
+        self.comboBox.setItemText(5, _translate("Ui_Prob_and_Stat", "T próba"))
+        self.comboBox.setItemText(6, _translate("Ui_Prob_and_Stat", "U próba"))
         self.label_2.setText(_translate("Ui_Prob_and_Stat", "Eredmény"))
         self.pushButton.setText(_translate("Ui_Prob_and_Stat", "Enter"))
         self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
