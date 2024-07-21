@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTextEdit
 from scipy import stats
 import statistics
+from scipy.stats import norm
 from sympy import pretty, sympify, symbols, gamma, log, digamma, sqrt
 from sympy.stats import (
     Normal,
@@ -170,6 +171,42 @@ class Ui_Prob_and_Stat(object):
 
             return result_string
 
+    def u_test(self, X=None, mu=None, sigma=None, alpha=None):
+        if X is not None or mu is not None or sigma is not None or alpha is not None:
+            # Sample statistics
+            n = len(X)
+            if n == 0:
+                raise ValueError("Sample data X cannot be empty.")
+                
+            sample_mean = np.mean(X)
+
+            # Calculate Z-value
+            z_value = (sample_mean - mu) / (sigma / np.sqrt(n))
+
+            # Left-tailed test
+            z_critical_left = norm.ppf(alpha)
+            p_value_left = norm.cdf(z_value)
+            reject_null_left = "igen" if z_value < z_critical_left else "nem"
+            left_test_result = f"Bal oldali próba: Kritikus Z-érték: {z_critical_left}, \nP-érték: {p_value_left}, Nullhipotézis elutasítása: {reject_null_left}"
+
+            # Two-tailed test
+            z_critical_two = norm.ppf(1 - alpha / 2)
+            p_value_two = 2 * (1 - norm.cdf(abs(z_value)))
+            reject_null_two = "igen" if abs(z_value) > z_critical_two else "nem"
+            two_test_result = f"Kétoldali próba: Kritikus Z-érték: ±{z_critical_two}, \nP-érték: {p_value_two}, Nullhipotézis elutasítása: {reject_null_two}"
+
+            # Right-tailed test
+            z_critical_right = norm.ppf(1 - alpha)
+            p_value_right = 1 - norm.cdf(z_value)
+            reject_null_right = "igen" if z_value > z_critical_right else "nem"
+            right_test_result = f"Jobb oldali próba: Kritikus Z-érték: {z_critical_right}, \nP-érték: {p_value_right}, Nullhipotézis elutasítása: {reject_null_right}"
+
+            return (f"Minta átlaga: {sample_mean}\n"
+                    f"Z-érték: {z_value}\n\n"
+                    f"{left_test_result}\n\n"
+                    f"{two_test_result}\n\n"
+                    f"{right_test_result}")
+
     def combobox_selector(self):
         distribution = self.comboBox_2.currentText()
         operation_type = self.comboBox.currentText()
@@ -224,7 +261,20 @@ class Ui_Prob_and_Stat(object):
                         self.label_2.setText("Két listát adj meg!")
 
             if operation_type == "U próba":
-                pass
+                if distribution == "Egymintás u próba":
+                    if len(lines) == 1:
+                        try:
+                            x = self.str_to_list(lines[0])
+                            mu = int(self.mu.toPlainText())
+                            alpha = float(self.alpha.toPlainText())
+                            sigma = int(self.sigma.toPlainText())
+                        except:
+                            self.label_2.setText("Hiányzik valamelyik érték!")
+                        else:
+                            res = self.u_test(X=x, mu=mu, sigma=sigma, alpha=alpha)
+                            self.label_2.setText(res)
+                    else:
+                        self.label_2.setText("Egy listát adj meg!")
 
         if distribution == "Normál":
 
@@ -438,6 +488,13 @@ class Ui_Prob_and_Stat(object):
             else:
                 self.mu.hide()
         
+        if distribution in ["Egymintás u próba","Kétmintás u próba"]:
+            self.mu.setPlaceholderText("m")
+            self.alpha.show()
+        else:
+            self.mu.setPlaceholderText("mu")
+            self.alpha.hide()
+        
     def handle_combobox_change(self):
         text = self.comboBox.currentText()
         eloszlások = ["Normál","Geometriai","Poisson","Logaritmikus","Erlang","Pareto"]
@@ -458,6 +515,7 @@ class Ui_Prob_and_Stat(object):
                 self.sigma.setPlaceholderText("alpha")
             if text == "U próba":
                 self.label.hide()
+                self.mu.show()
                 self.comboBox_2.clear()
                 self.comboBox_2.addItems(u)
         else:
@@ -492,7 +550,7 @@ class Ui_Prob_and_Stat(object):
         self.comboBox.currentTextChanged.connect(self.handle_combobox_change)
 
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 190, 781, 100))
+        self.label_2.setGeometry(QtCore.QRect(10, 190, 780, 350))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
@@ -547,6 +605,13 @@ class Ui_Prob_and_Stat(object):
         self.mu = QtWidgets.QTextEdit(self.centralwidget)
         self.mu.setGeometry(QtCore.QRect(300, 40, 104, 45))
         self.mu.setObjectName("mu")
+
+        self.alpha = QtWidgets.QTextEdit(self.centralwidget)
+        self.alpha.setGeometry(QtCore.QRect(300, 150, 104, 45))
+        self.alpha.setObjectName("alpha")
+        self.alpha.setPlaceholderText("alpha")
+        self.alpha.hide()
+
         self.sigma = QtWidgets.QTextEdit(self.centralwidget)
         self.sigma.setGeometry(QtCore.QRect(300, 96, 104, 45))
         self.sigma.setObjectName("sigma")
@@ -585,6 +650,7 @@ class Ui_Prob_and_Stat(object):
         self.comboBox_2.setItemText(5, _translate("Ui_Prob_and_Stat", "Pareto"))
         self.label.setText(_translate("Ui_Prob_and_Stat", "Eloszlás:"))
         self.mu.setPlaceholderText(_translate("Ui_Prob_and_Stat", "mu"))
+        self.alpha.setPlaceholderText(_translate("Ui_Prob_and_Stat", "alpha"))
         self.sigma.setPlaceholderText(_translate("Ui_Prob_and_Stat", "sigma"))
 
 
