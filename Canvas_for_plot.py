@@ -163,9 +163,9 @@ class Canvas(FigureCanvas):
         func = func_str.split("=")[1]
         func = self.replace_numpy_funcs(func)
 
-        nt, nv = 3.5, 3.5
-        t = np.arange(-10, 10, nt)
-        v = np.arange(-10, 10, nv)
+        nt, nv = 1, 1
+        t = np.arange(-100, 100, nt)
+        v = np.arange(-100, 100, nv)
         y, x = np.meshgrid(t, v)
 
         dv = eval(func)
