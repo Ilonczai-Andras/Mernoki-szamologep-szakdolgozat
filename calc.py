@@ -11,6 +11,7 @@ from calculus import Ui_Calculus
 from egyenlet import Ui_Egyenlet
 from diff_egyenlet import Ui_Diff_Egyenlet
 from prob_and_stat import Ui_Prob_and_Stat
+from Programmer_calc import Ui_Programmer_calc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QFont
@@ -33,6 +34,9 @@ class Ui_MainWindow(object):
             MainWindow.hide()
         elif window_type == "Valószínűségszámitás és statisztika":
             self.generateProb_and_Stat()
+            MainWindow.hide()
+        elif window_type == "Programozói számológép":
+            self.generateProgrammer_Calculator()
             MainWindow.hide()
 
         self.comboBox.setCurrentIndex(0)
@@ -60,6 +64,11 @@ class Ui_MainWindow(object):
         self.ui = Ui_Prob_and_Stat()
         self.ui.setupUi(self.window, MainWindow)
         self.window.show()
+    def generateProgrammer_Calculator(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Programmer_calc()
+        self.ui.setupUi(self.window, MainWindow)
+        self.window.show()
 
     def setupUi(self, MainWindow):
 
@@ -78,6 +87,7 @@ class Ui_MainWindow(object):
                 "Egyenletek",
                 "Differnciál számitás",
                 "Valószínűségszámitás és statisztika",
+                "Programozói számológép"
             ]
         )
         self.comboBox.currentIndexChanged.connect(self.generateWindow)
