@@ -9,6 +9,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import math
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+
+from sympy import false, true
 
 
 class Ui_Programmer_calc(object):
@@ -63,6 +68,49 @@ class Ui_Programmer_calc(object):
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
+    
+    def set_to_null(self, list1, list2):
+        for i in list1:
+            i.setEnabled(True)
+        
+        for i in list2:
+            i.setEnabled(True)
+    
+    def handle_combobox_3_change(self):
+        text = self.comboBox_3.currentText()
+
+        hex_buttons = [self.A_hex, self.B_hex, self.C_hex, self.D_hex, self.E_hex, self.F_hex]
+        numbers = [self.zero, self.one,self.two,self.three,self.four,self.five,self.six,self.seven,self.eight,self.nine]
+
+        if text == "Bináris":
+            self.set_to_null(hex_buttons, numbers)
+            for i in hex_buttons:
+                i.setEnabled(False)
+
+            for i in range(2,len(numbers)):
+                numbers[i].setEnabled(False)
+        elif text == "Oktális":
+            self.set_to_null(hex_buttons, numbers)
+
+            for i in hex_buttons:
+                i.setEnabled(False)
+
+            for i in range(7,len(numbers)):
+                numbers[i].setEnabled(False)
+        elif text == "Decimális":
+            self.set_to_null(hex_buttons, numbers)
+
+            for i in hex_buttons:
+                i.setEnabled(False)
+        
+        elif text == "Hexadecimális":
+            self.set_to_null(hex_buttons, numbers)
+
+    # def on_label_text_changed(self):
+    #     try:
+    #         self.evaluate_expression()
+    #     except Exception as e:
+    #         print("Error: ", e)
 
     def setupUi(self, Programmer_calc, MainWindow):
         self.applyStylesheet(Programmer_calc)
@@ -77,12 +125,13 @@ class Ui_Programmer_calc(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.Result = QtWidgets.QLabel(self.verticalLayoutWidget_2)
+        self.Result = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(24)
         self.Result.setFont(font)
         self.Result.setObjectName("Result")
+        # self.Result.textChanged.connect(self.on_label_text_changed)
         self.verticalLayout_2.addWidget(self.Result)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 0, 1051, 51))
@@ -110,17 +159,26 @@ class Ui_Programmer_calc(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
+        font = QFont("Times New Roman", 14)
         self.n8_63 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.n8_63.setAlignment(Qt.AlignCenter)
         self.n8_63.setObjectName("n8_63")
+        self.n8_63.setFont(font)
         self.verticalLayout.addWidget(self.n8_63)
         self.h2_47 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.h2_47.setAlignment(Qt.AlignCenter)
         self.h2_47.setObjectName("h2_47")
+        self.h2_47.setFont(font)
         self.verticalLayout.addWidget(self.h2_47)
         self.t6_31 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.t6_31.setAlignment(Qt.AlignCenter)
         self.t6_31.setObjectName("t6_31")
+        self.t6_31.setFont(font)
         self.verticalLayout.addWidget(self.t6_31)
         self.nulla_15 = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.nulla_15.setAlignment(Qt.AlignCenter)
         self.nulla_15.setObjectName("nulla_15")
+        self.nulla_15.setFont(font)
         self.verticalLayout.addWidget(self.nulla_15)
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 140, 1051, 41))
@@ -134,6 +192,10 @@ class Ui_Programmer_calc(object):
         self.comboBox_3.setFont(font)
         self.comboBox_3.setObjectName("comboBox_3")
         self.comboBox_3.addItem("")
+        self.comboBox_3.addItem("")
+        self.comboBox_3.addItem("")
+        self.comboBox_3.addItem("")
+        self.comboBox_3.currentTextChanged.connect(self.handle_combobox_3_change)
         self.horizontalLayout_2.addWidget(self.comboBox_3)
         spacerItem1 = QtWidgets.QSpacerItem(
             700, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum
@@ -154,91 +216,174 @@ class Ui_Programmer_calc(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.gridLayout_for_numbers = QtWidgets.QGridLayout()
         self.gridLayout_for_numbers.setObjectName("gridLayout_for_numbers")
-        self.bel_zj = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.bel_zj = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("("),
+        )
         self.bel_zj.setObjectName("bel_zj")
         self.gridLayout_for_numbers.addWidget(self.bel_zj, 0, 1, 1, 1)
-        self.eight = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.eight = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("8"),
+        )
         self.eight.setObjectName("eight")
         self.gridLayout_for_numbers.addWidget(self.eight, 3, 0, 1, 1)
-        self.D_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.D_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("D"),
+        )
         self.D_hex.setObjectName("D_hex")
         self.gridLayout_for_numbers.addWidget(self.D_hex, 1, 1, 1, 1)
-        self.C_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.C_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("C"),
+        )
         self.C_hex.setObjectName("C_hex")
         self.gridLayout_for_numbers.addWidget(self.C_hex, 1, 0, 1, 1)
-        self.three = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.three = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("3"),
+        )
         self.three.setObjectName("three")
         self.gridLayout_for_numbers.addWidget(self.three, 5, 3, 1, 1)
-        self.minus = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.minus = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("-"),
+        )
         self.minus.setObjectName("minus")
         self.gridLayout_for_numbers.addWidget(self.minus, 4, 4, 1, 1)
-        self.dot = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.dot = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("."),
+        )
         self.dot.setObjectName("dot")
         self.gridLayout_for_numbers.addWidget(self.dot, 3, 5, 1, 1)
-        self.B_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.B_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("B"),
+        )
         self.B_hex.setObjectName("B_hex")
         self.gridLayout_for_numbers.addWidget(self.B_hex, 3, 3, 1, 1)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout()
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.clear = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.clear = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("DEL"),
+        )
         self.clear.setObjectName("clear")
         self.verticalLayout_4.addWidget(self.clear)
         self.gridLayout_for_numbers.addLayout(self.verticalLayout_4, 0, 0, 1, 1)
-        self.four = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.four = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("4"),
+        )
         self.four.setObjectName("four")
         self.gridLayout_for_numbers.addWidget(self.four, 4, 0, 1, 1)
-        self.jobb_zj = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.jobb_zj = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it(")"),
+        )
         self.jobb_zj.setObjectName("jobb_zj")
         self.gridLayout_for_numbers.addWidget(self.jobb_zj, 0, 2, 1, 1)
-        self.one = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.one = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("1"),
+        )
         self.one.setObjectName("one")
         self.gridLayout_for_numbers.addWidget(self.one, 5, 1, 1, 1)
-        self.nine = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.nine = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("9"),
+        )
         self.nine.setObjectName("nine")
         self.gridLayout_for_numbers.addWidget(self.nine, 3, 1, 1, 1)
-        self.mod = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.mod = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("%"),
+        )
         self.mod.setObjectName("mod")
         self.gridLayout_for_numbers.addWidget(self.mod, 0, 3, 1, 1)
-        self.A_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.A_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("A"),
+        )
         self.A_hex.setObjectName("A_hex")
         self.gridLayout_for_numbers.addWidget(self.A_hex, 3, 2, 1, 1)
-        self.zero = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.zero = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("0"),
+        )
         self.zero.setObjectName("zero")
         self.gridLayout_for_numbers.addWidget(self.zero, 5, 0, 1, 1)
-        self.two = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.two = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("2"),
+        )
         self.two.setObjectName("two")
         self.gridLayout_for_numbers.addWidget(self.two, 5, 2, 1, 1)
-        self.six = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.six = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("6"),
+        )
         self.six.setObjectName("six")
         self.gridLayout_for_numbers.addWidget(self.six, 4, 2, 1, 1)
-        self.F_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.F_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("F"),
+        )
         self.F_hex.setObjectName("F_hex")
         self.gridLayout_for_numbers.addWidget(self.F_hex, 1, 3, 1, 1)
-        self.plusz = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.plusz = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("+"),
+        )
         self.plusz.setObjectName("plusz")
         self.gridLayout_for_numbers.addWidget(self.plusz, 5, 4, 1, 1)
-        self.seven = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.seven = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("7"),
+        )
         self.seven.setObjectName("seven")
         self.gridLayout_for_numbers.addWidget(self.seven, 4, 3, 1, 1)
-        self.equal = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.equal = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.evaluate_expression(),
+        )
         self.equal.setObjectName("equal")
         self.gridLayout_for_numbers.addWidget(self.equal, 4, 5, 2, 1)
-        self.five = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.five = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("5"),
+        )
         self.five.setObjectName("five")
         self.gridLayout_for_numbers.addWidget(self.five, 4, 1, 1, 1)
-        self.divide = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.divide = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("/"),
+        )
         self.divide.setObjectName("divide")
         self.gridLayout_for_numbers.addWidget(self.divide, 1, 4, 1, 1)
-        self.szorzas = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.szorzas = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("*"),
+        )
         self.szorzas.setObjectName("szorzas")
         self.gridLayout_for_numbers.addWidget(self.szorzas, 3, 4, 1, 1)
-        self.sqrt = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.sqrt = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.sqrt_func()
+        )
         self.sqrt.setObjectName("sqrt")
         self.gridLayout_for_numbers.addWidget(self.sqrt, 1, 5, 1, 1)
-        self.E_hex = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.E_hex = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("E"),
+        )
         self.E_hex.setObjectName("E_hex")
         self.gridLayout_for_numbers.addWidget(self.E_hex, 1, 2, 1, 1)
-        self.pi = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.pi = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("3.14"),
+        )
         self.pi.setObjectName("pi")
         self.gridLayout_for_numbers.addWidget(self.pi, 0, 4, 1, 2)
         self.horizontalLayout_3.addLayout(self.gridLayout_for_numbers)
@@ -249,28 +394,46 @@ class Ui_Programmer_calc(object):
         self.frac = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.frac.setObjectName("frac")
         self.gridLayout_for_special_buttons.addWidget(self.frac, 3, 2, 1, 1)
-        self.fakt = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.fakt = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("!"),
+        )
         self.fakt.setObjectName("fakt")
         self.gridLayout_for_special_buttons.addWidget(self.fakt, 3, 0, 1, 1)
         self.XOR = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.XOR.setObjectName("XOR")
         self.gridLayout_for_special_buttons.addWidget(self.XOR, 0, 4, 1, 1)
-        self.plusn = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.plusn = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("+"),
+        )
         self.plusn.setObjectName("plusn")
         self.gridLayout_for_special_buttons.addWidget(self.plusn, 0, 0, 1, 1)
-        self.abs = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.abs = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("|"),
+        )
         self.abs.setObjectName("abs")
         self.gridLayout_for_special_buttons.addWidget(self.abs, 3, 1, 1, 1)
         self.NOT = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.NOT.setObjectName("NOT")
         self.gridLayout_for_special_buttons.addWidget(self.NOT, 1, 2, 1, 1)
-        self.log = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.log = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("log"),
+        )
         self.log.setObjectName("log")
         self.gridLayout_for_special_buttons.addWidget(self.log, 2, 4, 1, 1)
-        self.x_xx_y = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.x_xx_y = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("**"),
+        )
         self.x_xx_y.setObjectName("x_xx_y")
         self.gridLayout_for_special_buttons.addWidget(self.x_xx_y, 2, 0, 1, 1)
-        self.minusn = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.minusn = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("-"),
+        )
         self.minusn.setObjectName("minusn")
         self.gridLayout_for_special_buttons.addWidget(self.minusn, 0, 1, 1, 1)
         self.ones = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
@@ -279,7 +442,10 @@ class Ui_Programmer_calc(object):
         self.int_2 = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.int_2.setObjectName("int_2")
         self.gridLayout_for_special_buttons.addWidget(self.int_2, 2, 2, 1, 1)
-        self.x_xx_1 = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.x_xx_1 = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("**-1"),
+        )
         self.x_xx_1.setObjectName("x_xx_1")
         self.gridLayout_for_special_buttons.addWidget(self.x_xx_1, 2, 1, 1, 1)
         self.twos = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
@@ -292,7 +458,10 @@ class Ui_Programmer_calc(object):
         self.variable_name.setObjectName("variable_name")
         self.variable_name.addItem("")
         self.gridLayout_for_special_buttons.addWidget(self.variable_name, 4, 0, 1, 2)
-        self.log2 = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.log2 = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("log2"),
+        )
         self.log2.setObjectName("log2")
         self.gridLayout_for_special_buttons.addWidget(self.log2, 2, 3, 1, 1)
         self.OR = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
@@ -309,7 +478,10 @@ class Ui_Programmer_calc(object):
         self.aaaa = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.aaaa.setObjectName("aaaa")
         self.gridLayout_for_special_buttons.addWidget(self.aaaa, 3, 3, 1, 2)
-        self.fact = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.fact = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.press_it("!"),
+        )
         self.fact.setObjectName("fact")
         self.gridLayout_for_special_buttons.addWidget(self.fact, 4, 2, 1, 1)
         self.variable_name_2 = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
@@ -317,9 +489,6 @@ class Ui_Programmer_calc(object):
         self.variable_name_2.addItem("")
         self.gridLayout_for_special_buttons.addWidget(self.variable_name_2, 4, 3, 1, 2)
         self.horizontalLayout_3.addLayout(self.gridLayout_for_special_buttons)
-        self.pushButton_111 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_111.setGeometry(QtCore.QRect(730, 600, 78, 23))
-        self.pushButton_111.setObjectName("pushButton_111")
         Programmer_calc.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Programmer_calc)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1083, 21))
@@ -332,16 +501,113 @@ class Ui_Programmer_calc(object):
         self.retranslateUi(Programmer_calc)
         QtCore.QMetaObject.connectSlotsByName(Programmer_calc)
 
+    def press_it(self, pressed):
+        if pressed == "DEL":
+            self.Result.setText("0")
+        else:
+            if self.Result.text() == "ERROR":
+                self.Result.setText("")
+            # Check to see if it starts with 0 and delete the zero
+            if self.Result.text() == "0":
+                self.Result.setText("")
+            # concatenate the pressed button with what was there already
+            else:
+                self.Result.setText(f"{self.Result.text()}{pressed}")
+
+    def evaluate_expression(self):
+        screen = self.Result.text()
+        try:
+            screen = screen.replace('A', '10').replace('B', '11').replace('C', '12').replace('D', '13').replace('E', '14').replace('F', '15')
+            answer = eval(screen)
+            if type(answer) is int:
+                if self.comboBox_3.currentText() == "Decimális":
+                    binary_segments = self.decimal_to_decimal_64bit_segments(answer)
+                    self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                    self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                    self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                    self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
+                elif self.comboBox_3.currentText() == "Oktális":
+                    octal_segments = self.octal_octal_to_64bit_segments(answer)
+                    self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
+                    self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
+                    self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
+                    self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
+                elif self.comboBox_3.currentText() == "Bináris":
+                    binary_segments = self.binary_tobinary_16bit_segments(answer)
+                    self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                    self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                    self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                    self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
+                self.Result.setText(str(answer))
+            else:
+                self.Result.setText(str(answer))
+        except Exception as e:
+            print("Error in eval", e)
+            self.Result.setText("ERROR")
+
+    def sqrt_func(self):
+        try:
+            original = self.Result.text().replace('A', '10').replace('B', '11').replace('C', '12').replace('D', '13').replace('E', '14').replace('F', '15')
+            self.Result.setText(str(round(math.sqrt(float(original)), 2)))
+        except:
+            self.Result.setText("ERROR")
+
+    def format_binary(self, binary_string):
+        # Insert a space every four characters
+        formatted_string = ' '.join(binary_string[i:i+4] for i in range(0, len(binary_string), 4))
+        return formatted_string
+
+    def decimal_to_decimal_64bit_segments(self, number):
+        if not isinstance(number, int):
+            return "Error: Input must be an integer."
+
+        if number == 0:
+            return ["0"]  # Special case for zero
+
+        binary_result = ""
+        while number > 0:
+            binary_result = str(number % 2) + binary_result
+            number //= 2
+
+        # Pad with leading zeros to make it 64 bits
+        binary_result = binary_result.zfill(64)
+
+        # Split into 16-bit segments
+        segments = [binary_result[i:i+16] for i in range(0, 64, 16)]
+
+        return segments
+
+    def octal_octal_to_64bit_segments(self,octal_number):
+        # Convert octal to binary
+        binary_string = bin(int(str(octal_number), 8))[2:]
+
+        # Pad with leading zeros to make it 64 bits
+        padded_binary = binary_string.zfill(64)
+
+        # Split into 16-bit chunks
+        chunks = [padded_binary[i:i+16] for i in range(0, 64, 16)]
+
+        return chunks
+
+    def binary_tobinary_16bit_segments(self, binary_number):
+        # Ensure the binary number is represented in 64 bits
+        padded_binary = format(int(str(binary_number), 2), '064b')
+        # Split the padded binary into four 16-bit chunks
+        return [padded_binary[i:i+16] for i in range(0, 64, 16)]
+
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
         Programmer_calc.setWindowTitle(_translate("Programmer_calc", "MainWindow"))
-        self.Result.setText(_translate("Programmer_calc", "Eredmény"))
+        self.Result.setText(_translate("Programmer_calc", ""))
         self.Back.setText(_translate("Programmer_calc", "Vissza"))
-        self.n8_63.setText(_translate("Programmer_calc", "TextLabel"))
-        self.h2_47.setText(_translate("Programmer_calc", "TextLabel"))
-        self.t6_31.setText(_translate("Programmer_calc", "TextLabel"))
-        self.nulla_15.setText(_translate("Programmer_calc", "TextLabel"))
-        self.comboBox_3.setItemText(0, _translate("Programmer_calc", "Decimális"))
+        self.n8_63.setText(_translate("Programmer_calc", ""))
+        self.h2_47.setText(_translate("Programmer_calc", ""))
+        self.t6_31.setText(_translate("Programmer_calc", ""))
+        self.nulla_15.setText(_translate("Programmer_calc", ""))
+        self.comboBox_3.setItemText(0, _translate("Programmer_calc", "Bináris"))
+        self.comboBox_3.setItemText(1, _translate("Programmer_calc", "Oktális"))
+        self.comboBox_3.setItemText(2, _translate("Programmer_calc", "Decimális"))
+        self.comboBox_3.setItemText(3, _translate("Programmer_calc", "Hexadecimális"))
         self.label_2.setText(_translate("Programmer_calc", "x fok = y radián"))
         self.bel_zj.setText(_translate("Programmer_calc", "("))
         self.eight.setText(_translate("Programmer_calc", "8"))
@@ -351,13 +617,13 @@ class Ui_Programmer_calc(object):
         self.minus.setText(_translate("Programmer_calc", "-"))
         self.dot.setText(_translate("Programmer_calc", "."))
         self.B_hex.setText(_translate("Programmer_calc", "B"))
-        self.clear.setText(_translate("Programmer_calc", "C"))
+        self.clear.setText(_translate("Programmer_calc", "DEL"))
         self.four.setText(_translate("Programmer_calc", "4"))
         self.jobb_zj.setText(_translate("Programmer_calc", ")"))
         self.one.setText(_translate("Programmer_calc", "1"))
         self.nine.setText(_translate("Programmer_calc", "9"))
         self.mod.setText(_translate("Programmer_calc", "mod"))
-        self.A_hex.setText(_translate("Programmer_calc", "C"))
+        self.A_hex.setText(_translate("Programmer_calc", "A"))
         self.zero.setText(_translate("Programmer_calc", "0"))
         self.two.setText(_translate("Programmer_calc", "2"))
         self.six.setText(_translate("Programmer_calc", "6"))
@@ -393,7 +659,6 @@ class Ui_Programmer_calc(object):
         self.aaaa.setText(_translate("Programmer_calc", "á"))
         self.fact.setText(_translate("Programmer_calc", "fact"))
         self.variable_name_2.setItemText(0, _translate("Programmer_calc", "32 bites"))
-        self.pushButton_111.setText(_translate("Programmer_calc", "PushButton"))
 
 
 if __name__ == "__main__":
