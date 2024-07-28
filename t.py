@@ -1,3 +1,5 @@
+import re
+
 class HexadecimalCalculator:
     def twos_complement(self, number: str, base: int) -> str:
         
@@ -122,4 +124,34 @@ def test_twos_complement():
     print(decimal_to_decimal_64bit_segments(result))
 
 # Run the tests
-test_twos_complement()
+# test_twos_complement()
+
+def logical_ops(string):
+    # Define allowed operators
+    allowed_operators = {"XOR", "OR", "AND", "NOT", "^", "|", "&", "~", "(", ")"}
+    
+    # Tokenize the string
+    tokens = re.findall(r'\b\w+\b|[&|^~()]+', string)
+    
+    # Validate tokens
+    for token in tokens:
+        if token.isdigit():  # Check if the token is a digit (integer)
+            continue
+        elif token in allowed_operators:  # Check if the token is an allowed operator
+            continue
+        else:
+            raise ValueError(f"Invalid token found: {token}")
+    
+    # Replace logical operators with corresponding symbols
+    string = (
+        string.replace("XOR", "^")
+            .replace("OR", "|")
+            .replace("AND", "&")
+            .replace("NOT", "~")
+    )
+    
+    # Final check to ensure the string contains only integers and allowed operators
+    if not re.fullmatch(r'[0-9&|^~() ]+', string):
+        return(string + ": The string contains invalid characters or floating-point numbers.")
+    
+    return eval(string)

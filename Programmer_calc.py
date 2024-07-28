@@ -19,8 +19,18 @@ from PyQt5.QtWidgets import QInputDialog
 
 
 class Ui_Programmer_calc(object):
+    def __init__(self):
+        self.operations = []  # List to store operations
+
     def applyStylesheet(self, Programmer_calc):
         stylesheet = """
+        QListWidget{
+            background-color: #2E2E2E;
+            color: #ffffff;
+            font: 14pt;
+            border: 1px solid #555555;
+            border-radius: 5px;
+        }
         QMainWindow {
             background-color: #2E2E2E;
         }
@@ -180,7 +190,7 @@ class Ui_Programmer_calc(object):
         self.centralwidget = QtWidgets.QWidget(Programmer_calc)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(10, 50, 1051, 91))
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(10, 80, 1051, 61))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -194,25 +204,20 @@ class Ui_Programmer_calc(object):
         # self.Result.textChanged.connect(self.on_label_text_changed)
         self.verticalLayout_2.addWidget(self.Result)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 0, 1051, 51))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 0, 1051, 81))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.Back = QtWidgets.QPushButton(
-            self.centralwidget,
-            clicked=lambda: self.back_to_mainwindow(Programmer_calc, MainWindow),
-        )
+
+        self.operations_list = QtWidgets.QListWidget(self.centralwidget)
+        self.operations_list.setGeometry(QtCore.QRect(10, 600, 1051, 100))  # Adjust size and position as needed
+        self.operations_list.setObjectName("operations_list")
+        self.horizontalLayout.addWidget(self.operations_list)
+
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(14)
-        self.Back.setFont(font)
-        self.Back.setObjectName("Back")
-        self.horizontalLayout.addWidget(self.Back)
-        spacerItem = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
-        )
-        self.horizontalLayout.addItem(spacerItem)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 180, 1051, 211))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
@@ -698,6 +703,7 @@ class Ui_Programmer_calc(object):
 
     def evaluate_expression(self):
         screen = self.Result.text()
+        operation = screen  # Store the current operation
 
         if self.comboBox_3.currentText() == "Decimális":
             if "int" in screen:
@@ -773,6 +779,11 @@ class Ui_Programmer_calc(object):
 
             if answer is not None:
                 self.Result.setText(str(answer))
+                # Append the operation and result to the operations list
+                self.operations.append(f"{operation} = {answer}")
+                # Update the display of operations
+                self.update_operations_display()
+
             if(type(answer) is int):
                 binary_segments = self.decimal_to_decimal_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
@@ -1470,11 +1481,14 @@ class Ui_Programmer_calc(object):
         
         return result
 
+    def update_operations_display(self):
+        self.operations_list.clear()  # Clear the current display
+        self.operations_list.addItems(self.operations)  # Add all operations to the display
+
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
         Programmer_calc.setWindowTitle(_translate("Programmer_calc", "MainWindow"))
         self.Result.setText(_translate("Programmer_calc", ""))
-        self.Back.setText(_translate("Programmer_calc", "Vissza"))
         self.n8_63.setText(_translate("Programmer_calc", ""))
         self.h2_47.setText(_translate("Programmer_calc", ""))
         self.t6_31.setText(_translate("Programmer_calc", ""))
@@ -1530,13 +1544,3 @@ class Ui_Programmer_calc(object):
         self.aaaa.setText(_translate("Programmer_calc", "á"))
         self.fact.setText(_translate("Programmer_calc", "fact"))
 
-
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    Programmer_calc = QtWidgets.QMainWindow()
-    ui = Ui_Programmer_calc()
-    ui.setupUi(Programmer_calc)
-    Programmer_calc.show()
-    sys.exit(app.exec_())
