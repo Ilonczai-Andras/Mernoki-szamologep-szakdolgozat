@@ -35,7 +35,7 @@ class Ui_Programmer_calc(object):
             border-radius: 5px;
             padding: 5px;
         }
-        QComboBox#shift_left, QComboBox#variable_name, QComboBox#variable_name_2, QComboBox#shift_right{
+        QComboBox#shift_left, QComboBox#shift_right{
             background-color: #4E4E4E;
             font-size: 14pt;
             width: 50px;
@@ -100,6 +100,9 @@ class Ui_Programmer_calc(object):
         for i in list1:
             i.setEnabled(True)
 
+        self.pi.setEnabled(True)
+        self.sqrt.setEnabled(True)
+        self.dot.setEnabled(True)
         for i in list2:
             i.setEnabled(True)
 
@@ -131,31 +134,31 @@ class Ui_Programmer_calc(object):
             self.set_to_null(hex_buttons, numbers)
             for i in hex_buttons:
                 i.setEnabled(False)
+            
+            self.pi.setEnabled(False)
+            self.dot.setEnabled(False)
 
             for i in range(2, len(numbers)):
                 numbers[i].setEnabled(False)
         elif text == "Oktális":
             self.set_to_null(hex_buttons, numbers)
-
+            self.pi.setEnabled(False)
+            self.sqrt.setEnabled(False)
             for i in hex_buttons:
                 i.setEnabled(False)
 
-            for i in range(7, len(numbers)):
+            for i in range(8, len(numbers)):
                 numbers[i].setEnabled(False)
         elif text == "Decimális":
             self.set_to_null(hex_buttons, numbers)
-
             for i in hex_buttons:
                 i.setEnabled(False)
-
         elif text == "Hexadecimális":
             self.set_to_null(hex_buttons, numbers)
+            self.pi.setEnabled(False)
+            self.sqrt.setEnabled(False)
+            self.dot.setEnabled(False)
 
-    # def on_label_text_changed(self):
-    #     try:
-    #         self.evaluate_expression()
-    #     except Exception as e:
-    #         print("Error: ", e)
 
     def setupUi(self, Programmer_calc, MainWindow):
         self.applyStylesheet(Programmer_calc)
@@ -242,7 +245,6 @@ class Ui_Programmer_calc(object):
         self.comboBox_3.addItem("")
         self.comboBox_3.addItem("")
         self.comboBox_3.addItem("")
-        self.comboBox_3.currentTextChanged.connect(self.handle_combobox_3_change)
         self.horizontalLayout_2.addWidget(self.comboBox_3)
         spacerItem1 = QtWidgets.QSpacerItem(
             700, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum
@@ -417,7 +419,8 @@ class Ui_Programmer_calc(object):
         self.szorzas.setObjectName("szorzas")
         self.gridLayout_for_numbers.addWidget(self.szorzas, 3, 4, 1, 1)
         self.sqrt = QtWidgets.QPushButton(
-            self.centralwidget, clicked=lambda: self.sqrt_func()
+            self.centralwidget,
+            clicked=lambda: self.press_it("SQRT"),
         )
         self.sqrt.setObjectName("sqrt")
         self.gridLayout_for_numbers.addWidget(self.sqrt, 1, 5, 1, 1)
@@ -452,12 +455,7 @@ class Ui_Programmer_calc(object):
         )
         self.XOR.setObjectName("XOR")
         self.gridLayout_for_special_buttons.addWidget(self.XOR, 0, 4, 1, 1)
-        self.plusn = QtWidgets.QPushButton(
-            self.centralwidget,
-            clicked=lambda: self.press_it("+"),
-        )
-        self.plusn.setObjectName("plusn")
-        self.gridLayout_for_special_buttons.addWidget(self.plusn, 0, 0, 1, 1)
+    
         self.abs = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.press_it("|"),
@@ -482,12 +480,7 @@ class Ui_Programmer_calc(object):
         )
         self.x_xx_y.setObjectName("x_xx_y")
         self.gridLayout_for_special_buttons.addWidget(self.x_xx_y, 2, 0, 1, 1)
-        self.minusn = QtWidgets.QPushButton(
-            self.centralwidget,
-            clicked=lambda: self.press_it("-"),
-        )
-        self.minusn.setObjectName("minusn")
-        self.gridLayout_for_special_buttons.addWidget(self.minusn, 0, 1, 1, 1)
+
         self.ones = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.ones.setObjectName("ones")
         self.gridLayout_for_special_buttons.addWidget(self.ones, 1, 0, 1, 1)
@@ -508,10 +501,6 @@ class Ui_Programmer_calc(object):
         )
         self.AND.setObjectName("AND")
         self.gridLayout_for_special_buttons.addWidget(self.AND, 1, 3, 1, 1)
-        self.variable_name = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
-        self.variable_name.setObjectName("variable_name")
-        self.variable_name.addItem("")
-        self.gridLayout_for_special_buttons.addWidget(self.variable_name, 4, 0, 1, 2)
         self.log2 = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.press_it("log2"),
@@ -523,14 +512,16 @@ class Ui_Programmer_calc(object):
         )
         self.OR.setObjectName("OR")
         self.gridLayout_for_special_buttons.addWidget(self.OR, 1, 4, 1, 1)
-        self.shift_left = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
+        self.shift_left = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.press_it("<<")
+        )
         self.shift_left.setObjectName("shift_left")
-        self.shift_left.addItem("")
-        self.gridLayout_for_special_buttons.addWidget(self.shift_left, 0, 2, 1, 1)
-        self.shift_right = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
+        self.gridLayout_for_special_buttons.addWidget(self.shift_left, 0, 0, 1, 2)
+        self.shift_right = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.press_it(">>")
+        )
         self.shift_right.setObjectName("shift_right")
-        self.shift_right.addItem("")
-        self.gridLayout_for_special_buttons.addWidget(self.shift_right, 0, 3, 1, 1)
+        self.gridLayout_for_special_buttons.addWidget(self.shift_right, 0, 2, 1, 2)
         self.aaaa = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
         self.aaaa.setObjectName("aaaa")
         self.gridLayout_for_special_buttons.addWidget(self.aaaa, 3, 3, 1, 2)
@@ -539,11 +530,7 @@ class Ui_Programmer_calc(object):
             clicked=lambda: self.press_it("!"),
         )
         self.fact.setObjectName("fact")
-        self.gridLayout_for_special_buttons.addWidget(self.fact, 4, 2, 1, 1)
-        self.variable_name_2 = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
-        self.variable_name_2.setObjectName("variable_name_2")
-        self.variable_name_2.addItem("")
-        self.gridLayout_for_special_buttons.addWidget(self.variable_name_2, 4, 3, 1, 2)
+        self.gridLayout_for_special_buttons.addWidget(self.fact, 4, 0, 1, 5)
         self.horizontalLayout_3.addLayout(self.gridLayout_for_special_buttons)
         Programmer_calc.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Programmer_calc)
@@ -553,7 +540,8 @@ class Ui_Programmer_calc(object):
         self.statusbar = QtWidgets.QStatusBar(Programmer_calc)
         self.statusbar.setObjectName("statusbar")
         Programmer_calc.setStatusBar(self.statusbar)
-
+        
+        self.comboBox_3.currentTextChanged.connect(self.handle_combobox_3_change)
         self.retranslateUi(Programmer_calc)
         QtCore.QMetaObject.connectSlotsByName(Programmer_calc)
 
@@ -575,21 +563,32 @@ class Ui_Programmer_calc(object):
 
         if self.comboBox_3.currentText() == "Decimális":
             answer = 0
-            if self.contain_arithmetic(screen) and not self.contain_logical(screen):
+            if not self.contain_logical(screen) and self.contains_sqrt(screen):
+                answer = self.sqrt_func(screen,'decimal')
+            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
                 answer = eval(screen)
+            elif "<<" in screen or ">>" in screen:
+                if "<<" in screen:
+                    num = screen.split("<<")[0]
+                    cnt = screen.split("<<")[1]
+                    answer = self.shift_left_func(cnt, num)
+                if ">>" in screen:
+                    num = screen.split(">>")[0]
+                    cnt = screen.split(">>")[1]
+                    answer = self.shift_right_func(cnt, num)
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
                 answer = self.logical_ops(screen)
             else:
                 answer = eval(screen)
 
             self.Result.setText(str(answer))
-            try:
+            if(type(answer) is int):
                 binary_segments = self.decimal_to_decimal_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
                 self.nulla_15.setText(f"15  {self.format_binary(binary_segments[3])} 0")
-            except:
+            else:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
                 self.t6_31.setText(f"")
@@ -617,7 +616,9 @@ class Ui_Programmer_calc(object):
         elif self.comboBox_3.currentText() == "Bináris":
 
             answer = 0
-            if self.contain_arithmetic(screen) and not self.contain_logical(screen):
+            if not self.contain_logical(screen) and self.contains_sqrt(screen):
+                answer = self.sqrt_func(screen,'binary')
+            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
                 answer = self.evaluate_binary_expression(screen)
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
                 answer = self.evaluate_binary_logical_expression(screen)
@@ -645,18 +646,46 @@ class Ui_Programmer_calc(object):
             else:
                 answer = screen
             self.Result.setText(str(answer))
-            try:
+            if(type(answer) is int):
                 binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
                 self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
-            except:
+            else:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
                 self.t6_31.setText(f"")
                 self.nulla_15.setText(f"")
 
+    def shift_left_func(self, num: str, number: str):
+        # Ensure the input number is an integer
+        if not number.isdigit():
+            return (f"{number}: the provided number is not an integer")
+
+        # Calculate the new number by shifting to the left
+        new_number = int(number) << int(num)
+        
+        # Return the new number as a string
+        return new_number
+
+    def shift_right_func(self, num: str, number: str):
+        # Ensure the input number is an integer
+        if not number.isdigit():
+            return (f"{number}: the provided number is not an integer")
+
+        # Calculate the new number by shifting to the right
+        new_number = int(number) >> int(num)
+        
+        # Return the new number as a string
+        return new_number
+
+    def contains_sqrt(self, string):
+        for i in string:
+            if "SQRT" in string:
+                return True
+        return False
+    
     def contain_arithmetic(self, string):
         contains_arithmetic = False
         arithmetic_exp = ["*", "/", "%", "-", "+"]
@@ -678,21 +707,6 @@ class Ui_Programmer_calc(object):
                 break
 
         return contains_logical
-
-    def sqrt_func(self):
-        try:
-            original = (
-                self.Result.text()
-                .replace("A", "10")
-                .replace("B", "11")
-                .replace("C", "12")
-                .replace("D", "13")
-                .replace("E", "14")
-                .replace("F", "15")
-            )
-            self.Result.setText(str(round(math.sqrt(float(original)), 2)))
-        except:
-            self.Result.setText("ERROR")
 
     def format_binary(self, binary_string):
         # Insert a space every four characters
@@ -972,8 +986,31 @@ class Ui_Programmer_calc(object):
         except Exception as e:
             return f"Error evaluating expression: {e}"
 
-        # Convert the result back to hexadecimal
-        hex_result = hex(result).upper()[2:]
+        if isinstance(result, int):
+            # Convert the integer result back to hexadecimal
+            hex_result = hex(result).upper()[2:]
+        elif isinstance(result, float):
+            # Handle float result
+            # Extract the integer and fractional parts
+            integer_part = int(result)
+            fractional_part = result - integer_part
+            
+            # Convert the integer part to hexadecimal
+            hex_integer_part = hex(integer_part).upper()[2:]
+            
+            # Convert the fractional part to hexadecimal
+            hex_fractional_part = []
+            while fractional_part != 0:
+                fractional_part *= 16
+                hex_digit = int(fractional_part)
+                hex_fractional_part.append(hex(hex_digit).upper()[2:])
+                fractional_part -= hex_digit
+                if len(hex_fractional_part) > 12:  # Limit precision to avoid infinite loops
+                    break
+            hex_fractional_part = ''.join(hex_fractional_part)
+
+            # Combine both parts
+            hex_result = f"{hex_integer_part}.{hex_fractional_part}"
 
         return hex_result
 
@@ -1000,15 +1037,89 @@ class Ui_Programmer_calc(object):
         return segments
 
     def logical_ops(self, string):
-
+        # Define allowed operators
+        allowed_operators = {"XOR", "OR", "AND", "NOT", "^", "|", "&", "~", "(", ")"}
+        
+        # Tokenize the string
+        tokens = re.findall(r'\b\w+\b|[&|^~()]+', string)
+        
+        # Validate tokens
+        for token in tokens:
+            if token.isdigit():  # Check if the token is a digit (integer)
+                continue
+            elif token in allowed_operators:  # Check if the token is an allowed operator
+                continue
+            else:
+                raise ValueError(f"Invalid token found: {token}")
+        
+        # Replace logical operators with corresponding symbols
         string = (
             string.replace("XOR", "^")
-            .replace("OR", "|")
-            .replace("AND", "&")
-            .replace("NOT", "~")
+                .replace("OR", "|")
+                .replace("AND", "&")
+                .replace("NOT", "~")
         )
-
+        
+        # Final check to ensure the string contains only integers and allowed operators
+        if not re.fullmatch(r'[0-9&|^~() ]+', string):
+            return(string + ": The string contains invalid characters or floating-point numbers.")
+        
         return eval(string)
+
+    def bin_to_dec(self, binary_str):
+        return int(binary_str, 2)
+
+    def oct_to_dec(self, octal_str):
+        return int(octal_str, 8)
+
+    def hex_to_dec(self, hex_str):
+        return int(hex_str, 16)
+
+    def dec_to_bin(self, decimal_float):
+        integer_part = int(decimal_float)
+        fractional_part = decimal_float - integer_part
+        integer_str = bin(integer_part)[2:]
+        
+        fractional_str = ""
+        while fractional_part > 0 and len(fractional_str) < 10:
+            fractional_part *= 2
+            bit = int(fractional_part)
+            fractional_str += str(bit)
+            fractional_part -= bit
+        
+        return integer_str + ('.' + fractional_str if fractional_str else '')
+    # Evaluate an arithmetic expression in the given base
+    def eval_expression(self, expression, mode):
+        if mode == 'binary':
+            expression = re.sub(r'(\b[01]+)', lambda x: str(self.bin_to_dec(x.group(1))), expression)
+        
+        # Replace common operators for Python eval
+        expression = expression.replace('×', '*').replace('÷', '/')
+        
+        # Evaluate the expression in decimal
+        result = eval(expression)
+        return result
+    # Main function to handle SQRT
+    def sqrt_func(self, input_str, mode):
+        input_str = input_str.strip().upper()
+        
+        # Handle the SQRT operation within the expression
+        input_str = re.sub(r'SQRT\((.*?)\)', lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))), input_str)
+        input_str = re.sub(r'SQRT([0-9A-Fa-f]+)', lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))), input_str)
+
+        # Evaluate the final expression
+        decimal_value = self.eval_expression(input_str, mode)
+        
+        if decimal_value.is_integer():
+            decimal_value = int(decimal_value)
+        
+        # Convert back to the original mode
+        if mode == 'binary':
+            result = self.dec_to_bin(decimal_value)
+        elif mode == 'decimal':
+            result = decimal_value
+        
+        return result
 
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
@@ -1019,10 +1130,10 @@ class Ui_Programmer_calc(object):
         self.h2_47.setText(_translate("Programmer_calc", ""))
         self.t6_31.setText(_translate("Programmer_calc", ""))
         self.nulla_15.setText(_translate("Programmer_calc", ""))
-        self.comboBox_3.setItemText(0, _translate("Programmer_calc", "Bináris"))
-        self.comboBox_3.setItemText(1, _translate("Programmer_calc", "Oktális"))
-        self.comboBox_3.setItemText(2, _translate("Programmer_calc", "Decimális"))
-        self.comboBox_3.setItemText(3, _translate("Programmer_calc", "Hexadecimális"))
+        self.comboBox_3.setItemText(0, _translate("Programmer_calc", "Decimális"))
+        self.comboBox_3.setItemText(1, _translate("Programmer_calc", "Hexadecimális"))
+        self.comboBox_3.setItemText(2, _translate("Programmer_calc", "Bináris"))
+        self.comboBox_3.setItemText(3, _translate("Programmer_calc", "Oktális"))
         self.label_2.setText(_translate("Programmer_calc", "x fok = y radián"))
         self.bel_zj.setText(_translate("Programmer_calc", "("))
         self.eight.setText(_translate("Programmer_calc", "8"))
@@ -1055,25 +1166,21 @@ class Ui_Programmer_calc(object):
         self.frac.setText(_translate("Programmer_calc", "frac"))
         self.fakt.setText(_translate("Programmer_calc", "x!"))
         self.XOR.setText(_translate("Programmer_calc", "XOR"))
-        self.plusn.setText(_translate("Programmer_calc", "+n"))
         self.abs.setText(_translate("Programmer_calc", "|x|"))
         self.NOT.setText(_translate("Programmer_calc", "NOT"))
         self.log.setText(_translate("Programmer_calc", "log"))
         self.x_xx_y.setText(_translate("Programmer_calc", "x^y"))
-        self.minusn.setText(_translate("Programmer_calc", "-n"))
         self.ones.setText(_translate("Programmer_calc", "ones"))
         self.int_2.setText(_translate("Programmer_calc", "int"))
         self.x_xx_1.setText(_translate("Programmer_calc", "x^-1"))
         self.twos.setText(_translate("Programmer_calc", "twos"))
         self.AND.setText(_translate("Programmer_calc", "AND"))
-        self.variable_name.setItemText(0, _translate("Programmer_calc", "x"))
         self.log2.setText(_translate("Programmer_calc", "log2"))
         self.OR.setText(_translate("Programmer_calc", "OR"))
-        self.shift_left.setItemText(0, _translate("Programmer_calc", "<<"))
-        self.shift_right.setItemText(0, _translate("Programmer_calc", ">>"))
+        self.shift_left.setText(_translate("Programmer_calc", "<<"))
+        self.shift_right.setText(_translate("Programmer_calc", ">>"))
         self.aaaa.setText(_translate("Programmer_calc", "á"))
         self.fact.setText(_translate("Programmer_calc", "fact"))
-        self.variable_name_2.setItemText(0, _translate("Programmer_calc", "32 bites"))
 
 
 if __name__ == "__main__":
