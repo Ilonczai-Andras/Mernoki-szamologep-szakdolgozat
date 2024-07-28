@@ -1,25 +1,32 @@
 import re
+def evaluate_binary_expression(expression):
+# Define a helper function to convert binary to decimal
+    def bin_to_dec(bin_str):
+        return int(bin_str, 2)
 
-def evaluate_hex_expression(expression):
-    # Regular expression to find hexadecimal numbers (e.g., A, FF)
-    hex_pattern = re.compile(r'\b[0-9a-fA-F]+\b')
+    # Define a helper function to convert decimal to binary
+    def dec_to_bin(dec_int):
+        return bin(dec_int)[2:]
 
-    # Function to convert hexadecimal to decimal
-    def hex_to_dec(match):
-        return str(int(match.group(), 16))
+    # Replace binary numbers with their decimal equivalents in the expression
+    def replace_binary_with_decimal(expr):
+        binary_numbers = re.findall(r'[01]+', expr)
+        for bin_num in binary_numbers:
+            expr = expr.replace(bin_num, str(bin_to_dec(bin_num)), 1)
+        return expr
 
-    # Replace all hexadecimal numbers in the expression with their decimal equivalents
-    decimal_expression = hex_pattern.sub(hex_to_dec, expression)
-
+    # Replace binary numbers with decimal equivalents
+    decimal_expression = replace_binary_with_decimal(expression)
+    
+    # Evaluate the decimal expression
     try:
-        # Evaluate the decimal expression
         result = eval(decimal_expression)
+    except ZeroDivisionError:
+        return "Error: Division by zero"
     except Exception as e:
-        return f"Error evaluating expression: {e}"
+        return f"Error: {e}"
+    
+    # Convert the result back to binary
+    return dec_to_bin(result)
 
-    return result
-
-# Example usage
-expression = "A +FF * (3+4)"
-result = evaluate_hex_expression(expression)
-print(f"Result of the expression '{expression}' is: {result}")
+print(evaluate_binary_expression("1110 AND 110"))

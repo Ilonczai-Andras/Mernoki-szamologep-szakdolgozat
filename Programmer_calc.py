@@ -13,12 +13,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import math
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-
-from sympy import false, true
+import re
 
 
 class Ui_Programmer_calc(object):
-    def applyStylesheet(self, Egyenlet):
+    def applyStylesheet(self, Programmer_calc):
         stylesheet = """
         QMainWindow {
             background-color: #2E2E2E;
@@ -31,6 +30,16 @@ class Ui_Programmer_calc(object):
         }
         QComboBox, QTextEdit {
             background-color: #4E4E4E;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        QComboBox#shift_left, QComboBox#variable_name, QComboBox#variable_name_2, QComboBox#shift_right{
+            background-color: #4E4E4E;
+            font-size: 14pt;
+            width: 50px;
+            height: 50px;
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 5px;
@@ -50,8 +59,20 @@ class Ui_Programmer_calc(object):
             font-size: 14pt;
             qproperty-alignment: 'AlignRight | AlignTrailing | AlignVCenter';
         }
+        QPushButton#equal {
+                background-color: #ff7300;
+                width: 50px;
+                height: 100%;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-radius: 10px;
+                padding: 10px;
+            }
         QPushButton {
             background-color: #4E4E4E;
+            font-size: 14pt;
+            width: 50px;
+            height: 50px;
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 10px;
@@ -63,8 +84,13 @@ class Ui_Programmer_calc(object):
         QPushButton:pressed {
             background-color: #6E6E6E;
         }
+        QGridLayout#gridLayout_for_numbers {
+            border: 1px solid #555555;
+            background: #ffffff;
+            border-radius: 10px;
+        }
         """
-        Egyenlet.setStyleSheet(stylesheet)
+        Programmer_calc.setStyleSheet(stylesheet)
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
@@ -134,7 +160,9 @@ class Ui_Programmer_calc(object):
     def setupUi(self, Programmer_calc, MainWindow):
         self.applyStylesheet(Programmer_calc)
         Programmer_calc.setObjectName("Programmer_calc")
-        Programmer_calc.resize(1083, 748)
+        Programmer_calc.resize(1080, 725)
+        Programmer_calc.setMinimumSize(QtCore.QSize(1080, 725))
+        Programmer_calc.setMaximumSize(QtCore.QSize(1080, 725))
         Programmer_calc.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         self.centralwidget = QtWidgets.QWidget(Programmer_calc)
         self.centralwidget.setObjectName("centralwidget")
@@ -420,7 +448,7 @@ class Ui_Programmer_calc(object):
         self.fakt.setObjectName("fakt")
         self.gridLayout_for_special_buttons.addWidget(self.fakt, 3, 0, 1, 1)
         self.XOR = QtWidgets.QPushButton(
-            self.centralwidget, clicked=lambda: self.press_it("XOR")
+            self.centralwidget, clicked=lambda: self.press_it(" XOR ")
         )
         self.XOR.setObjectName("XOR")
         self.gridLayout_for_special_buttons.addWidget(self.XOR, 0, 4, 1, 1)
@@ -438,7 +466,7 @@ class Ui_Programmer_calc(object):
         self.gridLayout_for_special_buttons.addWidget(self.abs, 3, 1, 1, 1)
         self.NOT = QtWidgets.QPushButton(
             self.centralwidget,
-            clicked=lambda: self.press_it("NOT"),
+            clicked=lambda: self.press_it(" NOT "),
         )
         self.NOT.setObjectName("NOT")
         self.gridLayout_for_special_buttons.addWidget(self.NOT, 1, 2, 1, 1)
@@ -476,7 +504,7 @@ class Ui_Programmer_calc(object):
         self.twos.setObjectName("twos")
         self.gridLayout_for_special_buttons.addWidget(self.twos, 1, 1, 1, 1)
         self.AND = QtWidgets.QPushButton(
-            self.centralwidget, clicked=lambda: self.press_it("AND")
+            self.centralwidget, clicked=lambda: self.press_it(" AND ")
         )
         self.AND.setObjectName("AND")
         self.gridLayout_for_special_buttons.addWidget(self.AND, 1, 3, 1, 1)
@@ -491,7 +519,7 @@ class Ui_Programmer_calc(object):
         self.log2.setObjectName("log2")
         self.gridLayout_for_special_buttons.addWidget(self.log2, 2, 3, 1, 1)
         self.OR = QtWidgets.QPushButton(
-            self.centralwidget, clicked=lambda: self.press_it("OR")
+            self.centralwidget, clicked=lambda: self.press_it(" OR ")
         )
         self.OR.setObjectName("OR")
         self.gridLayout_for_special_buttons.addWidget(self.OR, 1, 4, 1, 1)
@@ -544,7 +572,7 @@ class Ui_Programmer_calc(object):
 
     def evaluate_expression(self):
         screen = self.Result.text()
-        
+
         if self.comboBox_3.currentText() == "Decimális":
             answer = 0
             if self.contain_arithmetic(screen) and not self.contain_logical(screen):
@@ -555,23 +583,79 @@ class Ui_Programmer_calc(object):
                 answer = eval(screen)
 
             self.Result.setText(str(answer))
-            binary_segments = self.decimal_to_decimal_64bit_segments(answer)
-            self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
-            self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
-            self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-            self.nulla_15.setText(f"15  {self.format_binary(binary_segments[3])} 0")
+            try:
+                binary_segments = self.decimal_to_decimal_64bit_segments(answer)
+                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                self.nulla_15.setText(f"15  {self.format_binary(binary_segments[3])} 0")
+            except:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
         elif self.comboBox_3.currentText() == "Oktális":
-            octal_segments = self.octal_octal_to_64bit_segments(answer)
-            self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
-            self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
-            self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
-            self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
+            answer = 0
+            if self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                answer = self.evaluate_octal_expression(screen)
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                answer = self.evaluate_octal_logical_expression(screen)
+            else:
+                answer = eval(screen)
+            self.Result.setText(str(answer))
+            try:
+                octal_segments = self.octal_octal_to_64bit_segments(answer)
+                self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
+                self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
+            except:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
         elif self.comboBox_3.currentText() == "Bináris":
-                binary_segments = self.binary_tobinary_16bit_segments(answer)
+
+            answer = 0
+            if self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                answer = self.evaluate_binary_expression(screen)
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                answer = self.evaluate_binary_logical_expression(screen)
+            else:
+                answer = eval(screen)
+            self.Result.setText(str(answer))
+            try:
+                binary_segments = self.binary_tobinary_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
                 self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
+            except:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
+        elif self.comboBox_3.currentText() == "Hexadecimális":
+
+            answer = 0
+            if self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                answer = self.evaluate_hex_expression(screen)
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                answer = self.logical_ops(screen)
+            else:
+                answer = screen
+            self.Result.setText(str(answer))
+            try:
+                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(answer)
+                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
+            except:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
 
     def contain_arithmetic(self, string):
         contains_arithmetic = False
@@ -581,7 +665,7 @@ class Ui_Programmer_calc(object):
             if op in string:
                 contains_arithmetic = True
                 break
-        
+
         return contains_arithmetic
 
     def contain_logical(self, string):
@@ -592,8 +676,9 @@ class Ui_Programmer_calc(object):
             if op in string:
                 contains_logical = True
                 break
-        
+
         return contains_logical
+
     def sqrt_func(self):
         try:
             original = (
@@ -648,11 +733,271 @@ class Ui_Programmer_calc(object):
 
         return chunks
 
-    def binary_tobinary_16bit_segments(self, binary_number):
+    def evaluate_octal_expression(self, expression):
+        # Define a helper function to convert octal to decimal
+        def oct_to_dec(oct_str):
+            return int(oct_str, 8)
+
+        # Define a helper function to convert decimal to octal
+        def dec_to_oct(dec_int):
+            return oct(dec_int)[2:]
+
+        # Replace octal numbers with their decimal equivalents in the expression
+        def replace_octal_with_decimal(expr):
+            octal_numbers = re.findall(r"[0-7]+", expr)
+            for oct_num in octal_numbers:
+                expr = expr.replace(oct_num, str(oct_to_dec(oct_num)), 1)
+            return expr
+
+        # Replace octal numbers with decimal equivalents
+        decimal_expression = replace_octal_with_decimal(expression)
+
+        # Evaluate the decimal expression
+        try:
+            result = eval(decimal_expression)
+        except ZeroDivisionError:
+            return "Error: Division by zero"
+        except Exception as e:
+            return f"Error: {e}"
+
+        # Convert the result back to octal
+        return dec_to_oct(result)
+
+    def evaluate_octal_logical_expression(self, expression):
+        # Define a helper function to convert octal to decimal
+        def oct_to_dec(oct_str):
+            return int(oct_str, 8)
+
+        # Define a helper function to convert decimal to octal
+        def dec_to_oct(dec_int):
+            return oct(dec_int)[2:]
+
+        # Replace octal numbers with their decimal equivalents in the expression
+        def replace_octal_with_decimal(expr):
+            octal_numbers = re.findall(r"\b[0-7]+\b", expr)
+            for oct_num in octal_numbers:
+                expr = expr.replace(oct_num, str(oct_to_dec(oct_num)), 1)
+            return expr
+
+        # Define the logical operators and their corresponding lambda functions
+        logical_ops = {
+            "AND": lambda a, b: a & b,
+            "OR": lambda a, b: a | b,
+            "XOR": lambda a, b: a ^ b,
+            "NOT": lambda a: ~a,
+        }
+
+        # Replace octal numbers with decimal equivalents
+        decimal_expression = replace_octal_with_decimal(expression)
+
+        # Tokenize the expression into numbers and operators
+        tokens = re.split(r"(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b)", decimal_expression)
+
+        # Process the tokens to handle logical operations
+        def process_tokens(tokens):
+            # Stack for numbers and operators
+            num_stack = []
+            op_stack = []
+
+            def apply_operator():
+                op = op_stack.pop()
+                if op == "NOT":
+                    num = num_stack.pop()
+                    num_stack.append(logical_ops[op](num))
+                else:
+                    num2 = num_stack.pop()
+                    num1 = num_stack.pop()
+                    num_stack.append(logical_ops[op](num1, num2))
+
+            i = 0
+            while i < len(tokens):
+                token = tokens[i].strip()
+                if token in logical_ops:
+                    while (
+                        op_stack
+                        and op_stack[-1] in logical_ops
+                        and logical_ops[op_stack[-1]]
+                        in [logical_ops["AND"], logical_ops["OR"], logical_ops["XOR"]]
+                    ):
+                        apply_operator()
+                    op_stack.append(token)
+                else:
+                    num_stack.append(int(token))
+                i += 1
+
+            while op_stack:
+                apply_operator()
+
+            return num_stack[0]
+
+        # Evaluate the expression
+        try:
+            result = process_tokens(tokens)
+        except ZeroDivisionError:
+            return "Error: Division by zero"
+        except Exception as e:
+            return f"Error: {e}"
+
+        # Convert the result back to octal
+        return dec_to_oct(result)
+
+    def binary_tobinary_64bit_segments(self, binary_number):
         # Ensure the binary number is represented in 64 bits
         padded_binary = format(int(str(binary_number), 2), "064b")
         # Split the padded binary into four 16-bit chunks
         return [padded_binary[i : i + 16] for i in range(0, 64, 16)]
+
+    def evaluate_binary_expression(self, expression):
+        # Define a helper function to convert binary to decimal
+        def bin_to_dec(bin_str):
+            return int(bin_str, 2)
+
+        # Define a helper function to convert decimal to binary
+        def dec_to_bin(dec_int):
+            return bin(dec_int)[2:]
+
+        # Replace binary numbers with their decimal equivalents in the expression
+        def replace_binary_with_decimal(expr):
+            binary_numbers = re.findall(r"[01]+", expr)
+            for bin_num in binary_numbers:
+                expr = expr.replace(bin_num, str(bin_to_dec(bin_num)), 1)
+            return expr
+
+        # Replace binary numbers with decimal equivalents
+        decimal_expression = replace_binary_with_decimal(expression)
+
+        # Evaluate the decimal expression
+        try:
+            result = eval(decimal_expression)
+        except ZeroDivisionError:
+            return "Error: Division by zero"
+        except Exception as e:
+            return f"Error: {e}"
+
+        # Convert the result back to binary
+        return dec_to_bin(result)
+
+    def evaluate_binary_logical_expression(self, expression):
+        # Define a helper function to convert binary to decimal
+        def bin_to_dec(bin_str):
+            return int(bin_str, 2)
+
+        # Define a helper function to convert decimal to binary
+        def dec_to_bin(dec_int):
+            return bin(dec_int)[2:]
+
+        # Replace binary numbers with their decimal equivalents in the expression
+        def replace_binary_with_decimal(expr):
+            binary_numbers = re.findall(r"\b[01]+\b", expr)
+            for bin_num in binary_numbers:
+                expr = expr.replace(bin_num, str(bin_to_dec(bin_num)), 1)
+            return expr
+
+        # Define the logical operators and their corresponding lambda functions
+        logical_ops = {
+            "AND": lambda a, b: a & b,
+            "OR": lambda a, b: a | b,
+            "XOR": lambda a, b: a ^ b,
+            "NOT": lambda a: ~a,
+        }
+
+        # Replace binary numbers with decimal equivalents
+        decimal_expression = replace_binary_with_decimal(expression)
+
+        # Tokenize the expression into numbers and operators
+        tokens = re.split(r"(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b)", decimal_expression)
+
+        # Process the tokens to handle logical operations
+        def process_tokens(tokens):
+            # Stack for numbers and operators
+            num_stack = []
+            op_stack = []
+
+            def apply_operator():
+                op = op_stack.pop()
+                if op == "NOT":
+                    num = num_stack.pop()
+                    num_stack.append(logical_ops[op](num))
+                else:
+                    num2 = num_stack.pop()
+                    num1 = num_stack.pop()
+                    num_stack.append(logical_ops[op](num1, num2))
+
+            i = 0
+            while i < len(tokens):
+                token = tokens[i].strip()
+                if token in logical_ops:
+                    while (
+                        op_stack
+                        and op_stack[-1] in logical_ops
+                        and logical_ops[op_stack[-1]]
+                        in [logical_ops["AND"], logical_ops["OR"], logical_ops["XOR"]]
+                    ):
+                        apply_operator()
+                    op_stack.append(token)
+                else:
+                    num_stack.append(int(token))
+                i += 1
+
+            while op_stack:
+                apply_operator()
+
+            return num_stack[0]
+
+        # Evaluate the expression
+        try:
+            result = process_tokens(tokens)
+        except ZeroDivisionError:
+            return "Error: Division by zero"
+        except Exception as e:
+            return f"Error: {e}"
+
+        # Convert the result back to binary
+        return dec_to_bin(result)
+
+    def evaluate_hex_expression(self, expression):
+        # Regular expression to find hexadecimal numbers (e.g., A, FF)
+        hex_pattern = re.compile(r"\b[0-9a-fA-F]+\b")
+
+        # Function to convert hexadecimal to decimal
+        def hex_to_dec(match):
+            return str(int(match.group(), 16))
+
+        # Replace all hexadecimal numbers in the expression with their decimal equivalents
+        decimal_expression = hex_pattern.sub(hex_to_dec, expression)
+
+        try:
+            # Evaluate the decimal expression
+            result = eval(decimal_expression)
+        except Exception as e:
+            return f"Error evaluating expression: {e}"
+
+        # Convert the result back to hexadecimal
+        hex_result = hex(result).upper()[2:]
+
+        return hex_result
+
+    def hexidecimal_to_hexidecimal_64bit_segments(self, hex_number):
+        if not isinstance(hex_number, str):
+            return "Error: Input must be a hexadecimal string."
+
+        try:
+            number = int(hex_number, 16)
+        except ValueError:
+            return "Error: Input must be a valid hexadecimal string."
+
+        if number == 0:
+            return ["0" * 16]  # Special case for zero, with a single 16-bit segment
+
+        binary_result = bin(number)[2:]  # Get binary representation without '0b' prefix
+
+        # Pad with leading zeros to make it 64 bits
+        binary_result = binary_result.zfill(64)
+
+        # Split into 16-bit segments
+        segments = [binary_result[i : i + 16] for i in range(0, 64, 16)]
+
+        return segments
 
     def logical_ops(self, string):
 
