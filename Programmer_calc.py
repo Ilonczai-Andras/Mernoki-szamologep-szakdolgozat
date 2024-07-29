@@ -112,7 +112,6 @@ class Ui_Programmer_calc(object):
         """
         Programmer_calc.setStyleSheet(stylesheet)
 
-
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
@@ -155,7 +154,7 @@ class Ui_Programmer_calc(object):
             self.set_to_null(hex_buttons, numbers)
             for i in hex_buttons:
                 i.setEnabled(False)
-            
+
             self.pi.setEnabled(False)
             self.dot.setEnabled(False)
 
@@ -211,7 +210,9 @@ class Ui_Programmer_calc(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
 
         self.operations_list = QtWidgets.QListWidget(self.centralwidget)
-        self.operations_list.setGeometry(QtCore.QRect(10, 600, 1051, 100))  # Adjust size and position as needed
+        self.operations_list.setGeometry(
+            QtCore.QRect(10, 600, 1051, 100)
+        )  # Adjust size and position as needed
         self.operations_list.setObjectName("operations_list")
         self.horizontalLayout.addWidget(self.operations_list)
 
@@ -219,7 +220,7 @@ class Ui_Programmer_calc(object):
         font.setFamily("Times New Roman")
         font.setPointSize(14)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 180, 1051, 211))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 230, 1051, 161))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -245,7 +246,7 @@ class Ui_Programmer_calc(object):
         self.nulla_15.setObjectName("nulla_15")
         self.verticalLayout.addWidget(self.nulla_15)
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 140, 1051, 41))
+        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 131 , 1051, 59))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -466,7 +467,7 @@ class Ui_Programmer_calc(object):
         )
         self.XOR.setObjectName("XOR")
         self.gridLayout_for_special_buttons.addWidget(self.XOR, 0, 4, 1, 1)
-    
+
         self.abs = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.press_it("|"),
@@ -558,13 +559,15 @@ class Ui_Programmer_calc(object):
         self.statusbar = QtWidgets.QStatusBar(Programmer_calc)
         self.statusbar.setObjectName("statusbar")
         Programmer_calc.setStatusBar(self.statusbar)
-        
+
         self.comboBox_3.currentTextChanged.connect(self.handle_combobox_3_change)
         self.retranslateUi(Programmer_calc)
         QtCore.QMetaObject.connectSlotsByName(Programmer_calc)
 
     def show_dialog(self):
-        text, ok = QInputDialog.getText(self.centralwidget, 'Input Dialog', 'Enter a character:')
+        text, ok = QInputDialog.getText(
+            self.centralwidget, "Input Dialog", "Enter a character:"
+        )
         if ok and text:
             ascii_value = ord(text)
             current_mode = self.comboBox_3.currentText()
@@ -572,11 +575,17 @@ class Ui_Programmer_calc(object):
             if current_mode == "Decimális":
                 converted_value = str(ascii_value)
             elif current_mode == "Hexadecimális":
-                converted_value = hex(ascii_value)[2:].upper()  # Convert to hex and remove '0x' prefix
+                converted_value = hex(ascii_value)[
+                    2:
+                ].upper()  # Convert to hex and remove '0x' prefix
             elif current_mode == "Bináris":
-                converted_value = bin(ascii_value)[2:]  # Convert to binary and remove '0b' prefix
+                converted_value = bin(ascii_value)[
+                    2:
+                ]  # Convert to binary and remove '0b' prefix
             elif current_mode == "Oktális":
-                converted_value = oct(ascii_value)[2:]  # Convert to octal and remove '0o' prefix
+                converted_value = oct(ascii_value)[
+                    2:
+                ]  # Convert to octal and remove '0o' prefix
 
             self.Result.setText(self.Result.text() + converted_value)
 
@@ -609,7 +618,7 @@ class Ui_Programmer_calc(object):
     def factorize(self, n):
         if self.is_prime(n):
             return [n]
-        
+
         factors = []
         divisor = 2
         while n >= 2:
@@ -633,13 +642,13 @@ class Ui_Programmer_calc(object):
             base = 8
         else:
             base = 10
-        
+
         # Convert the number to decimal
         decimal_number = int(input_num, base)
-        
+
         # Factorize the decimal number
         factors = self.factorize(decimal_number)
-        
+
         # Convert factors back to the original base
         if base == 2:
             factors_str = "*".join(bin(f)[2:] for f in factors)
@@ -649,18 +658,18 @@ class Ui_Programmer_calc(object):
             factors_str = "*".join(oct(f)[2:] for f in factors)
         else:
             factors_str = "*".join(map(str, factors))
-    
+
         return factors_str
 
     def factorial(self, num_str, num_system):
         # Determine the base and convert to decimal
-        if num_system == 'binary':
+        if num_system == "binary":
             base = 2
-        elif num_system == 'octal':
+        elif num_system == "octal":
             base = 8
-        elif num_system == 'hexadecimal':
+        elif num_system == "hexadecimal":
             base = 16
-        elif num_system == 'decimal':
+        elif num_system == "decimal":
             base = 10
         else:
             raise ValueError("Invalid number system")
@@ -690,7 +699,7 @@ class Ui_Programmer_calc(object):
             result = hex(int(factorial_result))
         else:
             result = str(factorial_result)
-        
+
         return result
 
     def only_one_fact(self, string):
@@ -708,7 +717,7 @@ class Ui_Programmer_calc(object):
         if self.comboBox_3.currentText() == "Decimális":
             if "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1],'decimal')
+                    answer = self.round_down_number(screen.split("int")[1], "decimal")
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -720,9 +729,13 @@ class Ui_Programmer_calc(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
-            elif not self.contain_logical(screen) and self.contains_sqrt(screen) and self.only_one_fact(screen) == 0:
+            elif (
+                not self.contain_logical(screen)
+                and self.contains_sqrt(screen)
+                and self.only_one_fact(screen) == 0
+            ):
                 try:
-                    answer = self.sqrt_func(screen,'decimal')
+                    answer = self.sqrt_func(screen, "decimal")
                     print("#LOG: csak gyökvonás")
                 except:
                     answer = None
@@ -741,7 +754,11 @@ class Ui_Programmer_calc(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen shiftelés!")
-            elif self.contain_arithmetic(screen) and not self.contain_logical(screen) and self.only_one_fact(screen) == 0:
+            elif (
+                self.contain_arithmetic(screen)
+                and not self.contain_logical(screen)
+                and self.only_one_fact(screen) == 0
+            ):
                 try:
                     answer = eval(screen)
                     print("#LOG: csak aritmetikai")
@@ -758,7 +775,7 @@ class Ui_Programmer_calc(object):
             elif self.only_one_fact(screen) == 1 and "!" in screen:
                 try:
                     print("#LOG: factorial")
-                    answer = self.factorial(screen.split("!")[0], 'decimal')
+                    answer = self.factorial(screen.split("!")[0], "decimal")
                 except:
                     answer = None
                     self.Result.setText("Helytelen faktoriális!")
@@ -784,7 +801,7 @@ class Ui_Programmer_calc(object):
                 # Update the display of operations
                 self.update_operations_display()
 
-            if(type(answer) is int):
+            if type(answer) is int:
                 binary_segments = self.decimal_to_decimal_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
@@ -799,7 +816,7 @@ class Ui_Programmer_calc(object):
             answer = 0
             if "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1],'octal')
+                    answer = self.round_down_number(screen.split("int")[1], "octal")
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -838,7 +855,7 @@ class Ui_Programmer_calc(object):
             answer = 0
             if "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1],'binary')
+                    answer = self.round_down_number(screen.split("int")[1], "binary")
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -851,7 +868,7 @@ class Ui_Programmer_calc(object):
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
             elif not self.contain_logical(screen) and self.contains_sqrt(screen):
-                answer = self.sqrt_func(screen,'binary')
+                answer = self.sqrt_func(screen, "binary")
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
                 answer = self.evaluate_binary_expression(screen)
             elif "FACT" in screen:
@@ -877,7 +894,7 @@ class Ui_Programmer_calc(object):
             answer = 0
             if "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1],'hex')
+                    answer = self.round_down_number(screen.split("int")[1], "hex")
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -909,8 +926,10 @@ class Ui_Programmer_calc(object):
             else:
                 answer = screen
             self.Result.setText(str(answer))
-            if(isinstance(answer, str)):
-                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(str(answer))
+            if isinstance(answer, str):
+                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
+                    str(answer)
+                )
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
@@ -940,22 +959,31 @@ class Ui_Programmer_calc(object):
 
         # Convert back to the original base
         if base == 2:
-            result = bin(ones_complement_int)[2:].zfill(64)  # Remove the '0b' prefix and pad with zeros
+            result = bin(ones_complement_int)[2:].zfill(
+                64
+            )  # Remove the '0b' prefix and pad with zeros
         elif base == 8:
-            result = oct(ones_complement_int)[2:].zfill(64 // 3)   # Remove the '0o' prefix and pad with zeros
+            result = oct(ones_complement_int)[2:].zfill(
+                64 // 3
+            )  # Remove the '0o' prefix and pad with zeros
         elif base == 10:
-            result = (ones_complement_int)
+            result = ones_complement_int
         elif base == 16:
-            result = hex(ones_complement_int)[2:].upper().zfill(64 // 4)  # Remove the '0x' prefix and pad with zeros
-        
+            result = (
+                hex(ones_complement_int)[2:].upper().zfill(64 // 4)
+            )  # Remove the '0x' prefix and pad with zeros
+
         return result
 
     def round_down_number(self, number: str, mode: str) -> str:
         def convert_to_decimal(number: str, base: int) -> float:
-            if '.' in number:
-                integer_part, fractional_part = number.split('.')
+            if "." in number:
+                integer_part, fractional_part = number.split(".")
                 integer_value = int(integer_part, base)
-                fractional_value = sum(int(digit, base) * (base ** -i) for i, digit in enumerate(fractional_part, 1))
+                fractional_value = sum(
+                    int(digit, base) * (base**-i)
+                    for i, digit in enumerate(fractional_part, 1)
+                )
                 return integer_value + fractional_value
             else:
                 return int(number, base)
@@ -970,44 +998,46 @@ class Ui_Programmer_calc(object):
             else:
                 return str(number)
 
-        if mode == 'binary':
+        if mode == "binary":
             num = convert_to_decimal(number, 2)
             rounded_num = math.floor(num)
             return convert_from_decimal(rounded_num, 2)
-        elif mode == 'decimal':
+        elif mode == "decimal":
             num = float(number)
             rounded_num = math.floor(num)
             return str(rounded_num)
-        elif mode == 'octal':
+        elif mode == "octal":
             num = convert_to_decimal(number, 8)
             rounded_num = math.floor(num)
             return convert_from_decimal(rounded_num, 8)
-        elif mode == 'hex':
+        elif mode == "hex":
             num = convert_to_decimal(number, 16)
             rounded_num = math.floor(num)
             return convert_from_decimal(rounded_num, 16)
         else:
-            raise ValueError("Invalid mode. Choose from 'binary', 'decimal', 'octal', or 'hex'.")
+            raise ValueError(
+                "Invalid mode. Choose from 'binary', 'decimal', 'octal', or 'hex'."
+            )
 
     def shift_left_func(self, num: str, number: str):
         # Ensure the input number is an integer
         if not number.isdigit():
-            return (f"{number}: a megadott érték nem egész szám")
+            return f"{number}: a megadott érték nem egész szám"
 
         # Calculate the new number by shifting to the left
         new_number = int(number) << int(num)
-        
+
         # Return the new number as a string
         return new_number
 
     def shift_right_func(self, num: str, number: str):
         # Ensure the input number is an integer
         if not number.isdigit():
-            return (f"{number}: a megadott érték nem egész szám")
+            return f"{number}: a megadott érték nem egész szám"
 
         # Calculate the new number by shifting to the right
         new_number = int(number) >> int(num)
-        
+
         # Return the new number as a string
         return new_number
 
@@ -1025,9 +1055,9 @@ class Ui_Programmer_calc(object):
 
         # Calculate the new number by shifting to the left
         new_number = int(hex_number, 16) << int(num)
-        
+
         # Return the new number as a hexadecimal string
-        return int(str(hex(new_number))[2:] )
+        return int(str(hex(new_number))[2:])
 
     def hex_shift_right_func(self, num: str, hex_number: str) -> str:
         # Ensure the input hex number is valid
@@ -1036,16 +1066,16 @@ class Ui_Programmer_calc(object):
 
         # Calculate the new number by shifting to the right
         new_number = int(hex_number, 16) >> int(num)
-        
+
         # Return the new number as a hexadecimal string
-        return int(str(hex(new_number))[2:] )
+        return int(str(hex(new_number))[2:])
 
     def contains_sqrt(self, string):
         for i in string:
             if "SQRT" in string:
                 return True
         return False
-    
+
     def contain_arithmetic(self, string):
         contains_arithmetic = False
         arithmetic_exp = ["*", "/", "%", "-", "+"]
@@ -1080,7 +1110,12 @@ class Ui_Programmer_calc(object):
             return "Error: Input must be an integer."
 
         if number == 0:
-            return ["0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"]  # Special case for zero
+            return [
+                "0000000000000000",
+                "0000000000000000",
+                "0000000000000000",
+                "0000000000000000",
+            ]  # Special case for zero
 
         binary_result = ""
         while number > 0:
@@ -1354,10 +1389,10 @@ class Ui_Programmer_calc(object):
             # Extract the integer and fractional parts
             integer_part = int(result)
             fractional_part = result - integer_part
-            
+
             # Convert the integer part to hexadecimal
             hex_integer_part = hex(integer_part).upper()[2:]
-            
+
             # Convert the fractional part to hexadecimal
             hex_fractional_part = []
             while fractional_part != 0:
@@ -1365,9 +1400,11 @@ class Ui_Programmer_calc(object):
                 hex_digit = int(fractional_part)
                 hex_fractional_part.append(hex(hex_digit).upper()[2:])
                 fractional_part -= hex_digit
-                if len(hex_fractional_part) > 12:  # Limit precision to avoid infinite loops
+                if (
+                    len(hex_fractional_part) > 12
+                ):  # Limit precision to avoid infinite loops
                     break
-            hex_fractional_part = ''.join(hex_fractional_part)
+            hex_fractional_part = "".join(hex_fractional_part)
 
             # Combine both parts
             hex_result = f"{hex_integer_part}.{hex_fractional_part}"
@@ -1399,31 +1436,36 @@ class Ui_Programmer_calc(object):
     def logical_ops(self, string):
         # Define allowed operators
         allowed_operators = {"XOR", "OR", "AND", "NOT", "^", "|", "&", "~", "(", ")"}
-        
+
         # Tokenize the string
-        tokens = re.findall(r'\b\w+\b|[&|^~()]+', string)
-        
+        tokens = re.findall(r"\b\w+\b|[&|^~()]+", string)
+
         # Validate tokens
         for token in tokens:
             if token.isdigit():  # Check if the token is a digit (integer)
                 continue
-            elif token in allowed_operators:  # Check if the token is an allowed operator
+            elif (
+                token in allowed_operators
+            ):  # Check if the token is an allowed operator
                 continue
             else:
                 raise ValueError(f"Invalid token found: {token}")
-        
+
         # Replace logical operators with corresponding symbols
         string = (
             string.replace("XOR", "^")
-                .replace("OR", "|")
-                .replace("AND", "&")
-                .replace("NOT", "~")
+            .replace("OR", "|")
+            .replace("AND", "&")
+            .replace("NOT", "~")
         )
-        
+
         # Final check to ensure the string contains only integers and allowed operators
-        if not re.fullmatch(r'[0-9&|^~() ]+', string):
-            return(string + ": The string contains invalid characters or floating-point numbers.")
-        
+        if not re.fullmatch(r"[0-9&|^~() ]+", string):
+            return (
+                string
+                + ": The string contains invalid characters or floating-point numbers."
+            )
+
         return eval(string)
 
     def bin_to_dec(self, binary_str):
@@ -1439,51 +1481,65 @@ class Ui_Programmer_calc(object):
         integer_part = int(decimal_float)
         fractional_part = decimal_float - integer_part
         integer_str = bin(integer_part)[2:]
-        
+
         fractional_str = ""
         while fractional_part > 0 and len(fractional_str) < 10:
             fractional_part *= 2
             bit = int(fractional_part)
             fractional_str += str(bit)
             fractional_part -= bit
-        
-        return integer_str + ('.' + fractional_str if fractional_str else '')
+
+        return integer_str + ("." + fractional_str if fractional_str else "")
+
     # Evaluate an arithmetic expression in the given base
     def eval_expression(self, expression, mode):
-        if mode == 'binary':
-            expression = re.sub(r'(\b[01]+)', lambda x: str(self.bin_to_dec(x.group(1))), expression)
-        
+        if mode == "binary":
+            expression = re.sub(
+                r"(\b[01]+)", lambda x: str(self.bin_to_dec(x.group(1))), expression
+            )
+
         # Replace common operators for Python eval
-        expression = expression.replace('×', '*').replace('÷', '/')
-        
+        expression = expression.replace("×", "*").replace("÷", "/")
+
         # Evaluate the expression in decimal
         result = eval(expression)
         return result
+
     # Main function to handle SQRT
     def sqrt_func(self, input_str, mode):
         input_str = input_str.strip().upper()
-        
+
         # Handle the SQRT operation within the expression
-        input_str = re.sub(r'SQRT\((.*?)\)', lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))), input_str)
-        input_str = re.sub(r'SQRT([0-9A-Fa-f]+)', lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))), input_str)
+        input_str = re.sub(
+            r"SQRT\((.*?)\)",
+            lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))),
+            input_str,
+        )
+        input_str = re.sub(
+            r"SQRT([0-9A-Fa-f]+)",
+            lambda m: str(math.sqrt(self.eval_expression(m.group(1), mode))),
+            input_str,
+        )
 
         # Evaluate the final expression
         decimal_value = self.eval_expression(input_str, mode)
-        
+
         if decimal_value.is_integer():
             decimal_value = int(decimal_value)
-        
+
         # Convert back to the original mode
-        if mode == 'binary':
+        if mode == "binary":
             result = self.dec_to_bin(decimal_value)
-        elif mode == 'decimal':
+        elif mode == "decimal":
             result = decimal_value
-        
+
         return result
 
     def update_operations_display(self):
         self.operations_list.clear()  # Clear the current display
-        self.operations_list.addItems(self.operations)  # Add all operations to the display
+        self.operations_list.addItems(
+            self.operations
+        )  # Add all operations to the display
 
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
@@ -1543,4 +1599,3 @@ class Ui_Programmer_calc(object):
         self.shift_right.setText(_translate("Programmer_calc", ">>"))
         self.aaaa.setText(_translate("Programmer_calc", "á"))
         self.fact.setText(_translate("Programmer_calc", "fact"))
-
