@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import QInputDialog
 class Ui_Programmer_calc(object):
     def __init__(self):
         self.operations = []  # List to store operations
+        self.operations2 = []  # List to store operations
 
     def applyStylesheet(self, Programmer_calc):
         stylesheet = """
@@ -211,12 +212,16 @@ class Ui_Programmer_calc(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
 
         self.operations_list = QtWidgets.QListWidget(self.centralwidget)
-        self.operations_list.setGeometry(
-            QtCore.QRect(10, 600, 1051, 100)
-        )  # Adjust size and position as needed
+        self.operations_list.setGeometry(QtCore.QRect(10, 600, 1051, 100))  # Adjust size and position as needed
         self.operations_list.setObjectName("operations_list")
         self.horizontalLayout.addWidget(self.operations_list)
         self.operations_list.itemClicked.connect(self.on_item_clicked)
+
+        self.operations_list2 = QtWidgets.QListWidget(self.centralwidget)
+        self.operations_list2.setGeometry(QtCore.QRect(10, 600, 1051, 100))  # Adjust size and position as needed
+        self.operations_list2.setObjectName("operations_list")
+        self.horizontalLayout.addWidget(self.operations_list2)
+        self.operations_list2.itemClicked.connect(self.on_item_clicked2)
 
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -801,10 +806,12 @@ class Ui_Programmer_calc(object):
 
             if answer is not None:
                 self.Result.setText(str(answer))
-                # Append the operation and result to the operations list
-                self.operations.append(f"{operation} = {answer}")
-                # Update the display of operations
+
+                self.operations.append(f"{operation}")
                 self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
 
             if type(answer) is int:
                 binary_segments = self.decimal_to_decimal_64bit_segments(answer)
@@ -1599,11 +1606,21 @@ class Ui_Programmer_calc(object):
         self.operations_list.clear()
         self.operations_list.addItems(self.operations)
         self.operations_list.scrollToBottom()
+    
+    def update_operations_display2(self):
+        self.operations_list2.clear()
+        self.operations_list2.addItems(self.operations2)
+        self.operations_list2.scrollToBottom()
 
     def on_item_clicked(self, item):
         # This function will be called when an item is clicked
         item_text = item.text()
-        self.Result.setText(item_text.split)
+        self.Result.setText(item_text)  # Use the full item text directly
+
+    def on_item_clicked2(self, item):
+        # This function will be called when an item is clicked
+        item_text = item.text()
+        self.Result.setText(item_text)  # Use the full item text directly
 
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
