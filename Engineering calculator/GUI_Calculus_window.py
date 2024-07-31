@@ -51,7 +51,6 @@ from math import pi
 
 
 class Ui_Calculus(object):
-
     def extract_variable(self, expression):
         pattern = r"[a-zA-Z]+"
 
@@ -115,11 +114,19 @@ class Ui_Calculus(object):
 
         # pi
         if "pi" in self.lineEdit_2.text() or "pi" in self.lineEdit_3.text():
-            also = int(int(self.lineEdit_2.text().split(" ")[0]) * pi)
+            print("#LOG PI")
+            if "pi" in self.lineEdit_2.text():
+                also = int(int(self.lineEdit_2.text().split(" ")[0]) * pi)
+            else:
+                also = int(self.lineEdit_2.text())
 
-            felso = int(int(self.lineEdit_3.text().split(" ")[0]) * pi)
+            if "pi" in self.lineEdit_3.text():
+                felso = int(int(self.lineEdit_3.text().split(" ")[0]) * pi)
+            else:
+                felso = int(self.lineEdit_3.text())
             interval = (also, felso)
-        else:
+        elif self.lineEdit_2.text().replace("-", "").isdigit() and self.lineEdit_3.text().isdigit():
+            print("#LOG Másik ág")
             also = sympify(self.lineEdit_2.text())
             felso = sympify(self.lineEdit_3.text())
             # inf
@@ -142,108 +149,147 @@ class Ui_Calculus(object):
 
             if sympify(self.lineEdit_3.text()) != 0:
                 felso = float(felso)
+            interval = (also, felso)
 
-        text = self.lineEdit.text()
-        x = Symbol("x", real=True)
+            text = self.lineEdit.text()
+            x = Symbol("x", real=True)
 
-        input = self.comboBox.currentText()
-        interval = (also, felso)
+            input = self.comboBox.currentText()
+        
+            self.canvas.clear(interval_x=interval, interval_y=interval)
+            if input == "Növekvő":
+                res = is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
+                if res == True:
+                    self.label_2.setText(text + " növekvő")
+                else:
+                    self.label_2.setText(text + " nem növekvő")
+                result = self.canvas.plot_function(func_str=text, interval_x=interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Növekvő":
-            res = True  # is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
-            if res == True:
-                self.label_2.setText(text + " növekvő")
-            else:
-                self.label_2.setText(text + " nem növekvő")
-            self.canvas.clear((-10, 10), (-10, 10))
-            self.canvas.plot_function(text, interval)
+            if input == "Szigorúan növekvő":
+                res = is_strictly_increasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " szigorúan növekvő")
+                else:
+                    self.label_2.setText(text + " szigorúan nem növekvő")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Szigorúan növekvő":
-            res = is_strictly_increasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " szigorúan növekvő")
-            else:
-                self.label_2.setText(text + " szigorúan nem növekvő")
-            self.canvas.plot_function(text, interval)
+            if input == "Csökkenő":
+                res = is_decreasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " Csökkenő")
+                else:
+                    self.label_2.setText(text + " nem csökkenő")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Csökkenő":
-            res = is_decreasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " Csökkenő")
-            else:
-                self.label_2.setText(text + " nem csökkenő")
-            self.canvas.plot_function(text, interval)
+            if input == "Szigorúan csökkenő":
+                res = is_strictly_decreasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " szigorúan csökkenő")
+                else:
+                    self.label_2.setText(text + " szigorúan nem csökkenő")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Szigorúan csökkenő":
-            res = is_strictly_decreasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " szigorúan csökkenő")
-            else:
-                self.label_2.setText(text + " szigorúan nem csökkenő")
-            self.canvas.plot_function(text, interval)
+            if input == "Monoton":
+                res = is_monotonic(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " Monoton")
+                else:
+                    self.label_2.setText(text + " nem monoton")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Monoton":
-            res = is_monotonic(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " Monoton")
-            else:
-                self.label_2.setText(text + " nem monoton")
-            self.canvas.plot_function(text, interval)
-
-        if input == "Divergens":
-            res = limit(sympify(text), x, oo)
-            if res == oo:
-                self.label_2.setText(text + " Divergens")
-            else:
-                self.label_2.setText(text + " Nem divergens")
-            self.canvas.plot_function(text, interval)
-
-        if input == "Határérték":
-            if self.has_no_variables(text):
-                self.label_2.setText(text + " -> " + str(eval(text)))
-            else:
+            if input == "Divergens":
                 res = limit(sympify(text), x, oo)
-                self.label_2.setText(text + " -> " + str(res))
-            self.canvas.plot_function(text, interval)
+                if res == oo:
+                    self.label_2.setText(text + " Divergens")
+                else:
+                    self.label_2.setText(text + " Nem divergens")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Konvergens":
+            if input == "Határérték":
+                if self.has_no_variables(text):
+                    self.label_2.setText(text + " -> " + str(eval(text)))
+                else:
+                    res = limit(sympify(text), x, oo)
+                    self.label_2.setText(text + " -> " + str(res))
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-            res = Sum(text, (x, also, felso)).is_convergent()
-            if res:
-                self.label_2.setText(text + " a sorozat konvergál.")
-            else:
-                self.label_2.setText(text + " a sorozat nem konvergál.")
-            self.canvas.plot_function(text, interval)
+            if input == "Konvergens":
 
-        if input == "Deriválás":
-            tmp = eval(self.replace_sympy_funcs(text))
-            # print(tmp)
-            res = diff((tmp), x)
-            self.label_2.setText(str(res))
-            res_str = str(res)
-            self.canvas.plot_function(res_str, interval)
+                res = Sum(text, (x, also, felso)).is_convergent()
+                if res:
+                    self.label_2.setText(text + " a sorozat konvergál.")
+                else:
+                    self.label_2.setText(text + " a sorozat nem konvergál.")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
 
-        if input == "Integrálás":
-            x = Symbol("x")
-            res = integrate(self.replace_sympy_funcs(text), x)
-            self.label_2.setText(str(res).replace("**", "^") + " + C")
-            res_str = str(res)
-            try:
-                self.canvas.plot_function(res_str, interval)
-            except Exception as e:
-                print(e)
+            if input == "Deriválás":
+                tmp = eval(self.replace_sympy_funcs(text))
+                # print(tmp)
+                res = diff((tmp), x)
+                self.label_2.setText(str(res))
+                res_str = str(res)
+                result = self.canvas.plot_function(res_str, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+                
+
+            if input == "Integrálás":
+                x = Symbol("x")
+                res = integrate(self.replace_sympy_funcs(text), x)
+                self.label_2.setText(str(res).replace("**", "^") + " + C")
+                res_str = str(res)
+                try:
+                    result = self.canvas.plot_function(res_str, interval)
+                    if result == False:
+                        self.label_2.setText("ERROR: hibás függvény!")
+                        self.lineEdit.setText("")
+                except Exception as e:
+                    print(e)
+            self.pushButton.setEnabled(False)
+        else:
+            self.label_2.setText("ERROR: nem jó határok")
+            self.lineEdit_2.setText("-10")
+            self.lineEdit_3.setText("10")
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
+    
+    def on_text_changed(self, text):
+        self.pushButton.setEnabled(bool(text.strip()))
 
     def setupUi(self, Calculus, MainWindow):
 
@@ -307,6 +353,7 @@ class Ui_Calculus(object):
 
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.textChanged.connect(self.on_text_changed)
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -321,6 +368,7 @@ class Ui_Calculus(object):
         )
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setText("Enter")
+        self.pushButton.setEnabled(False)  # Initially disable the button
 
         # Create layouts
         main_layout = QtWidgets.QVBoxLayout(self.centralwidget)

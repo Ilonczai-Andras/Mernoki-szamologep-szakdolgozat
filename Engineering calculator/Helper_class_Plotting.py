@@ -131,8 +131,7 @@ class Canvas(FigureCanvas):
                 try:
                     y_vals[i] = self.f(x)
                 except:
-                    print(f"Canvas_for_plot: nem sikerült az y értékek számolása")
-
+                    return False
         threshold = 10
         if "tan" in func_str or "sec" in func_str or "csc" in func_str:
             large_jumps = self.check_for_large_jumps(y_vals, threshold)
@@ -201,6 +200,7 @@ class Canvas(FigureCanvas):
             self.interval_x = [self.interval_x[0] / (1 + self.zoom_factor), self.interval_x[1] / (1 + self.zoom_factor)]
             self.interval_y = [self.interval_y[0] / (1 + self.zoom_factor), self.interval_y[1] / (1 + self.zoom_factor)]
 
+        print(self.interval_y[0], self.interval_y[1])
         self.ax.set_xlim(self.interval_x)
         self.ax.set_ylim(self.interval_y)
         self.fig.canvas.draw_idle()
