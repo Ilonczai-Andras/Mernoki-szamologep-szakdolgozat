@@ -355,14 +355,6 @@ class Ui_Calculus(object):
         self.lineEdit.setObjectName("lineEdit")
         self.lineEdit.textChanged.connect(self.on_text_changed)
 
-        self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(12)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        self.label_3.setText("Határok:")
-
         self.pushButton = QtWidgets.QPushButton(
             self.centralwidget, clicked=lambda: self.combobox_selector()
         )
@@ -374,7 +366,6 @@ class Ui_Calculus(object):
         main_layout = QtWidgets.QVBoxLayout(self.centralwidget)
         form_layout = QtWidgets.QHBoxLayout()
         form_layout.addWidget(self.label)
-        form_layout.addWidget(self.label_3)
         form_layout.addWidget(self.lineEdit_2)
         form_layout.addWidget(self.lineEdit_3)
 
@@ -419,17 +410,40 @@ class Ui_Calculus(object):
         }
         QLabel#label_2 {
             background-color: #1C1C1C;
+            font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
             border: 2px solid #555555;
             border-radius: 5px;
             padding: 10px;
         }
+        QLabel#label {
+            background-color: #1C1C1C;
+            font-size: 12pt;
+            font-family: 'Courier New', Courier, monospace;
+            color: #FFFFFF;
+        }
+        QLineEdit#lineEdit_2, QLineEdit#lineEdit_3, QLineEdit#lineEdit {
+            background-color: #1C1C1C;
+            font-family: 'Courier New', Courier, monospace;
+            color: #FFFFFF;
+            font-size: 10pt;
+            width: 35px;
+            height: 30%;
+        }
         QPushButton {
             background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
+            font-size: 12pt;
             border: 1px solid #555555;
             border-radius: 10px;
             padding: 10px;
+            width: 50px;
+            height: 35%;
+        }
+        QPushButton#pushButton_2 {
+            width: 60px;
+            height: 40%;
         }
         QPushButton:hover {
             background-color: #5E5E5E;
@@ -439,18 +453,25 @@ class Ui_Calculus(object):
         }
         QComboBox {
             background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 5px;
             padding: 5px;
         }
+        QComboBox#comboBox {
+        font-family: 'Courier New', Courier, monospace;
+        width: 330px;
+        }
         QComboBox QAbstractItemView {
+            font-family: 'Courier New', Courier, monospace;
             background-color: #4E4E4E;
             selection-background-color: #5E5E5E;
             color: #FFFFFF;
         }
         QToolBar {
             background-color: #3E3E3E;
+            font-family: 'Courier New', Courier, monospace;
             border: none;
         }
         """

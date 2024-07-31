@@ -11,7 +11,20 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Helper_class_Plotting import Canvas
 from PyQt5.QtWidgets import QTextEdit
-from sympy import Or, And, sympify, fourier_transform, symbols, solve, Eq, SympifyError, oo, pretty, FourierTransform, fourier_series
+from sympy import (
+    Or,
+    And,
+    sympify,
+    fourier_transform,
+    symbols,
+    solve,
+    Eq,
+    SympifyError,
+    oo,
+    pretty,
+    FourierTransform,
+    fourier_series,
+)
 from numpy import *
 import sys
 import re
@@ -99,34 +112,53 @@ class Ui_Equation(object):
             # Check if rhs is a number and not -oo or oo
             if rhs.is_number and rhs != -oo and rhs != oo:
                 numbers.add(rhs)
+
     def system_of_equations(self, funcs):
-        number_of_rows = (
-            funcs.pop()
-        )  # Remove the last element which is the number of equations
-        symbols_set = set()
-        equations = []
+        try:
+            print("#LOG egyenlet rendszerek")
+            number_of_rows = funcs.pop()
 
-        for eq_str in funcs:
-            lhs, rhs = eq_str.split("=")
-            lhs_sympy = sympify(lhs.strip())
-            rhs_sympy = sympify(rhs.strip())
-            symbols_in_eq = self.extract_variable(
-                self.replace_trigonometric_funcs(lhs)
-            ) + self.extract_variable(self.replace_trigonometric_funcs(rhs))
-            symbols_set.update(symbols_in_eq)
-            equations.append(Eq(lhs_sympy, rhs_sympy))
+            symbols_set = set()
+            equations = []
 
-        symbols_list = list(symbols_set)
-        symbol_objects = symbols(" ".join(symbols_list))
+            for eq_str in funcs:
+                # Split the equation into left-hand side and right-hand side
+                lhs, rhs = eq_str.split("=")
+                lhs_sympy = sympify(lhs.strip())
+                rhs_sympy = sympify(rhs.strip())
 
-        # Solve the system of equations
-        solution = solve(equations, symbol_objects)
+                # Replace trigonometric functions and extract variables
+                lhs_vars = self.extract_variable(self.replace_trigonometric_funcs(lhs))
+                rhs_vars = self.extract_variable(self.replace_trigonometric_funcs(rhs))
+                symbols_in_eq = lhs_vars + rhs_vars
 
-        # Format the solution to have each result on a new line
-        formatted_solution = "\n".join([str(sol) for sol in solution])
-        print("for_sol: ", formatted_solution)
+                # Update the set of symbols with variables found in this equation
+                symbols_set.update(symbols_in_eq)
 
-        return formatted_solution
+                # Create a sympy Eq object and add it to the equations list
+                equations.append(Eq(lhs_sympy, rhs_sympy))
+
+            # Convert the set of symbols into a list and then into sympy symbols
+            symbols_list = list(symbols_set)
+            symbol_objects = symbols(" ".join(symbols_list))
+
+            # Solve the system of equations
+            solution = solve(equations, symbol_objects)
+
+            # Check if the solution is a dictionary and format it
+            if isinstance(solution, dict):
+                formatted_solution = "\n".join(
+                    [f"{str(key)} = {str(value)}" for key, value in solution.items()]
+                )
+            else:
+                formatted_solution = str(solution)
+
+            return formatted_solution
+        except:
+            print("#LOG egyenlet rendszerek")
+            self.label_2.setText(f"ERROR: Helytelen egyenletrendszerek!")
+            self.text_edit.setText(f"")
+            return "ERROR: Helytelen egyenletrendszerek!"
 
     def one_func(self, one_func, replaced_func):
         try:
@@ -185,10 +217,10 @@ class Ui_Equation(object):
 
         except SympifyError as e:
             print("Sympify error:", e)
-            self.label_2.setText("Invalid equation!")
+            self.label_2.setText("ERROR hibás egyenlet!")
         except Exception as x:
             print(x)
-            self.label_2.setText("An error occurred!")
+            self.label_2.setText("ERROR hibás egyenlet!")
 
     def combobox_selector(self):
         input_text = self.comboBox.currentText()
@@ -199,25 +231,40 @@ class Ui_Equation(object):
         if input_text == "Egyenlet":
             if len(number_of_rows) == 2:
                 self.common_area = []
-                self.one_func(function_text, self.replace_trigonometric_funcs(function_text).replace("sqrt", ""))
+                self.one_func(
+                    function_text,
+                    self.replace_trigonometric_funcs(function_text).replace("sqrt", ""),
+                )
                 for ineq in inequality:
                     if ineq in function_text:
                         self.canvas.clear((-10, 10), (-10, 10))
                         self.canvas.plotted_functions = []
                         lhs, rhs = function_text.split(ineq)
                         self.canvas.plot_function(lhs, (-10, 10), clear=False)
-                        self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
+                        self.canvas.store_function(
+                            lhs, (-10, 10), self.canvas.interval_y, None, False, ""
+                        )
                         self.canvas.plot_function(rhs, (-10, 10), clear=False)
-                        self.canvas.store_function(rhs, (-10, 10), self.canvas.interval_y, None, False, "")
-                        
-                        # Separate real and complex numbers
-                        real_common_area = [float(val) for val in self.common_area if val.is_real]
-                        complex_common_area = [val for val in self.common_area if not val.is_real]
+                        self.canvas.store_function(
+                            rhs, (-10, 10), self.canvas.interval_y, None, False, ""
+                        )
 
-                        print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
+                        # Separate real and complex numbers
+                        real_common_area = [
+                            float(val) for val in self.common_area if val.is_real
+                        ]
+                        complex_common_area = [
+                            val for val in self.common_area if not val.is_real
+                        ]
+
+                        print(
+                            f"Calling plot_area_between_functions with {real_common_area}"
+                        )  # Debug statement
                         self.canvas.plot_area_between_functions(real_common_area)
                         if complex_common_area:
-                            print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
+                            print(
+                                f"Complex solutions: {complex_common_area}"
+                            )  # Handle complex solutions if needed
                         break
             else:
                 self.label_2.setText("Egy sort adj meg")
@@ -231,7 +278,7 @@ class Ui_Equation(object):
                 self.text_edit.setText("")
         if input_text == "Fourier transzformált":
             if len(number_of_rows) == 2:
-                t, x = symbols('t x')
+                t, x = symbols("t x")
                 try:
                     input_function = sympify(function_text)
                     ft = fourier_transform(input_function, t, x)
@@ -239,11 +286,13 @@ class Ui_Equation(object):
                     print(result)
                     if not isinstance(ft, FourierTransform):
                         self.label_2.setText(result)
-                        self.label_2.setText(result )
+                        self.label_2.setText(result)
                         self.canvas.clear((-10, 10), (-10, 10))
                         self.canvas.plotted_functions = []
                         self.canvas.plot_function(result, (-10, 10), clear=False)
-                        self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
+                        self.canvas.store_function(
+                            result, (-10, 10), self.canvas.interval_y, None, False, ""
+                        )
                     else:
                         self.label_2.setText("Nem számolható fourier")
                 except SympifyError as e:
@@ -259,19 +308,19 @@ class Ui_Equation(object):
                     series = fourier_series(input_function)
                     result = str(series.truncate())
                     print(result)
-                    self.label_2.setText(result )
+                    self.label_2.setText(result)
                     self.canvas.clear((-10, 10), (-10, 10))
                     self.canvas.plotted_functions = []
                     self.canvas.plot_function(result, (-10, 10), clear=False)
                     # self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
-                        
+
                 except SympifyError as e:
                     self.label_2.setText("Invalid function for Fourier transform")
                     print(f"Sympify error: {e}")
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
-        
+
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
         MainWindow.show()
@@ -284,12 +333,17 @@ class Ui_Equation(object):
         QWidget#centralwidget {
             background-color: #2E2E2E;
         }
-        QLabel {
+        QTextEdit#text_edit{
             color: #FFFFFF;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14pt;
         }
-        QComboBox, QTextEdit {
+        
+        QComboBox, QTextEdit, QLineEdit {
             background-color: #4E4E4E;
             color: #FFFFFF;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace;
             border: 1px solid #555555;
             border-radius: 5px;
             padding: 5px;
@@ -299,12 +353,8 @@ class Ui_Equation(object):
             selection-background-color: #5E5E5E;
             color: #FFFFFF;
         }
-        QLabel#label {
-            font-family: Times New Roman;
-            font-size: 12pt;
-            text-align: center;
-        }
         QLabel#label_2 {
+            color: #FFFFFF;
             font-size: 14pt;
             qproperty-alignment: 'AlignRight | AlignTrailing | AlignVCenter';
         }
@@ -333,7 +383,7 @@ class Ui_Equation(object):
         self.centralwidget = QtWidgets.QWidget(Egyenlet)
         self.centralwidget.setObjectName("centralwidget")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox.setGeometry(QtCore.QRect(10, 70, 291, 51))
+        self.comboBox.setGeometry(QtCore.QRect(10, 10, 291, 51))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.comboBox.setFont(font)
@@ -342,14 +392,9 @@ class Ui_Equation(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(10, 10, 231, 41))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(12)
-        self.label.setFont(font)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(10, 130, 780, 200))
         font = QtGui.QFont()
@@ -367,7 +412,7 @@ class Ui_Equation(object):
         self.pushButton = QtWidgets.QPushButton(
             self.centralwidget, clicked=lambda: self.combobox_selector()
         )
-        self.pushButton.setGeometry(QtCore.QRect(710, 70, 75, 51))
+        self.pushButton.setGeometry(QtCore.QRect(710, 10, 75, 51))
         self.pushButton.setObjectName("pushButton")
 
         self.pushButton_2 = QtWidgets.QPushButton(
@@ -378,17 +423,9 @@ class Ui_Equation(object):
         self.pushButton_2.setObjectName("pushButton_2")
 
         self.text_edit = QTextEdit(self.centralwidget)
-        self.text_edit.setGeometry(310, 20, 391, 101)
+        self.text_edit.setGeometry(310, 10, 391, 102)
         self.text_edit.setObjectName("text_edit")
 
-        self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(250, 10, 391, 41))
-        font = QtGui.QFont()
-        font.setFamily("Times New Roman")
-        font.setPointSize(12)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        
         Egyenlet.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Egyenlet)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -408,13 +445,9 @@ class Ui_Equation(object):
         self.comboBox.setItemText(1, _translate("Egyenlet", "Egyenletrendszerek"))
         self.comboBox.setItemText(2, _translate("Egyenlet", "Fourier transzformált"))
         self.comboBox.setItemText(3, _translate("Egyenlet", "Fourier sor"))
-        self.label.setText(
-            _translate("Egyenlet", "Válaszd ki a végrahajtandó műveletet")
-        )
         self.label_2.setText(_translate("Egyenlet", "Eredmény"))
         self.pushButton.setText(_translate("Egyenlet", "Enter"))
         self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
-        self.label_3.setText(_translate("Egyenlet", "Egyenlet"))
         self.label_2.setText(_translate("Egyenlet", "Eredmény"))
 
 
