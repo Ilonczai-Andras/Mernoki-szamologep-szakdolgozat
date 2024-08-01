@@ -118,6 +118,9 @@ class Canvas(FigureCanvas):
 
         x_vals = np.linspace(-1000, 1000, 10000)
 
+        if "fact" in func_str:
+            x_vals = np.linspace(0, 15, 100)
+
         if "tan" in func_str:
             x_vals = np.linspace(-100000, 100000, 100000)
 

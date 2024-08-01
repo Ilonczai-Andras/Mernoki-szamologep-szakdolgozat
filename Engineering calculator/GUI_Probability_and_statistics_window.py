@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QTextEdit
 from scipy import stats
 import statistics
 from scipy.stats import norm
-from sympy import pretty, sympify, symbols, gamma, log, digamma, sqrt
+from sympy import N, pretty, sympify, symbols, gamma, log, digamma, sqrt
 from sympy.stats import (
     Normal,
     Geometric,
@@ -216,7 +216,6 @@ class Ui_Probability_and_statistics(object):
 
         text = self.lineEdit_2.toPlainText()
         lines = self.number_of_lines(text)
-        t = ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]
     
         if operation_type in ["T próba", "U próba"]:
             if operation_type == "T próba":
@@ -278,112 +277,135 @@ class Ui_Probability_and_statistics(object):
 
         if distribution == "Normál":
 
-            self.label_2.setText("")
+            try:
+                self.label_2.setText("")
 
-            m = float(self.mu.toPlainText())
-            s = float(self.sigma.toPlainText())
-            X = Normal("X", m, s)
-            x = symbols("x")
-
-            if operation_type == "Valószinűség":
-                if self.lineEdit_2.text() == "":
-                    self.label_2.setText("Adjon meg feltételt!")
-                else:
-                    condition = sympify(self.lineEdit_2.text(), locals={"X": X})
-                    self.label_2.setText(str(P(condition)))
-
-            elif operation_type == "Várható érték":
-                self.label_2.setText(str(E(X)))
-
-            elif operation_type == "Entrópia":
-                try:
-                    self.label_2.setText(str(entropy(X)))
-                except:
-                    self.label_2.setText("Hiba")
-                else:
-                    self.label_2.setText(str(round(entropy(X).evalf(), 4)))
-
-            elif operation_type == "Variancia":
-                self.label_2.setText(str(variance(X)))
-
-            elif operation_type == "Sűrűség függvény":
-                self.label_2.setText(str(density(X)(x)))
-                func_str = self.label_2.text()
-                self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
-            #
-
-        elif distribution == "Geometriai":
-            self.label_2.setText("")
-            p = float(self.mu.toPlainText())
-            if p <= 0.0 or p >= 1.0:
-                self.label_2.setText("A valószínűségnek 0 és 1 között kell lennie")
-            else:
-                X = Geometric("X", p)
+                m = float(self.mu.toPlainText())
+                s = float(sqrt(float(self.sigma.toPlainText())))
+                X = Normal("X", m, s)
                 x = symbols("x")
+
                 if operation_type == "Valószinűség":
-                    if self.lineEdit_2.text() == "":
+                    if self.lineEdit_2.toPlainText() == "":
                         self.label_2.setText("Adjon meg feltételt!")
                     else:
-                        condition = sympify(self.lineEdit_2.text(), locals={"X": X})
-                        self.label_2.setText(str(P(condition)))
-                if operation_type == "Várható érték":
+                        condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                        self.label_2.setText(str(N(P(condition))))
+
+                elif operation_type == "Várható érték":
                     self.label_2.setText(str(E(X)))
+
                 elif operation_type == "Entrópia":
-                    self.label_2.setText(str(entropy(X)))
+                    try:
+                        self.label_2.setText(str(entropy(X)))
+                    except:
+                        self.label_2.setText("Hiba")
+                    else:
+                        self.label_2.setText(str(round(entropy(X).evalf(), 4)))
+
                 elif operation_type == "Variancia":
                     self.label_2.setText(str(variance(X)))
+
                 elif operation_type == "Sűrűség függvény":
                     self.label_2.setText(str(density(X)(x)))
                     func_str = self.label_2.text()
                     self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
+                #
+            except:
+                self.label_2.setText("ERROR helytelen input!")
+
+        elif distribution == "Geometriai":
+            try:
+                self.label_2.setText("")
+                try:
+                    p = float(self.mu.toPlainText())
+                except ValueError:
+                    self.label_2.setText("ERROR helytelen input!")
+                else:
+                    if p <= 0.0 or p >= 1.0:
+                        self.label_2.setText("A valószínűségnek 0 és 1 között kell lennie")
+                    else:
+                        X = Geometric("X", p)
+                        x = symbols("x")
+                        if operation_type == "Valószinűség":
+                            if self.lineEdit_2.toPlainText() == "":
+                                self.label_2.setText("Adjon meg feltételt!")
+                            else:
+                                condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                                self.label_2.setText(str(P(condition)))
+                        if operation_type == "Várható érték":
+                            self.label_2.setText(str(E(X)))
+                        elif operation_type == "Entrópia":
+                            self.label_2.setText(str(entropy(X)))
+                        elif operation_type == "Variancia":
+                            self.label_2.setText(str(variance(X)))
+                        elif operation_type == "Sűrűség függvény":
+                            self.label_2.setText(str(density(X)(x)))
+                            print(str(density(X)(x)))
+                            func_str = self.label_2.text()
+                            self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
+            except:
+                self.label_2.setText("ERROR helytelen input!")
 
         elif distribution == "Poisson":
-            self.label_2.setText("")
-            λ_value = int(self.mu.toPlainText())
-            X = Poisson("X", λ_value)
-            x = symbols("x")
-            if operation_type == "Valószinűség":
-                if self.lineEdit_2.text() == "":
-                    self.label_2.setText("Adjon meg feltételt!")
+            try:
+                self.label_2.setText("")
+                λ_value = int(self.mu.toPlainText())
+                if λ_value <= 0:
+                    self.label_2.setText("Helytelen lambda")
                 else:
-                    condition = sympify(self.lineEdit_2.text(), locals={"X": X})
-                    self.label_2.setText(str(P(condition)))
-            if operation_type == "Várható érték":
-                self.label_2.setText(str(E(X)))
-            elif operation_type == "Entrópia":
-                self.label_2.setText(str(entropy(X).evalf()))
-            elif operation_type == "Variancia":
-                self.label_2.setText(str(variance(X)))
-            elif operation_type == "Sűrűség függvény":
-                self.label_2.setText(str(density(X)(x)))
-                func_str = self.label_2.text()
-                self.canvas.plot_function(func_str, interval_x=(0, 15), interval_y=(0,1))
+                    X = Poisson("X", λ_value)
+                    x = symbols("x")
+                    if operation_type == "Valószinűség":
+                        if self.lineEdit_2.toPlainText() == "":
+                            self.label_2.setText("Adjon meg feltételt!")
+                        else:
+                            condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                            self.label_2.setText(str(N(P(condition))))
+                    if operation_type == "Várható érték":
+                        self.label_2.setText(str(E(X)))
+                    elif operation_type == "Entrópia":
+                        self.label_2.setText(str(entropy(X).evalf()))
+                    elif operation_type == "Variancia":
+                        self.label_2.setText(str(variance(X)))
+                    elif operation_type == "Sűrűség függvény":
+                        self.label_2.setText(str(density(X)(x)))
+                        #JAVÍT vlmi nem jó
+                        func_str = self.label_2.text()
+                        self.canvas.plot_function(func_str, interval_x=(0, 15), interval_y=(0,1))
+            except:
+                self.label_2.setTextInteractionFlags("ERROR helytelen poisson!")
 
         elif distribution == "Logaritmikus":
             self.label_2.setText("")
-            P_s = sympify(self.string_to_S(self.mu.toPlainText()))
-            p = float(eval(self.mu.toPlainText()))
-            if p <= 0.0 or p >= 1.0:
-                self.label_2.setText("A valószínűségnek 0 és 1 között kell lennie")
-            else:
-                X = Logarithmic("X", P_s)
-                x = symbols("x")
-                if operation_type == "Valószinűség":
-                    if self.lineEdit_2.text() == "":
-                        self.label_2.setText("Adjon meg feltételt!")
-                    else:
-                        condition = sympify(self.lineEdit_2.text(), locals={"X": X})
-                        self.label_2.setText(str(P(condition).evalf()))
-                if operation_type == "Várható érték":
-                    self.label_2.setText(str(E(X).evalf()))
-                elif operation_type == "Entrópia":
-                    self.label_2.setText(str(entropy(X).evalf()))
-                elif operation_type == "Variancia":
-                    self.label_2.setText(str(variance(X).evalf()))
-                elif operation_type == "Sűrűség függvény":
-                    self.label_2.setText(str(density(X)(x)))
-                    func_str = self.label_2.text()
-                    self.canvas.plot_function(func_str, (-15, 15))
+            try:
+                P_s = sympify(self.string_to_S(self.mu.toPlainText()))
+                p = float(eval(self.mu.toPlainText()))
+                if p <= 0.0 or p >= 1.0:
+                    self.label_2.setText("A valószínűségnek 0 és 1 között kell lennie")
+                else:
+                    X = Logarithmic("X", P_s)
+                    x = symbols("x")
+                    if operation_type == "Valószinűség":
+                        if self.lineEdit_2.toPlainText() == "":
+                            self.label_2.setText("Adjon meg feltételt!")
+                        else:
+                            condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                            self.label_2.setText(str(P(condition).evalf()))
+                    if operation_type == "Várható érték":
+                        self.label_2.setText(str(E(X).evalf()))
+                    elif operation_type == "Entrópia":
+                        self.label_2.setText(str(entropy(X).evalf()))
+                    elif operation_type == "Variancia":
+                        self.label_2.setText(str(variance(X).evalf()))
+                    elif operation_type == "Sűrűség függvény":
+                        result = density(X)(x) 
+                        #JAVÍT vlmi nem jó
+                        self.label_2.setText(str(result))
+                        func_str = self.label_2.text()
+                        self.canvas.plot_function(func_str, (-15, 15))
+            except:
+                self.label_2.setText("ERROR helytelen poisson!")
 
         elif distribution == "Erlang":
             self.label_2.setText("")
@@ -455,13 +477,7 @@ class Ui_Probability_and_statistics(object):
     def handle_combobox2_change(self):
         distribution = self.comboBox_2.currentText()
 
-        if distribution in [
-            "Geometriai",
-            "Poisson",
-            "Logaritmikus",
-            "Erlang",
-            "Pareto",
-        ]:
+        if distribution in ["Geometriai", "Poisson", "Logaritmikus", "Erlang", "Pareto"]:
             self.sigma.hide()
             if distribution == "Geometriai" or distribution == "Logaritmikus":
                 self.mu.setPlaceholderText("p")
@@ -480,49 +496,53 @@ class Ui_Probability_and_statistics(object):
             self.mu.setPlaceholderText("mu")
             self.sigma.setPlaceholderText("sigma")
 
-        if distribution in ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]:
+        if distribution in ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]:
             self.sigma.setPlaceholderText("alpha")
-                
             if distribution == "Egymintás t próba":
                 self.mu.show()
             else:
                 self.mu.hide()
-        
-        if distribution in ["Egymintás u próba","Kétmintás u próba"]:
+        elif distribution in ["Egymintás u próba", "Kétmintás u próba"]:
             self.mu.setPlaceholderText("m")
             self.alpha.show()
         else:
             self.mu.setPlaceholderText("mu")
             self.alpha.hide()
-        
+
     def handle_combobox_change(self):
         text = self.comboBox.currentText()
-        eloszlások = ["Normál","Geometriai","Poisson","Logaritmikus","Erlang","Pareto"]
-
-        t = ["Egymintás t próba","Kétmintás párosított t próba","Kétmintás t próba"]
-        u = ["Egymintás u próba","Kétmintás u próba"]
+        current_distribution = self.comboBox_2.currentText()  # Save the current selection
+        eloszlások = ["Normál", "Geometriai", "Poisson", "Logaritmikus", "Erlang", "Pareto"]
+        t = ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]
+        u = ["Egymintás u próba"]
 
         if text == "Sűrűség függvény":
             self.canvas.show()
         else:
             self.canvas.hide()
-        #
-        if text in ["T próba", "U próba"]:
-            if text == "T próba":
-                self.label.hide()
-                self.comboBox_2.clear()
-                self.comboBox_2.addItems(t)
-                self.sigma.setPlaceholderText("alpha")
-            if text == "U próba":
-                self.label.hide()
-                self.mu.show()
-                self.comboBox_2.clear()
-                self.comboBox_2.addItems(u)
+
+        if text == "T próba":
+            self.label.hide()
+            self.comboBox_2.clear()
+            self.comboBox_2.addItems(t)
+            self.sigma.setPlaceholderText("alpha")
+        elif text == "U próba":
+            self.label.hide()
+            self.mu.show()
+            self.comboBox_2.clear()
+            self.comboBox_2.addItems(u)
         else:
             self.label.show()
             self.comboBox_2.clear()
             self.comboBox_2.addItems(eloszlások)
             self.sigma.setPlaceholderText("sigma")
+        
+        # Restore the previous selection
+        index = self.comboBox_2.findText(current_distribution)
+        if index != -1:
+            self.comboBox_2.setCurrentIndex(index)
+
+        self.handle_combobox2_change()  # Ensure the UI updates correctly based on the new selection
 
     def setupUi(self, Ui_Prob_and_Stat, MainWindow):
         self.applyStylesheet(Ui_Prob_and_Stat)
