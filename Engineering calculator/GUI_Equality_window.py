@@ -241,13 +241,9 @@ class Ui_Equation(object):
                         self.canvas.plotted_functions = []
                         lhs, rhs = function_text.split(ineq)
                         self.canvas.plot_function(lhs, (-10, 10), clear=False)
-                        self.canvas.store_function(
-                            lhs, (-10, 10), self.canvas.interval_y, None, False, ""
-                        )
+                        #self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
                         self.canvas.plot_function(rhs, (-10, 10), clear=False)
-                        self.canvas.store_function(
-                            rhs, (-10, 10), self.canvas.interval_y, None, False, ""
-                        )
+                        #self.canvas.store_function( rhs, (-10, 10), self.canvas.interval_y, None, False, "" )
 
                         # Separate real and complex numbers
                         real_common_area = [
@@ -284,7 +280,7 @@ class Ui_Equation(object):
                     ft = fourier_transform(input_function, t, x)
                     result = str(ft)
                     print(result)
-                    if not isinstance(ft, FourierTransform):
+                    if not isinstance(ft, FourierTransform) and result != "0":
                         self.label_2.setText(result)
                         self.label_2.setText(result)
                         self.canvas.clear((-10, 10), (-10, 10))
@@ -303,16 +299,17 @@ class Ui_Equation(object):
                 self.text_edit.setText("")
         if input_text == "Fourier sor":
             if len(number_of_rows) == 2:
+                
+                input_function = sympify(function_text)
+                series = fourier_series(input_function)
+                result = str(series.truncate())
+                print(result)
+                self.label_2.setText(result)
+                self.canvas.clear((-10, 10), (-10, 10))
                 try:
-                    input_function = sympify(function_text)
-                    series = fourier_series(input_function)
-                    result = str(series.truncate())
-                    print(result)
-                    self.label_2.setText(result)
-                    self.canvas.clear((-10, 10), (-10, 10))
                     self.canvas.plotted_functions = []
                     self.canvas.plot_function(result, (-10, 10), clear=False)
-                    # self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
+                    self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
 
                 except SympifyError as e:
                     self.label_2.setText("Invalid function for Fourier transform")

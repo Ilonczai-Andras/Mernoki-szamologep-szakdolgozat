@@ -11,7 +11,7 @@ class Ui_Differential_Equation(object):
     def is_first_order_ode(self, func):
         lhs, rhs = func.split("=")
 
-        return "y'(x)" in lhs and "y'(x)" not in rhs
+        return "y'(x)" == lhs and "y'(x)" not in rhs and "y''(x)" not in rhs and  "y'''(x)" not in rhs
 
     def extract_number_from_string(self,s):
         """
@@ -37,32 +37,31 @@ class Ui_Differential_Equation(object):
         
         initial_value_problem = ""
 
-        if self.lineEdit.text() != "":
-            initial_value_problem = self.lineEdit.text().split("=")
-            initial_value_problem[0] = self.extract_number_from_string(initial_value_problem[0])
-            initial_value_problem[1] = int(initial_value_problem[1])
+        try:
+            if self.lineEdit.text() != "":
+                initial_value_problem = self.lineEdit.text().split("=")
+                initial_value_problem[0] = self.extract_number_from_string(initial_value_problem[0])
+                initial_value_problem[1] = int(initial_value_problem[1])
 
-            solution = self.solve_diff_eq_from_string(replaced, initial_value=initial_value_problem)
-        else:
-            solution = self.solve_diff_eq_from_string(replaced)
+                solution = self.solve_diff_eq_from_string(replaced, initial_value=initial_value_problem)
+            else:
+                solution = self.solve_diff_eq_from_string(replaced)
 
-        self.canvas.clear((-100, 100), (-10, 10))
+            self.canvas.clear((-100, 100), (-10, 10))
 
-        print(f"rhs: {str(solution.rhs)}")
-        print(f"replaced: {replaced}")
-        self.canvas.plot_function(str(solution.rhs), (-10,10), C=[1,1,1],clear=false, df=true, df_func=replaced)
+            print(f"rhs: {str(solution.rhs)}")
+            print(f"replaced: {replaced}")
+            if self.is_first_order_ode(string):
+                self.canvas.plot_function(str(solution.rhs), (-10,10), C=[1,1,1],clear=false, df=true, df_func=replaced)
+            else:
+                self.canvas.plot_function(str(solution.rhs), (-10,10), C=[1,1,1],clear=false, df=false)
 
-        # try:
-            
-        #     self.canvas.direction_field(replaced, clear=false)
-        # except Exception as e:
-        #     print(e)
-
-        latex_solution = pretty(solution)
-        self.label_2.setText(f"{latex_solution}")
-        self.label_4.setText(f"{solution.rhs}")
-        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
-
+            latex_solution = pretty(solution)
+            self.label_2.setText(f"{latex_solution}")
+            self.label_4.setText(f"{solution.rhs}")
+            self.label_2.setAlignment(QtCore.Qt.AlignCenter)
+        except:
+            self.label_2.setText("ERROR: helytelen differenciál egyenlet")
 
     def replace_nth_derivative(self, eq_string):
         # Handle third-order derivatives first
@@ -101,18 +100,36 @@ class Ui_Differential_Equation(object):
         QWidget#centralwidget {
             background-color: #2E2E2E;
         }
-        QLabel {
+        QTextEdit#text_edit{
             color: #FFFFFF;
+            background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14pt;
         }
-        QTextEdit {
+        
+        QLineEdit#lineEdit {
             background-color: #4E4E4E;
             color: #FFFFFF;
+            font-size: 10pt;
+            font-family: 'Courier New', Courier, monospace;
             border: 1px solid #555555;
             border-radius: 5px;
             padding: 5px;
         }
+        QLabel#label_2, QLabel#label_4{
+            color: #FFFFFF;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        QLabel#label_3{
+            color: #FFFFFF;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace;
+            qproperty-alignment: 'AlignLeft;
+        }
         QPushButton {
             background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 10px;
@@ -161,7 +178,7 @@ class Ui_Differential_Equation(object):
                 self.text_edit.toPlainText().lower()
             ),
         )
-        self.pushButton.setGeometry(QtCore.QRect(660, 60, 75, 51))
+        self.pushButton.setGeometry(QtCore.QRect(610, 70, 170, 50))
         self.pushButton.setObjectName("pushButton")
 
         self.pushButton_2 = QtWidgets.QPushButton(
@@ -175,11 +192,11 @@ class Ui_Differential_Equation(object):
         self.canvas.setGeometry(QtCore.QRect(9, 340, 781, 341))
 
         self.text_edit = QTextEdit(self.centralwidget)
-        self.text_edit.setGeometry(QtCore.QRect(250, 10, 391, 101))
+        self.text_edit.setGeometry(QtCore.QRect(250, 10, 330, 100))
         self.text_edit.setObjectName("text_edit")
 
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(660, 10, 75, 51))
+        self.lineEdit.setGeometry(QtCore.QRect(610, 10, 170, 50))
         self.lineEdit.setObjectName("lineEdit")
         self.lineEdit.setPlaceholderText("Kezdeti érték probléma")
 

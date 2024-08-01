@@ -119,7 +119,7 @@ class Canvas(FigureCanvas):
         x_vals = np.linspace(-1000, 1000, 10000)
 
         if "tan" in func_str:
-            x_vals = np.linspace(-1000, 1000, 100000)
+            x_vals = np.linspace(-100000, 100000, 100000)
 
         y_vals = 0
 
@@ -161,8 +161,8 @@ class Canvas(FigureCanvas):
         func = self.replace_numpy_funcs(func)
 
         nt, nv = 1, 1
-        t = np.arange(-100, 100, nt)
-        v = np.arange(-100, 100, nv)
+        t = np.arange(-50, 50, nt)
+        v = np.arange(-50, 50, nv)
         y, x = np.meshgrid(t, v)
 
         dv = eval(func)
