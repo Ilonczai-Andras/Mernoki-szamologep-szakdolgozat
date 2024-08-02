@@ -36,6 +36,12 @@ class Ui_Programmer_calculator(object):
         QWidget#centralwidget {
             background-color: #2E2E2E;
         }
+        QInputDialog{
+            color: #FFFFFF;
+            background-color: #2E2E2E;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+            font-size: 10pt; /* Increase font size */
+        }
         QLabel {
             color: #FFFFFF;
             font-family: 'Courier New', Courier, monospace; /* Monospaced font */
@@ -111,8 +117,8 @@ class Ui_Programmer_calculator(object):
         """
         Programmer_calc.setStyleSheet(stylesheet)
 
-    def back_to_mainwindow(self, Egyenlet, MainWindow):
-        Egyenlet.close()
+    def back_to_mainwindow(self, Programmer_calc, MainWindow):
+        Programmer_calc.close()
         MainWindow.show()
 
     def set_to_null(self, list1, list2):
@@ -182,8 +188,8 @@ class Ui_Programmer_calculator(object):
         self.applyStylesheet(Programmer_calc)
         Programmer_calc.setObjectName("Programmer_calc")
         Programmer_calc.resize(1080, 725)
-        Programmer_calc.setMinimumSize(QtCore.QSize(1080, 725))
-        Programmer_calc.setMaximumSize(QtCore.QSize(1080, 725))
+        Programmer_calc.setMinimumSize(QtCore.QSize(1080, 777))
+        Programmer_calc.setMaximumSize(QtCore.QSize(1080, 777))
         Programmer_calc.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         self.centralwidget = QtWidgets.QWidget(Programmer_calc)
         self.centralwidget.setObjectName("centralwidget")
@@ -466,6 +472,14 @@ class Ui_Programmer_calculator(object):
         )
         self.fakt.setObjectName("fakt")
         self.gridLayout_for_special_buttons.addWidget(self.fakt, 3, 0, 1, 2)
+        self.back = QtWidgets.QPushButton(
+            self.centralwidget,
+            clicked=lambda: self.back_to_mainwindow(Programmer_calc, MainWindow),
+        )
+        self.back.setObjectName("back")
+        self.back.setGeometry(QtCore.QRect(985, 710, 75, 23))
+        self.gridLayout_for_special_buttons.addWidget(self.back, 4, 3, 1, 2)
+        self.back.setEnabled(True)
         self.XOR = QtWidgets.QPushButton(
             self.centralwidget, clicked=lambda: self.press_it(" XOR ")
         )
@@ -556,7 +570,7 @@ class Ui_Programmer_calculator(object):
             clicked=lambda: self.press_it("FACT"),
         )
         self.fact.setObjectName("fact")
-        self.gridLayout_for_special_buttons.addWidget(self.fact, 4, 0, 1, 5)
+        self.gridLayout_for_special_buttons.addWidget(self.fact, 4, 0, 1, 3)
         self.horizontalLayout_3.addLayout(self.gridLayout_for_special_buttons)
         Programmer_calc.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(Programmer_calc)
@@ -573,9 +587,9 @@ class Ui_Programmer_calculator(object):
 
     def show_dialog(self):
         text, ok = QInputDialog.getText(
-            self.centralwidget, "Input Dialog", "Enter a character:"
+            self.centralwidget, "", "Adj meg egy karaktert:"
         )
-        if ok and text:
+        if ok and text and len(text) == 1:
             ascii_value = ord(text)
             current_mode = self.comboBox_3.currentText()
 
@@ -599,11 +613,11 @@ class Ui_Programmer_calculator(object):
     def press_it(self, pressed):
         if pressed == "DEL":
             self.Result.setText("0")
-        if self.Result.text() == "ERROR":
-            self.Result.setText("")
+        elif self.Result.text() == "ERROR!" and pressed:
+            self.Result.setText(pressed)
             # Check to see if it starts with 0 and delete the zero
-        if self.Result.text() == "0":
-            self.Result.setText("")
+        elif self.Result.text() == "0":
+            self.Result.setText(pressed)
         # concatenate the pressed button with what was there already
         else:
             self.Result.setText(f"{self.Result.text()}{pressed}")
@@ -1611,14 +1625,17 @@ class Ui_Programmer_calculator(object):
 
     def on_item_clicked(self, item):
         # This function will be called when an item is clicked
+        tmp = self.Result.text()
+        self.Result.setText("") 
         item_text = item.text()
-        self.Result.setText(item_text)  # Use the full item text directly
+        self.Result.setText(tmp + item_text)  # Use the full item text directly
 
     def on_item_clicked2(self, item):
         # This function will be called when an item is clicked
+        tmp = self.Result.text()
+        self.Result.setText("") 
         item_text = item.text()
-        self.Result.setText(item_text)  # Use the full item text directly
-
+        self.Result.setText(tmp + item_text)
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
         Programmer_calc.setWindowTitle(_translate("Programmer_calc", "Programozói számológép"))
@@ -1634,6 +1651,7 @@ class Ui_Programmer_calculator(object):
         self.label_2.setText(_translate("Programmer_calc", ""))
         self.bel_zj.setText(_translate("Programmer_calc", "("))
         self.eight.setText(_translate("Programmer_calc", "8"))
+        self.back.setText(_translate("Programmer_calc", "Vissza"))
         self.D_hex.setText(_translate("Programmer_calc", "D"))
         self.C_hex.setText(_translate("Programmer_calc", "C"))
         self.three.setText(_translate("Programmer_calc", "3"))
