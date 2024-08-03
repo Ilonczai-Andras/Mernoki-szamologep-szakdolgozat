@@ -488,7 +488,7 @@ class Ui_Programmer_calculator(object):
 
         self.abs = QtWidgets.QPushButton(
             self.centralwidget,
-            clicked=lambda: self.press_it("|"),
+            clicked=lambda: self.press_it("ABS "),
         )
         self.abs.setObjectName("abs")
         self.gridLayout_for_special_buttons.addWidget(self.abs, 3, 2, 1, 1)
@@ -500,7 +500,7 @@ class Ui_Programmer_calculator(object):
         self.gridLayout_for_special_buttons.addWidget(self.NOT, 1, 2, 1, 1)
         self.log = QtWidgets.QPushButton(
             self.centralwidget,
-            clicked=lambda: self.press_it("log"),
+            clicked=lambda: self.press_it("log "),
         )
         self.log.setObjectName("log")
         self.gridLayout_for_special_buttons.addWidget(self.log, 2, 4, 1, 1)
@@ -542,7 +542,7 @@ class Ui_Programmer_calculator(object):
         self.gridLayout_for_special_buttons.addWidget(self.AND, 1, 3, 1, 1)
         self.log2 = QtWidgets.QPushButton(
             self.centralwidget,
-            clicked=lambda: self.press_it("log2"),
+            clicked=lambda: self.press_it("log2 "),
         )
         self.log2.setObjectName("log2")
         self.gridLayout_for_special_buttons.addWidget(self.log2, 2, 3, 1, 1)
@@ -683,7 +683,7 @@ class Ui_Programmer_calculator(object):
         return factors_str
 
     def factorial(self, num_str, num_system):
-        # Determine the base and convert to decimal
+                # Determine the base and convert to decimal
         if num_system == "binary":
             base = 2
         elif num_system == "octal":
@@ -713,11 +713,11 @@ class Ui_Programmer_calculator(object):
 
         # Convert the result back to the original format
         if base == 2:
-            result = bin(int(factorial_result))
+            result = bin(int(factorial_result))[2:]
         elif base == 8:
-            result = oct(int(factorial_result))
+            result = oct(int(factorial_result))[2:]
         elif base == 16:
-            result = hex(int(factorial_result))
+            result = hex(int(factorial_result))[2:].upper()
         else:
             result = str(factorial_result)
 
@@ -736,7 +736,17 @@ class Ui_Programmer_calculator(object):
         operation = screen  # Store the current operation
 
         if self.comboBox_3.currentText() == "Decimális":
-            if "int" in screen:
+            if "twos" in screen:
+                try:
+                    number = screen.split("twos ")[1]
+                    print(f"'{number}'")
+                    answer = self.twos_complement(number, 10)
+                    print(answer)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "int" in screen:
                 try:
                     answer = self.round_down_number(screen.split("int")[1], "decimal")
                     print("#LOG: kerekítés egészre")
@@ -837,9 +847,71 @@ class Ui_Programmer_calculator(object):
                 self.nulla_15.setText(f"")
         elif self.comboBox_3.currentText() == "Oktális":
             answer = 0
-            if "int" in screen:
+            if "twos" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1], "octal")
+                    number = screen.split(" ")[1]
+                    print(f"'{number}'")
+                    answer = self.twos_complement(number, 8)
+                    print(answer)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "**-" in screen:
+                try:
+                    print("#LOG: negatív kitevőjű")
+                    number = screen.split("**")[0]
+                    kitevő = int(screen.split("**")[1])
+                    answer = self.power_octal(number, kitevő)
+                except:
+                     self.Result.setText("Helytelen negatív kitevőjű!")
+            elif "<<" in screen or ">>" in screen:
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        number = screen.split("<<")[0]
+                        shift_amount = int(screen.split("<<")[1] )
+                        answer = self.shift_octal_custom('<<', shift_amount, number)
+                    if ">>" in screen:
+                        number = screen.split(">>")[0]
+                        shift_amount = int(screen.split(">>")[1] )
+                        answer = self.shift_octal_custom('>>', shift_amount, number)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
+            elif "ABS" in screen:
+                try:
+                    print("#LOG: abs")
+                    answer = int(self.absolute_octal(screen.split(" ")[1]))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_octal(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_octal(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            
+            elif self.only_one_fact(screen) == 1 and "!" in screen:
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "octal")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "int" in screen:
+                try:
+                    answer = int( self.round_down_number(screen.split("int")[1], "octal").strip() )
+
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -854,21 +926,32 @@ class Ui_Programmer_calculator(object):
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                answer = self.evaluate_octal_expression(screen)
+                print("# Aritmetikus oktál")
+                if not '.' in self.evaluate_octal_expression(screen):
+                    answer = int(self.evaluate_octal_expression(screen))
+                else:
+                    answer = (self.evaluate_octal_expression(screen))
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                answer = self.evaluate_octal_logical_expression(screen)
+                answer = int(self.evaluate_octal_logical_expression(screen))
             elif "FACT" in screen:
                 answer = self.convert_and_factorize("0o" + screen.split("FACT")[1])
-            else:
-                answer = eval(screen)
-            self.Result.setText(str(answer))
-            try:
+
+            if answer is not None:
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
+            print(f"ans: '{answer}' {type(answer)}")
+            if type(answer) is int:
                 octal_segments = self.octal_octal_to_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
                 self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
-            except:
+            else:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
                 self.t6_31.setText(f"")
@@ -876,7 +959,17 @@ class Ui_Programmer_calculator(object):
         elif self.comboBox_3.currentText() == "Bináris":
 
             answer = 0
-            if "int" in screen:
+            if "twos" in screen:
+                try:
+                    number = screen.split(" ")[1]
+                    print(f"'{number}'")
+                    answer = self.twos_complement(number, 2)
+                    print(answer)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "int" in screen:
                 try:
                     answer = self.round_down_number(screen.split("int")[1], "binary")
                     print("#LOG: kerekítés egészre")
@@ -901,12 +994,20 @@ class Ui_Programmer_calculator(object):
             else:
                 answer = eval(screen)
             self.Result.setText(str(answer))
+            if answer is not None:
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
             try:
                 binary_segments = self.binary_tobinary_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])} 0")
+                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
             except:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
@@ -961,10 +1062,12 @@ class Ui_Programmer_calculator(object):
             
             if answer is not None:
                 self.Result.setText(str(answer))
-                # Append the operation and result to the operations list
-                self.operations.append(f"{operation} = {answer}")
-                # Update the display of operations
+
+                self.operations.append(f"{operation}")
                 self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
 
             self.Result.setText(str(answer))
             if isinstance(answer, str):
@@ -1056,48 +1159,22 @@ class Ui_Programmer_calculator(object):
         return result
 
     def round_down_number(self, number: str, mode: str) -> str:
-        def convert_to_decimal(number: str, base: int) -> float:
-            if "." in number:
-                integer_part, fractional_part = number.split(".")
-                integer_value = int(integer_part, base)
-                fractional_value = sum(
-                    int(digit, base) * (base**-i)
-                    for i, digit in enumerate(fractional_part, 1)
-                )
-                return integer_value + fractional_value
-            else:
-                return int(number, base)
-
-        def convert_from_decimal(number: int, base: int) -> str:
-            if base == 2:
-                return bin(number)[2:]
-            elif base == 8:
-                return oct(number)[2:]
-            elif base == 16:
-                return hex(number)[2:].upper()
-            else:
-                return str(number)
-
-        if mode == "binary":
-            num = convert_to_decimal(number, 2)
-            rounded_num = math.floor(num)
-            return convert_from_decimal(rounded_num, 2)
-        elif mode == "decimal":
-            num = float(number)
-            rounded_num = math.floor(num)
-            return str(rounded_num)
-        elif mode == "octal":
-            num = convert_to_decimal(number, 8)
-            rounded_num = math.floor(num)
-            return convert_from_decimal(rounded_num, 8)
-        elif mode == "hex":
-            num = convert_to_decimal(number, 16)
-            rounded_num = math.floor(num)
-            return convert_from_decimal(rounded_num, 16)
+        if mode not in {'binary', 'decimal', 'octal', 'hex'}:
+            raise ValueError("Invalid mode. Choose from 'binary', 'decimal', 'octal', or 'hex'.")
+        
+        negative = number.startswith('-')
+        if negative:
+            number = number[1:]
+        
+        if '.' in number:
+            integer_part, _ = number.split('.')
         else:
-            raise ValueError(
-                "Invalid mode. Choose from 'binary', 'decimal', 'octal', or 'hex'."
-            )
+            integer_part = number
+        
+        if negative:
+            integer_part = '-' + integer_part
+        
+        return integer_part
 
     def shift_left_func(self, num: str, number: str):
         # Ensure the input number is an integer
@@ -1211,11 +1288,20 @@ class Ui_Programmer_calculator(object):
         return segments
 
     def octal_octal_to_64bit_segments(self, octal_number):
-        # Convert octal to binary
-        binary_string = bin(int(str(octal_number), 8))[2:]
+        is_negative = octal_number < 0
+    
+        # Convert octal to binary string
+        binary_string = bin(int(str(abs(octal_number)), 8))[2:]
+
+        if is_negative:
+            # Convert to a full 64-bit binary number with two's complement for negative numbers
+            binary_string = bin((1 << 64) - int(binary_string, 2))[2:]
 
         # Pad with leading zeros to make it 64 bits
         padded_binary = binary_string.zfill(64)
+        
+        # Ensure it is exactly 64 bits by taking the last 64 bits
+        padded_binary = padded_binary[-64:]
 
         # Split into 16-bit chunks
         chunks = [padded_binary[i : i + 16] for i in range(0, 64, 16)]
@@ -1223,17 +1309,29 @@ class Ui_Programmer_calculator(object):
         return chunks
 
     def evaluate_octal_expression(self, expression):
-        # Define a helper function to convert octal to decimal
+                # Define a helper function to convert octal to decimal
         def oct_to_dec(oct_str):
             return int(oct_str, 8)
 
         # Define a helper function to convert decimal to octal
-        def dec_to_oct(dec_int):
-            return oct(dec_int)[2:]
+        def dec_to_oct(dec_number):
+            if isinstance(dec_number, float):
+                integer_part = int(dec_number)
+                fractional_part = dec_number - integer_part
+                octal_integer = oct(integer_part)[2:]
+                octal_fractional = ""
+                for _ in range(10):  # Limit the fractional precision
+                    fractional_part *= 8
+                    octal_fractional += str(int(fractional_part))
+                    fractional_part -= int(fractional_part)
+                return f"{octal_integer}.{octal_fractional}".rstrip('0').rstrip('.')
+            elif dec_number < 0:
+                return '-' + oct(abs(int(dec_number)))[2:]
+            return oct(int(dec_number))[2:]
 
         # Replace octal numbers with their decimal equivalents in the expression
         def replace_octal_with_decimal(expr):
-            octal_numbers = re.findall(r"[0-7]+", expr)
+            octal_numbers = re.findall(r"-?[0-7]+", expr)
             for oct_num in octal_numbers:
                 expr = expr.replace(oct_num, str(oct_to_dec(oct_num)), 1)
             return expr
@@ -1273,14 +1371,15 @@ class Ui_Programmer_calculator(object):
             "AND": lambda a, b: a & b,
             "OR": lambda a, b: a | b,
             "XOR": lambda a, b: a ^ b,
-            "NOT": lambda a: ~a,
+            "NOT": lambda a: ~a & ((1 << 63) - 1),  # Ensure NOT operation results in a 63-bit unsigned value
         }
 
         # Replace octal numbers with decimal equivalents
         decimal_expression = replace_octal_with_decimal(expression)
 
         # Tokenize the expression into numbers and operators
-        tokens = re.split(r"(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b)", decimal_expression)
+        tokens = re.split(r"(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b|\s+)", decimal_expression)
+        tokens = [token.strip() for token in tokens if token.strip()]
 
         # Process the tokens to handle logical operations
         def process_tokens(tokens):
@@ -1300,23 +1399,23 @@ class Ui_Programmer_calculator(object):
 
             i = 0
             while i < len(tokens):
-                token = tokens[i].strip()
+                token = tokens[i]
                 if token in logical_ops:
-                    while (
-                        op_stack
-                        and op_stack[-1] in logical_ops
-                        and logical_ops[op_stack[-1]]
-                        in [logical_ops["AND"], logical_ops["OR"], logical_ops["XOR"]]
-                    ):
-                        apply_operator()
-                    op_stack.append(token)
+                    if token == "NOT":
+                        op_stack.append(token)
+                    else:
+                        while op_stack and op_stack[-1] in logical_ops:
+                            apply_operator()
+                        op_stack.append(token)
                 else:
                     num_stack.append(int(token))
+                    while op_stack and op_stack[-1] == "NOT":
+                        apply_operator()
                 i += 1
 
             while op_stack:
                 apply_operator()
-
+            
             return num_stack[0]
 
         # Evaluate the expression
@@ -1328,8 +1427,158 @@ class Ui_Programmer_calculator(object):
             return f"Error: {e}"
 
         # Convert the result back to octal
-        return dec_to_oct(result)
+        octal_result = dec_to_oct(result)
+        
+        # Ensure the result is in 64-bit octal format and starts with 1
+        if "NOT" in expression:
+            octal_result = octal_result.zfill(22)
+            if not octal_result.startswith('1'):
+                octal_result = '1' + octal_result[1:]
 
+        return octal_result
+
+    def shift_octal_custom(self, operation, shift_amount, number):
+        octal_value = int(number, 8)
+        if operation == '<<':
+            shifted_value = octal_value << shift_amount
+        elif operation == '>>':
+            shifted_value = octal_value >> shift_amount
+        else:
+            return None
+        
+        return int(str(oct(shifted_value))[2:])
+    
+    def absolute_octal(self, octal_str: str)-> str:
+        try:
+            # Convert octal string to a decimal integer
+            decimal_number = int(octal_str, 8)
+            
+            # Get the absolute value of the decimal number
+            abs_decimal = abs(decimal_number)
+            
+            # Convert the absolute decimal number back to an octal string
+            abs_octal_str = oct(abs_decimal)[2:]
+            
+            return abs_octal_str
+        except ValueError:
+            return "Invalid octal number"
+    
+    def float_to_octal(self, f):
+        """
+        Convert a floating-point number to its octal representation as a string.
+        
+        Parameters:
+        f (float): The floating-point number to convert.
+        
+        Returns:
+        str: The octal representation of the floating-point number.
+        """
+        if f < 0:
+            sign = "-"
+            f = -f
+        else:
+            sign = ""
+
+        # Separate the integer part and the fractional part
+        integer_part = int(f)
+        fractional_part = f - integer_part
+        
+        # Convert the integer part to octal
+        octal_integer = oct(integer_part)[2:]
+
+        # Convert the fractional part to octal
+        octal_fraction = ""
+        while fractional_part != 0 and len(octal_fraction) < 12:  # limit length to prevent infinite loop
+            fractional_part *= 8
+            digit = int(fractional_part)
+            octal_fraction += str(digit)
+            fractional_part -= digit
+
+        return sign + octal_integer + "." + octal_fraction
+
+    def power_octal(self, octal_str, power_value):
+        """
+        Calculate the result of raising an octal number to a given power and return the result as an octal string.
+
+        Parameters:
+        octal_str (str): The octal number as a string.
+        power_value (float): The power to which the octal number is to be raised.
+
+        Returns:
+        str: The octal representation of the result after exponentiation.
+        """
+        try:
+            # Convert the octal string to a decimal number
+            decimal_value = int(octal_str, 8)
+            
+            # Perform the power operation
+            result_value = decimal_value ** power_value
+            
+            # Convert the result back to an octal string with fraction handling
+            octal_result = self.float_to_octal2(result_value)
+            
+            return octal_result
+        except ValueError as e:
+            return f"Error: {e}"
+        
+    def float_to_octal2(self, f):
+        """
+        Convert a floating-point number to its octal representation as a string.
+        
+        Parameters:
+        f (float): The floating-point number to convert.
+        
+        Returns:
+        str: The octal representation of the floating-point number.
+        """
+        if f < 0:
+            sign = "-"
+            f = -f
+        else:
+            sign = ""
+
+        # Separate the integer part and the fractional part
+        integer_part = int(f)
+        fractional_part = f - integer_part
+        
+        # Convert the integer part to octal
+        octal_integer = oct(integer_part)[2:]
+
+        # Convert the fractional part to octal
+        octal_fraction = ""
+        while fractional_part != 0 and len(octal_fraction) < 12:  # limit length to prevent infinite loop
+            fractional_part *= 8
+            digit = int(fractional_part)
+            octal_fraction += str(digit)
+            fractional_part -= digit
+
+        return sign + octal_integer + ("." + octal_fraction if octal_fraction else "")
+    
+    def log_from_octal(self, octal_str, base=10):
+        """
+        Calculate the logarithm of an octal number and return the result in both decimal and octal format.
+
+        Parameters:
+        octal_str (str): The octal number as a string.
+        base (int): The base of the logarithm (default is 10).
+
+        Returns:
+        tuple: A tuple containing the logarithm of the octal number in decimal and octal format.
+        """
+        try:
+            # Convert the octal string to a decimal integer
+            decimal_value = int(octal_str, 8)
+            
+            # Calculate the logarithm of the decimal value
+            log_value = math.log(decimal_value, base)
+            
+            # Convert the logarithm result to octal float representation
+            log_value_octal = self.float_to_octal(log_value)
+            
+            return log_value_octal
+        except ValueError:
+            return "Invalid octal number"
+    
     def binary_tobinary_64bit_segments(self, binary_number):
         # Ensure the binary number is represented in 64 bits
         padded_binary = format(int(str(binary_number), 2), "064b")
@@ -1624,18 +1873,15 @@ class Ui_Programmer_calculator(object):
         self.operations_list2.scrollToBottom()
 
     def on_item_clicked(self, item):
-        # This function will be called when an item is clicked
-        tmp = self.Result.text()
         self.Result.setText("") 
         item_text = item.text()
-        self.Result.setText(tmp + item_text)  # Use the full item text directly
+        self.Result.setText(item_text)  # Use the full item text directly
 
     def on_item_clicked2(self, item):
-        # This function will be called when an item is clicked
-        tmp = self.Result.text()
         self.Result.setText("") 
         item_text = item.text()
-        self.Result.setText(tmp + item_text)
+        self.Result.setText(item_text)
+
     def retranslateUi(self, Programmer_calc):
         _translate = QtCore.QCoreApplication.translate
         Programmer_calc.setWindowTitle(_translate("Programmer_calc", "Programozói számológép"))
