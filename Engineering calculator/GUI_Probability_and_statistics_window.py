@@ -147,20 +147,39 @@ class Ui_Probability_and_statistics(object):
         }
         QLabel {
             color: #FFFFFF;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
         }
-        QLineEdit, QComboBox {
+        QComboBox {
             background-color: #4E4E4E;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 5px;
             padding: 5px;
         }
         QPushButton {
-            background-color: #4E4E4E;
+            background-color: #1C1C1C;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 10px;
             padding: 10px;
+        }
+        QPushButton#pushButton_2 {
+        
+            font-size: 10pt;
+
+        }
+        QTextEdit, QLineEdit {
+            background-color: #1C1C1C;
+            font-size: 14pt;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            padding: 5px;
         }
         QPushButton:hover {
             background-color: #5E5E5E;

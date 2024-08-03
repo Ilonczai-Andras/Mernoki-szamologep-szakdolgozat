@@ -355,7 +355,7 @@ class Ui_MainWindow(object):
             self.Button_9,
         ]
         for button in number_buttons:
-            button.setStyleSheet("background-color: lightblue")
+            button.setStyleSheet("background-color: #ff7300")
 
     def applyStylesheet(self, MainWindow):
         stylesheet = """
@@ -364,6 +364,7 @@ class Ui_MainWindow(object):
         }
         QLabel#outputLabel {
             background-color: #1C1C1C;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 2px solid #555555;
             border-radius: 5px;
@@ -371,6 +372,7 @@ class Ui_MainWindow(object):
         }
         QPushButton {
             background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 10px;
@@ -384,6 +386,7 @@ class Ui_MainWindow(object):
         }
         QComboBox {
             background-color: #4E4E4E;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 1px solid #555555;
             border-radius: 5px;
@@ -393,10 +396,12 @@ class Ui_MainWindow(object):
             background-color: #4E4E4E;
             selection-background-color: #5E5E5E;
             color: #FFFFFF;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
         }
         QToolBar {
             background-color: #3E3E3E;
             border: none;
+            font-family: 'Courier New', Courier, monospace; /* Monospaced font */
         }
         """
         MainWindow.setStyleSheet(stylesheet)
@@ -508,7 +513,7 @@ class Ui_MainWindow(object):
         self.deleteButton.setText(_translate("MainWindow", "DEL"))
         self.quadratButton.setText(_translate("MainWindow", "x²"))
         self.onePerXButton.setText(_translate("MainWindow", "1/x"))
-        self.sqrtButton.setText(_translate("MainWindow", "sqrt(2)"))
+        self.sqrtButton.setText(_translate("MainWindow", "sqrt"))
         self.divideButton.setText(_translate("MainWindow", "/"))
         self.Button_7.setText(_translate("MainWindow", "7"))
         self.Button_8.setText(_translate("MainWindow", "8"))

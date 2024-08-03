@@ -102,13 +102,13 @@ class Ui_Differential_Equation(object):
         }
         QTextEdit#text_edit{
             color: #FFFFFF;
-            background-color: #4E4E4E;
+            background-color: #1C1C1C;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14pt;
         }
         
         QLineEdit#lineEdit {
-            background-color: #4E4E4E;
+            background-color: #1C1C1C;
             color: #FFFFFF;
             font-size: 10pt;
             font-family: 'Courier New', Courier, monospace;
@@ -128,7 +128,7 @@ class Ui_Differential_Equation(object):
             qproperty-alignment: 'AlignLeft;
         }
         QPushButton {
-            background-color: #4E4E4E;
+            background-color: #1C1C1C;
             font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
             border: 1px solid #555555;

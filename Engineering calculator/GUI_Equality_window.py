@@ -331,13 +331,14 @@ class Ui_Equation(object):
             background-color: #2E2E2E;
         }
         QTextEdit#text_edit{
+            background: #1C1C1C;
             color: #FFFFFF;
             font-family: 'Courier New', Courier, monospace;
             font-size: 14pt;
         }
         
         QComboBox, QTextEdit, QLineEdit {
-            background-color: #4E4E4E;
+            background-color: #1C1C1C;
             color: #FFFFFF;
             font-size: 14pt;
             font-family: 'Courier New', Courier, monospace;
