@@ -2,6 +2,12 @@
 REM Navigate to the directory containing setup.py
 cd /d "%~dp0"
 
+REM Check if pip is installed
+python -m ensurepip --default-pip
+
+REM Install necessary packages using pip
+python -m pip install cx_Freeze PyQt5 sympy numpy scipy matplotlib
+
 REM Run the Python setup script with the build command
 python setup.py build
 
@@ -11,4 +17,4 @@ if %errorlevel% equ 0 (
 ) else (
     echo Python setup script failed to execute.
 )
-pause
+pause 
