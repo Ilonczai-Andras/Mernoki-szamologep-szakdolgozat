@@ -1,6 +1,6 @@
 @echo off
 REM Navigate to the directory containing setup.py
-cd /d D:\Andreas\Szakdolgozat\Mernoki-szamologep-szakdolgozat\Engineering calculator
+cd /d "%~dp0"
 
 REM Run the Python setup script with the build command
 python setup.py build
