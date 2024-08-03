@@ -60,8 +60,7 @@ class Ui_Probability_and_statistics(object):
         self.comboBox.currentTextChanged.connect(self.handle_combobox_change)
 
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(10, 190, 780, 70
-                                              ))
+        self.label_2.setGeometry(QtCore.QRect(10, 190, 780, 300))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_2.setFont(font)
@@ -202,7 +201,7 @@ class Ui_Probability_and_statistics(object):
     def t_test(self=None, mu=None, alpha=None, x=None, y=None, paired=None):
 
         if x is not None and mu is not None and alpha is not None:
-            print("egymintás t")
+            print("#LOG egymintás t")
             result_string = ""
 
             avg = statistics.mean(x)
@@ -217,96 +216,92 @@ class Ui_Probability_and_statistics(object):
             t = (avg - m) / (stan_dev / sqrt(n)) 
             t = float(t)  # Ensure numerical evaluation
 
-            t_p = stats.t.ppf(q= Alpha/2,df= df)
+            t_p = stats.t.ppf(q=1- Alpha/2,df= df)
             p_value = 2 * (1 - stats.t.sf(abs(float(t)), df))
 
             if abs(t) >= t_p:
                 
-                result_string += f"\nA nullhipotézist elvetjük t: {t} p: {2 - p_value}\n"
-                result_string += f"two tail  p:{stats.t.ppf(q= Alpha/2,df= df)}" +"\n"
-                result_string += f"one tail  p:{stats.t.ppf(q= Alpha,df= df)}" +"\n"
+                result_string += f"\nH0-t elutasítjuk t: {t}\n{abs(t)} >= {t_p}\np: {2 - p_value}\n"
+                # result_string += f"two tail  t:{abs(stats.t.ppf(q= Alpha/2,df= df) )}" +"\n"
+                # result_string += f"one tail  t:{abs(stats.t.ppf(q= Alpha,df= df) )}" +"\n"
             elif abs(t) < t_p:
-                result_string += f"\nA nullhipotézist elfogadjuk t: {t} p: {2 - p_value}\n"
-                result_string += f"two tail  p:{stats.t.ppf(q= Alpha/2,df= df)}" +"\n"
-                result_string += f"one tail  p:{stats.t.ppf(q= Alpha,df= df)}" +"\n"
+                result_string += f"\nH0-t elfogadjuk t: {t}\n{abs(t)} < {t_p}\np: {2 - p_value}\n"
+                # result_string += f"two tail  t:{abs(stats.t.ppf(q= Alpha/2,df= df) )}" +"\n"
+                # result_string += f"one tail  t:{abs(stats.t.ppf(q= Alpha,df= df) )}" +"\n"
 
             return result_string
-        elif x is not None and y is not None and paired is True and alpha is not None:
-            print("kétmintás párosított t próba")
+        elif x is not None and y is not None and alpha is not None and paired is not None:
+            print("#LOG kétmintás párosított t próba")
             result_string = ""
-            
+
             x = np.array(x)
             y = np.array(y)
             z = y - x
             N = len(z)
-            korr_sz = np.std(z, ddof=1)
             Alpha = 1 - alpha
-            atlag = np.mean(z)
-            t_critical = stats.t.ppf(1 - Alpha, N - 1)
 
-            if atlag > t_critical * korr_sz / np.sqrt(N):
-                result_string += 'H0-t elutasítjuk\n'
+            # Paired t-test using scipy.stats
+            t_stat, p_value = stats.ttest_1samp(z, 0)
+
+            # Determine if we reject or accept the null hypothesis
+            if p_value < Alpha:
+                result_string += 'H0-t elutasítjuk\n'  # We reject H0
             else:
-                result_string += 'H0-t elfogadjuk\n'
+                result_string += 'H0-t elfogadjuk\n'  # We accept H0
 
-            H, P_ertek = stats.ttest_1samp(z, 0)
-            print(H, P_ertek)
-
-            result_string += f"t: {H} p: {P_ertek}\n"
-            result_string += f"two tail p: {stats.t.ppf(q=Alpha/2, df=N-1)}\n"
-            result_string += f"one tail p: {stats.t.ppf(q=Alpha, df=N-1)}\n"
+            result_string += f"t: {t_stat} p: {p_value}\n"
 
             return result_string
         elif (x is not None and y is not None and alpha is not None):
-            print("kétmintás t")
+            print("#LOG kétmintás t")
             result_string = ""
             
             t_statistic, p_value = stats.ttest_ind(x, y)
 
             Alpha = 1 - alpha
             if p_value < Alpha:
-                result_string += "H0-t elvetjük\n"
+                result_string += "H0-t elutasítjuk\n"
             else:
                 result_string += "H0-t elfogadjuk\n"
 
             result_string += f"P: {p_value} T: {t_statistic}\n"
-            result_string += f"two tail p: {stats.t.ppf(q=Alpha/2, df=(len(x) + len(y) - 2))}\n"
-            result_string += f"one tail p: {stats.t.ppf(q=Alpha, df=(len(x) + len(y) - 2))}\n"
+            # result_string += f"two tail p: {stats.t.ppf(q=Alpha/2, df=(len(x) + len(y) - 2))}\n"
+            # result_string += f"one tail p: {stats.t.ppf(q=Alpha, df=(len(x) + len(y) - 2))}\n"
 
             return result_string
 
     def u_test(self, X=None, mu=None, sigma=None, alpha=None):
-        if X is not None or mu is not None or sigma is not None or alpha is not None:
+        if X is not None and mu is not None and sigma is not None and alpha is not None:
             # Sample statistics
             n = len(X)
             if n == 0:
                 raise ValueError("Sample data X cannot be empty.")
                 
             sample_mean = np.mean(X)
+            Alpha = 1 - alpha
 
             # Calculate Z-value
             z_value = (sample_mean - mu) / (sigma / np.sqrt(n))
 
             # Left-tailed test
-            z_critical_left = norm.ppf(alpha)
+            z_critical_left = norm.ppf(Alpha)
             p_value_left = norm.cdf(z_value)
-            reject_null_left = "igen" if z_value < z_critical_left else "nem"
-            left_test_result = f"Bal oldali próba: Kritikus Z-érték: {z_critical_left}, \nP-érték: {p_value_left}, Nullhipotézis elutasítása: {reject_null_left}"
+            accept_null_left = "igen" if p_value_left > Alpha else "nem"
+            left_test_result = f"Bal oldali próba: Kritikus Z-érték: {z_critical_left}, \nP-érték: {p_value_left}, HO elfogadása: {accept_null_left}"
 
             # Two-tailed test
-            z_critical_two = norm.ppf(1 - alpha / 2)
+            z_critical_two = norm.ppf(1 - Alpha / 2)
             p_value_two = 2 * (1 - norm.cdf(abs(z_value)))
-            reject_null_two = "igen" if abs(z_value) > z_critical_two else "nem"
-            two_test_result = f"Kétoldali próba: Kritikus Z-érték: ±{z_critical_two}, \nP-érték: {p_value_two}, Nullhipotézis elutasítása: {reject_null_two}"
+            accept_null_two = "igen" if p_value_two > alpha else "nem"
+            two_test_result = f"Kétoldali próba: Kritikus Z-érték: ±{z_critical_two}, \nP-érték: {p_value_two}, HO elfogadása: {accept_null_two}"
 
             # Right-tailed test
-            z_critical_right = norm.ppf(1 - alpha)
+            z_critical_right = norm.ppf(1 - Alpha)
             p_value_right = 1 - norm.cdf(z_value)
-            reject_null_right = "igen" if z_value > z_critical_right else "nem"
-            right_test_result = f"Jobb oldali próba: Kritikus Z-érték: {z_critical_right}, \nP-érték: {p_value_right}, Nullhipotézis elutasítása: {reject_null_right}"
+            accept_null_right = "igen" if p_value_right > Alpha else "nem"
+            right_test_result = f"Jobb oldali próba: Kritikus Z-érték: {z_critical_right}, \nP-érték: {p_value_right}, HO elfogadása: {accept_null_right}"
 
-            return (f"Minta átlaga: {sample_mean}\n"
-                    f"Z-érték: {z_value}\n\n"
+            return (f"Z-érték: {z_value}\n\n"
                     f"{left_test_result}\n\n"
                     f"{two_test_result}\n\n"
                     f"{right_test_result}")
@@ -331,7 +326,7 @@ class Ui_Probability_and_statistics(object):
                             mu = int(self.mu.toPlainText())
                             alpha = float(self.sigma.toPlainText())
                         except:
-                            self.label_2.setText("Hiányzik valamelyik érték!")
+                            self.label_2.setText("ERROR hibás t próba!")
                         else:
                             res = self.t_test(x=x, mu=mu, alpha=alpha)
                             self.label_2.setText(res)
@@ -343,8 +338,9 @@ class Ui_Probability_and_statistics(object):
                             x = self.str_to_list(lines[0])
                             y = self.str_to_list(lines[1])
                             alpha = float(self.sigma.toPlainText())
+                            mu = float(self.sigma.toPlainText())
                         except:
-                            self.label_2.setText("Hiányzik valamelyik érték!")
+                            self.label_2.setText("ERROR hibás t próba!")
                         else:
                             res = self.t_test(x=x, y=y, alpha=alpha, paired=True)
                             self.label_2.setText(res)
@@ -357,7 +353,7 @@ class Ui_Probability_and_statistics(object):
                             y = self.str_to_list(lines[1])
                             alpha = float(self.sigma.toPlainText())
                         except:
-                            self.label_2.setText("Hiányzik valamelyik érték!")
+                            self.label_2.setText("ERROR hibás t próba!")
                         else:
                             res = self.t_test(x=x, y=y, alpha=alpha)
                             self.label_2.setText(res)
@@ -373,7 +369,7 @@ class Ui_Probability_and_statistics(object):
                             alpha = float(self.alpha.toPlainText())
                             sigma = int(self.sigma.toPlainText())
                         except:
-                            self.label_2.setText("Hiányzik valamelyik érték!")
+                            self.label_2.setText("ERROR hibás u próba!")
                         else:
                             res = self.u_test(X=x, mu=mu, sigma=sigma, alpha=alpha)
                             self.label_2.setText(res)
@@ -446,7 +442,6 @@ class Ui_Probability_and_statistics(object):
                             self.label_2.setText(str(variance(X)))
                         elif operation_type == "Sűrűség függvény":
                             self.label_2.setText(str(density(X)(x)))
-                            print(str(density(X)(x)))
                             func_str = self.label_2.text()
                             self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
             except:
@@ -603,11 +598,11 @@ class Ui_Probability_and_statistics(object):
 
         if distribution in ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]:
             self.sigma.setPlaceholderText("alpha")
-            if distribution == "Egymintás t próba":
+            if distribution == "Egymintás t próba" or distribution =="Kétmintás párosított t próba":
                 self.mu.show()
             else:
                 self.mu.hide()
-        elif distribution in ["Egymintás u próba", "Kétmintás u próba"]:
+        elif distribution in ["Egymintás u próba"]:
             self.mu.setPlaceholderText("m")
             self.alpha.show()
         else:
