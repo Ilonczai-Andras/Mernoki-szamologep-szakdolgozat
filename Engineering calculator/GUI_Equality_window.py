@@ -182,8 +182,7 @@ class Ui_Equation(object):
 
                 self.label_2.setText(pretty(result))
 
-                # Call plot_area_between_functions with intervals and inequality type
-                self.canvas.plot_area_between_functions(x_intervals, inequality_type)
+                self.canvas.plot_area_between_functions(x_intervals)
             else:
                 splitted_func = one_func.replace(" ", "").split("=")
                 symbs = self.extract_variable(replaced_func)
@@ -231,36 +230,25 @@ class Ui_Equation(object):
         if input_text == "Egyenlet":
             if len(number_of_rows) == 2:
                 self.common_area = []
-                self.one_func(
-                    function_text,
-                    self.replace_trigonometric_funcs(function_text).replace("sqrt", ""),
-                )
+                self.one_func(function_text,self.replace_trigonometric_funcs(function_text).replace("sqrt", ""),)
                 for ineq in inequality:
                     if ineq in function_text:
                         self.canvas.clear((-10, 10), (-10, 10))
                         self.canvas.plotted_functions = []
                         lhs, rhs = function_text.split(ineq)
                         self.canvas.plot_function(lhs, (-10, 10), clear=False)
-                        #self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
+                        self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
                         self.canvas.plot_function(rhs, (-10, 10), clear=False)
-                        #self.canvas.store_function( rhs, (-10, 10), self.canvas.interval_y, None, False, "" )
+                        self.canvas.store_function( rhs, (-10, 10), self.canvas.interval_y, None, False, "" )
 
                         # Separate real and complex numbers
-                        real_common_area = [
-                            float(val) for val in self.common_area if val.is_real
-                        ]
-                        complex_common_area = [
-                            val for val in self.common_area if not val.is_real
-                        ]
+                        real_common_area = [float(val) for val in self.common_area if val.is_real]
+                        complex_common_area = [val for val in self.common_area if not val.is_real]
 
-                        print(
-                            f"Calling plot_area_between_functions with {real_common_area}"
-                        )  # Debug statement
+                        print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
                         self.canvas.plot_area_between_functions(real_common_area)
                         if complex_common_area:
-                            print(
-                                f"Complex solutions: {complex_common_area}"
-                            )  # Handle complex solutions if needed
+                            print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
                         break
             else:
                 self.label_2.setText("Egy sort adj meg")
