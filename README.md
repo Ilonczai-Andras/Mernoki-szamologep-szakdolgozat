@@ -13,7 +13,6 @@ But it requires python so you may want to install it first. The recommended vers
 
 ## Usage
 
-To use the Engineering Calculator, follow these steps:
 The instructions for use can be found in the files. On the first page.
 
 ## Contributing
