@@ -106,8 +106,9 @@ class Canvas(FigureCanvas):
         self.interval_x = [interval_x[0], interval_x[1]]
         self.interval_y = [interval_y[0], interval_y[1]]
 
-        self.func = func_str.replace("A", "a")
-        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a")
+        self.func = func_str.replace("A", "a").replace("E", "e")
+        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a").replace("E", "e")
+        print(func_str)
         self.text = func_str
         self.df = df
         self.df_func = df_func

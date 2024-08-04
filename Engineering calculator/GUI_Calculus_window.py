@@ -103,7 +103,7 @@ class Ui_Calculus(object):
             r"\bcsc\b": "csc",
             #pi and e
             r"\bpi\b": "pi",
-            r"\be\b": "E"
+            r"\math.\b": "E"
         }
 
         for pattern, np_func in replacements.items():
@@ -190,118 +190,150 @@ class Ui_Calculus(object):
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen növekvő függvény!")
+                self.label_2.setText("ERROR helytelen Növekvő függvény!")
 
         if input == "Szigorúan növekvő":
-            res = is_strictly_increasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " szigorúan növekvő")
-            else:
-                self.label_2.setText(text + " szigorúan nem növekvő")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Csökkenő":
-            res = is_decreasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " Csökkenő")
-            else:
-                self.label_2.setText(text + " nem csökkenő")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Szigorúan csökkenő":
-            res = is_strictly_decreasing(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " szigorúan csökkenő")
-            else:
-                self.label_2.setText(text + " szigorúan nem csökkenő")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Monoton":
-            res = is_monotonic(
-                sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
-            )
-            if res == True:
-                self.label_2.setText(text + " Monoton")
-            else:
-                self.label_2.setText(text + " nem monoton")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Divergens":
-            res = limit(sympify(text), x, oo)
-            if res == oo:
-                self.label_2.setText(text + " Divergens")
-            else:
-                self.label_2.setText(text + " Nem divergens")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Határérték":
-            if self.has_no_variables(text):
-                self.label_2.setText(text + " -> " + str(eval(text)))
-            else:
-                res = limit(sympify(text), x, oo)
-                self.label_2.setText(text + " -> " + str(res))
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Konvergens":
-
-            res = Sum(text, (x, also, felso)).is_convergent()
-            if res:
-                self.label_2.setText(text + " a sorozat konvergál.")
-            else:
-                self.label_2.setText(text + " a sorozat nem konvergál.")
-            result = self.canvas.plot_function(text, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-
-        if input == "Deriválás":
-            tmp = eval(self.replace_sympy_funcs(text))
-            # print(tmp)
-            res = diff((tmp), x)
-            self.label_2.setText(str(res))
-            res_str = str(res)
-            result = self.canvas.plot_function(res_str, interval)
-            if result == False:
-                self.label_2.setText("ERROR: hibás függvény!")
-                self.lineEdit.setText("")
-            
-
-        if input == "Integrálás":
-            x = Symbol("x")
-            res = integrate(self.replace_sympy_funcs(text), x)
-            self.label_2.setText(str(res).replace("**", "^") + " + C")
-            res_str = str(res)
             try:
-                result = self.canvas.plot_function(res_str, interval)
+                res = is_strictly_increasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " szigorúan növekvő")
+                else:
+                    self.label_2.setText(text + " szigorúan nem növekvő")
+                result = self.canvas.plot_function(text, interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
+                self.label_2.setText("ERROR helytelen Szigorúan növekvő függvény!")
+
+        if input == "Csökkenő":
+            try:
+                res = is_decreasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " Csökkenő")
+                else:
+                    self.label_2.setText(text + " nem csökkenő")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Csökkenő függvény!")
+
+        if input == "Szigorúan csökkenő":
+            try:
+                res = is_strictly_decreasing(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " szigorúan csökkenő")
+                else:
+                    self.label_2.setText(text + " szigorúan nem csökkenő")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Szigorúan csökkenő függvény!")
+
+        if input == "Monoton":
+            try:
+                res = is_monotonic(
+                    sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
+                )
+                if res == True:
+                    self.label_2.setText(text + " Monoton")
+                else:
+                    self.label_2.setText(text + " nem monoton")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Monoton függvény!")
+
+        if input == "Divergens":
+            try:
+                res = limit(sympify(text), x, oo)
+                if res == oo:
+                    self.label_2.setText(text + " Divergens")
+                else:
+                    self.label_2.setText(text + " Nem divergens")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Divergens függvény!")
+            
+        if input == "Határérték":
+            try:
+                if self.has_no_variables(text):
+                    self.label_2.setText(text + " -> " + str(eval(text)))
+                else:
+                    res = limit(sympify(text), x, oo)
+                    self.label_2.setText(text + " -> " + str(res))
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Határérték függvény!")
+
+        if input == "Konvergens":
+            try:
+                res = Sum(self.replace_sympy_funcs(text), (x, also, felso)).is_convergent()
+                if res:
+                    self.label_2.setText(text + " a sorozat konvergál.")
+                else:
+                    self.label_2.setText(text + " a sorozat nem konvergál.")
+                result = self.canvas.plot_function(text, interval)
+                if result == False:
+                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Konvergens függvény!")
+
+        if input == "Deriválás":
+            try:
+                tmp = eval(self.replace_sympy_funcs(text))
+                print(tmp)
+                res = diff((tmp), x)
+                self.label_2.setText(str(res))
+                res_str = str(res)
+                result = self.canvas.plot_function(res_str, interval)
+                if result == False:
+                    #self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Deriválás!")
+            
+
+        if input == "Integrálás":
+            try:
+                x = Symbol("x")
+                res = integrate(self.replace_sympy_funcs(text), x)
+                self.label_2.setText(str(res).replace("**", "^").replace("E", "e") + " + C")
+                res_str = str(res)
+                result = self.canvas.plot_function(res_str, interval)
+                if result == False:
+                    #self.label_2.setText("ERROR: hibás függvény!")
+                    self.lineEdit.setText("")
+            except Exception as e:
+                print(e)
+                self.label_2.setText("ERROR helytelen Integrálás!")
         self.pushButton.setEnabled(False)
         # except:
         #     self.label_2.setText("ERROR helytelen függvény!")
