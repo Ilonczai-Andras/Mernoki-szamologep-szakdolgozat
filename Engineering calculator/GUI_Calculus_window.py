@@ -310,8 +310,8 @@ class Ui_Calculus(object):
                 tmp = eval(self.replace_sympy_funcs(text))
                 print(tmp)
                 res = diff((tmp), x)
-                self.label_2.setText(str(res))
-                res_str = str(res)
+                self.label_2.setText(str(res).replace("E", "e"))
+                res_str = str(res).replace("E", "e")
                 result = self.canvas.plot_function(res_str, interval)
                 if result == False:
                     #self.label_2.setText("ERROR: hibás függvény!")
