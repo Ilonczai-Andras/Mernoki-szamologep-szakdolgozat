@@ -103,7 +103,7 @@ class Ui_Calculus(object):
             r"\bcsc\b": "csc",
             #pi and e
             r"\bpi\b": "pi",
-            r"\math.\b": "E"
+            r"\be\b": "E"
         }
 
         for pattern, np_func in replacements.items():
@@ -326,7 +326,7 @@ class Ui_Calculus(object):
                 x = Symbol("x")
                 res = integrate(self.replace_sympy_funcs(text), x)
                 self.label_2.setText(str(res).replace("**", "^").replace("E", "e") + " + C")
-                res_str = str(res)
+                res_str = str(res).replace("E", "e")
                 result = self.canvas.plot_function(res_str, interval)
                 if result == False:
                     #self.label_2.setText("ERROR: hibás függvény!")

@@ -108,7 +108,7 @@ class Canvas(FigureCanvas):
 
         self.func = func_str.replace("A", "a").replace("E", "e")
         func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a").replace("E", "e")
-        print(func_str)
+        print(f"func_Str: '{func_str}'")
         self.text = func_str
         self.df = df
         self.df_func = df_func
