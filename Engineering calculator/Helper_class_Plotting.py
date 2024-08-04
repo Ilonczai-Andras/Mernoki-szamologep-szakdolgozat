@@ -78,6 +78,7 @@ class Canvas(FigureCanvas):
             r"\bsec\b": "self.sec",
             r"\bcsc\b": "self.csc",
             r"\bpi\b": "np.pi",
+            r"\be\b": "math.e",
             r"\bfactorial\b": "self.fact",
         }
 
