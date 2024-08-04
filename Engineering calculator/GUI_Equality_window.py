@@ -228,6 +228,7 @@ class Ui_Equation(object):
         inequality = ["<=", ">=", "<", ">", "="]
 
         if input_text == "Egyenlet":
+            self.canvas.show()
             if len(number_of_rows) == 2:
                 self.common_area = []
                 self.one_func(function_text,self.replace_trigonometric_funcs(function_text).replace("sqrt", ""),)
@@ -254,6 +255,7 @@ class Ui_Equation(object):
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
         if input_text == "Egyenletrendszerek":
+            self.canvas.hide()
             if len(number_of_rows) >= 2:
                 formatted_solution = self.system_of_equations(number_of_rows)
                 self.label_2.setText(formatted_solution)
@@ -286,6 +288,7 @@ class Ui_Equation(object):
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
         if input_text == "Fourier sor":
+            self.canvas.show()
             if len(number_of_rows) == 2:
                 
                 input_function = sympify(function_text)
