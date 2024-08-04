@@ -116,13 +116,10 @@ class Canvas(FigureCanvas):
             self.text = self.text.replace("C2", str(C[1]))
             self.text = self.text.replace("C3", str(C[2]))
 
-        x_vals = np.linspace(-1000, 1000, 10000)
+        x_vals = np.linspace(-100, 100, 100000)
 
         if "fact" in func_str:
             x_vals = np.linspace(0, 15, 100)
-
-        if "tan" in func_str:
-            x_vals = np.linspace(-100000, 100000, 100000)
 
         y_vals = 0
 
