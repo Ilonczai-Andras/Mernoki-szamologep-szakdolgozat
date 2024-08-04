@@ -8,7 +8,8 @@ This project is an engineering calculator designed to help engineering universit
 
 ## Installation
 
-Not implemented.
+It can be installed by running the installer file in the Engineering calculator folder. 
+But it requires python so you may want to install it first. The recommended version of python is 3.12.2.
 
 ## Usage
 
