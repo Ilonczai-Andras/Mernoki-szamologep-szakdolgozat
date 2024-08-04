@@ -134,14 +134,6 @@ class Ui_MainWindow(object):
         self.percentageButton.setFont(font)
         self.percentageButton.setObjectName("percentageButton")
         self.gridLayout.addWidget(self.percentageButton, 0, 0, 1, 1)
-        self.clearEntryButton = QtWidgets.QPushButton(
-            self.widget, clicked=lambda: self.press_it("CE")
-        )
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.clearEntryButton.setFont(font)
-        self.clearEntryButton.setObjectName("clearEntryButton")
-        self.gridLayout.addWidget(self.clearEntryButton, 0, 1, 1, 1)
         self.clearButton = QtWidgets.QPushButton(
             self.widget, clicked=lambda: self.press_it("C")
         )
@@ -149,7 +141,7 @@ class Ui_MainWindow(object):
         font.setPointSize(26)
         self.clearButton.setFont(font)
         self.clearButton.setObjectName("clearButton")
-        self.gridLayout.addWidget(self.clearButton, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.clearButton, 0, 1, 1, 1)
         self.deleteButton = QtWidgets.QPushButton(
             self.widget, clicked=lambda: self.delete()
         )
@@ -157,7 +149,7 @@ class Ui_MainWindow(object):
         font.setPointSize(26)
         self.deleteButton.setFont(font)
         self.deleteButton.setObjectName("deleteButton")
-        self.gridLayout.addWidget(self.deleteButton, 0, 3, 1, 1)
+        self.gridLayout.addWidget(self.deleteButton, 0, 2, 1, 2)
         self.onePerXButton = QtWidgets.QPushButton(
             self.widget, clicked=lambda: self.one_per_x()
         )
@@ -364,6 +356,7 @@ class Ui_MainWindow(object):
         }
         QLabel#outputLabel {
             background-color: #1C1C1C;
+            font-size:40px;
             font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 2px solid #555555;
@@ -409,6 +402,8 @@ class Ui_MainWindow(object):
     def press_it(self, pressed):
         if pressed == "C":
             self.outputLabel.setText("0")
+        elif self.outputLabel.text() == "ERROR!" and pressed:
+            self.outputLabel.setText(pressed)
         else:
             # Check to see if it starts with 0 and delete the zero
             if self.outputLabel.text() == "0":
@@ -476,8 +471,12 @@ class Ui_MainWindow(object):
             self.outputLabel.setText("ERROR")
 
     def one_per_x(self):
-        original = float(self.outputLabel.text())
-        self.outputLabel.setText(str(round((1 / original), 2)))
+        try:
+            original = float(self.outputLabel.text())
+            if original != 0.0 :
+                self.outputLabel.setText(str((1 / original)))
+        except:
+            self.outputLabel.setText("ERROR")
 
     def last_number(self, string):
         i = len(string) - 1
@@ -508,7 +507,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Engineering Calculator"))
         self.outputLabel.setText(_translate("MainWindow", "0"))
         self.percentageButton.setText(_translate("MainWindow", "%"))
-        self.clearEntryButton.setText(_translate("MainWindow", "CE"))
         self.clearButton.setText(_translate("MainWindow", "C"))
         self.deleteButton.setText(_translate("MainWindow", "DEL"))
         self.quadratButton.setText(_translate("MainWindow", "x²"))
