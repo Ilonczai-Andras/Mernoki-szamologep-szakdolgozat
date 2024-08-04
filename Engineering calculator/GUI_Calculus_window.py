@@ -184,7 +184,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " növekvő")
                 else:
                     self.label_2.setText(text + " nem növekvő")
-                result = self.canvas.plot_function(func_str=text, interval_x=interval)
+                result = self.canvas.plot_function(func_str=text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -201,7 +201,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " szigorúan növekvő")
                 else:
                     self.label_2.setText(text + " szigorúan nem növekvő")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -218,7 +218,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " Csökkenő")
                 else:
                     self.label_2.setText(text + " nem csökkenő")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -235,7 +235,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " szigorúan csökkenő")
                 else:
                     self.label_2.setText(text + " szigorúan nem csökkenő")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -252,7 +252,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " Monoton")
                 else:
                     self.label_2.setText(text + " nem monoton")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -267,7 +267,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " Divergens")
                 else:
                     self.label_2.setText(text + " Nem divergens")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -282,7 +282,7 @@ class Ui_Calculus(object):
                 else:
                     res = limit(sympify(text), x, oo)
                     self.label_2.setText(text + " -> " + str(res))
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -297,7 +297,7 @@ class Ui_Calculus(object):
                     self.label_2.setText(text + " a sorozat konvergál.")
                 else:
                     self.label_2.setText(text + " a sorozat nem konvergál.")
-                result = self.canvas.plot_function(text, interval)
+                result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -312,7 +312,7 @@ class Ui_Calculus(object):
                 res = diff((tmp), x)
                 self.label_2.setText(str(res).replace("E", "e"))
                 res_str = str(res).replace("E", "e")
-                result = self.canvas.plot_function(res_str, interval)
+                result = self.canvas.plot_function(res_str, interval_x=interval, interval_y=interval)
                 if result == False:
                     #self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
@@ -327,7 +327,7 @@ class Ui_Calculus(object):
                 res = integrate(self.replace_sympy_funcs(text), x)
                 self.label_2.setText(str(res).replace("**", "^").replace("E", "e") + " + C")
                 res_str = str(res).replace("E", "e")
-                result = self.canvas.plot_function(res_str, interval)
+                result = self.canvas.plot_function(res_str, interval_x=interval, interval_y=interval)
                 if result == False:
                     #self.label_2.setText("ERROR: hibás függvény!")
                     self.lineEdit.setText("")
