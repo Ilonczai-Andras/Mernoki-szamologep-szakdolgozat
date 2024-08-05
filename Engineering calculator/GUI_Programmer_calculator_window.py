@@ -746,9 +746,33 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen kettes komlemens!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_decimal(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_decimal(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "ABS" in screen:
+                try:
+                    print("#LOG: abs")
+                    if '.' in screen:
+                        answer = abs(float((screen.split(" ")[1]) ))
+                    else:
+                        answer = abs(int((screen.split(" ")[1]) ))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")       
             elif "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1], "decimal")
+                    answer = int(self.round_down_number(screen.split("int")[1], "decimal").strip())
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -760,11 +784,7 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
-            elif (
-                not self.contain_logical(screen)
-                and self.contains_sqrt(screen)
-                and self.only_one_fact(screen) == 0
-            ):
+            elif (not self.contain_logical(screen)and self.contains_sqrt(screen)and self.only_one_fact(screen) == 0):
                 try:
                     answer = self.sqrt_func(screen, "decimal")
                     print("#LOG: csak gyökvonás")
@@ -785,11 +805,7 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen shiftelés!")
-            elif (
-                self.contain_arithmetic(screen)
-                and not self.contain_logical(screen)
-                and self.only_one_fact(screen) == 0
-            ):
+            elif (self.contain_arithmetic(screen)and not self.contain_logical(screen)and self.only_one_fact(screen) == 0):
                 try:
                     answer = eval(screen)
                     print("#LOG: csak aritmetikai")
@@ -899,8 +915,7 @@ class Ui_Programmer_calculator(object):
                     answer = self.log_from_octal(screen.split(" ")[1], 10)
                 except:
                     answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            
+                    self.Result.setText("Helytelen faktoriális!")       
             elif self.only_one_fact(screen) == 1 and "!" in screen:
                 try:
                     print("#LOG: factorial")
@@ -927,15 +942,19 @@ class Ui_Programmer_calculator(object):
                     self.Result.setText("Helytelen egyes komlemens!")
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
                 print("# Aritmetikus oktál")
-                if not '.' in self.evaluate_octal_expression(screen):
-                    answer = int(self.evaluate_octal_expression(screen))
-                else:
-                    answer = (self.evaluate_octal_expression(screen))
+                try:
+                    if not '.' in self.evaluate_octal_expression(screen):
+                        answer = int(self.evaluate_octal_expression(screen))
+                    else:
+                        answer = (self.evaluate_octal_expression(screen))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen aritmetikai müvelet!")
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
                 answer = int(self.evaluate_octal_logical_expression(screen))
             elif "FACT" in screen:
                 answer = self.convert_and_factorize("0o" + screen.split("FACT")[1])
-
+            print(answer)
             if answer is not None:
                 self.Result.setText(str(answer))
 
@@ -1266,26 +1285,25 @@ class Ui_Programmer_calculator(object):
         if not isinstance(number, int):
             return "Error: Input must be an integer."
 
-        if number == 0:
-            return [
-                "0000000000000000",
-                "0000000000000000",
-                "0000000000000000",
-                "0000000000000000",
-            ]  # Special case for zero
+        is_negative = number < 0
 
-        binary_result = ""
-        while number > 0:
-            binary_result = str(number % 2) + binary_result
-            number //= 2
+        # Convert decimal to binary string
+        if is_negative:
+            # Convert to a full 64-bit binary number with two's complement for negative numbers
+            binary_string = bin((1 << 64) + number)[2:]
+        else:
+            binary_string = bin(number)[2:]
 
         # Pad with leading zeros to make it 64 bits
-        binary_result = binary_result.zfill(64)
+        padded_binary = binary_string.zfill(64)
+        
+        # Ensure it is exactly 64 bits by taking the last 64 bits
+        padded_binary = padded_binary[-64:]
 
-        # Split into 16-bit segments
-        segments = [binary_result[i : i + 16] for i in range(0, 64, 16)]
+        # Split into 16-bit chunks
+        chunks = [padded_binary[i : i + 16] for i in range(0, 64, 16)]
 
-        return segments
+        return chunks
 
     def octal_octal_to_64bit_segments(self, octal_number):
         is_negative = octal_number < 0
@@ -1554,6 +1572,32 @@ class Ui_Programmer_calculator(object):
 
         return sign + octal_integer + ("." + octal_fraction if octal_fraction else "")
     
+    def log_from_decimal(self, decimal_str, base=10):
+        """
+        Calculate the logarithm of a decimal number and return the result.
+
+        Parameters:
+        decimal_str (str): The decimal number as a string.
+        base (int): The base of the logarithm (default is 10, can also be 2).
+
+        Returns:
+        float: The logarithm of the decimal number.
+        """
+        try:
+            # Convert the decimal string to a float
+            decimal_value = float(decimal_str)
+            
+            # Check for valid base
+            if base not in [2, 10]:
+                return "Invalid base. Only base 2 and base 10 are supported."
+            
+            # Calculate the logarithm of the decimal value
+            log_value = math.log(decimal_value, base)
+            
+            return log_value
+        except ValueError:
+            return "Helytelen decimális logaritmus számolás!"
+
     def log_from_octal(self, octal_str, base=10):
         """
         Calculate the logarithm of an octal number and return the result in both decimal and octal format.
