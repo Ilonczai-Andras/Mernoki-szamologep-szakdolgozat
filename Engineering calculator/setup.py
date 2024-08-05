@@ -6,7 +6,9 @@ import os
 sys.setrecursionlimit(1500)
 
 # Determine the absolute path to the icon
-icon_path = os.path.join(os.path.dirname(__file__), 'Mernoki-szamologep-szakdolgozat', 'Engineering calculator', 'icon.ico')
+icon_path = os.path.join(os.path.dirname(__file__), 'icon.ico')
+# print(f"icon path:{icon_path}")
+# print(f"path: {os.path.dirname(__file__)}")
 
 # Dependencies are automatically detected, but it might need fine tuning.
 build_options = {'packages': [], 'excludes': []}
