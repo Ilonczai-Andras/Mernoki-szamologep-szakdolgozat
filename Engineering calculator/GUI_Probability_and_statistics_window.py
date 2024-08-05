@@ -88,7 +88,7 @@ class Ui_Probability_and_statistics(object):
         self.lineEdit_2 = QTextEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(410, 40, 281, 100))
         self.lineEdit_2.setObjectName("lineEdit_2")
-        self.lineEdit_2.setPlaceholderText("Felétetel: X < 12")
+        self.lineEdit_2.setPlaceholderText("Feltétel: X < 12")
 
         self.comboBox_2 = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox_2.setGeometry(QtCore.QRect(10, 130, 271, 51))
@@ -513,8 +513,8 @@ class Ui_Probability_and_statistics(object):
                             self.label_2.setText(str(P(condition).evalf()))
                     if operation_type == "Várható érték":
                         self.label_2.setText(str(E(X).evalf()))
-                    elif operation_type == "Entrópia":
-                        self.label_2.setText(str(entropy(X).evalf()))
+                    # elif operation_type == "Entrópia":
+                    #     self.label_2.setText(str(entropy(X).evalf()))
                     elif operation_type == "Variancia":
                         self.label_2.setText(str(variance(X).evalf()))
                     elif operation_type == "Sűrűség függvény":
@@ -600,6 +600,7 @@ class Ui_Probability_and_statistics(object):
             self.sigma.hide()
             if distribution == "Geometriai" or distribution == "Logaritmikus":
                 self.mu.setPlaceholderText("p")
+                self.sigma.hide()
             elif distribution == "Poisson":
                 self.mu.setPlaceholderText("lambda")
             elif distribution == "Erlang":
@@ -610,23 +611,28 @@ class Ui_Probability_and_statistics(object):
                 self.sigma.show()
                 self.mu.setPlaceholderText("xm")
                 self.sigma.setPlaceholderText("alpha")
-        else:
-            self.sigma.show()
-            self.mu.setPlaceholderText("mu")
-            self.sigma.setPlaceholderText("sigma")
-
-        if distribution in ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]:
-            self.sigma.setPlaceholderText("alpha")
-            if distribution == "Egymintás t próba" or distribution =="Kétmintás párosított t próba":
+        elif distribution in ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]:
+            if distribution == "Egymintás t próba":
                 self.mu.show()
-            else:
+                self.mu.setPlaceholderText("m")
+                self.sigma.show()
+                self.sigma.setPlaceholderText("alpha")
+                self.lineEdit_2.setPlaceholderText("X értékek ',' elválasztva")
+            if distribution == "Kétmintás t próba" or distribution == "Kétmintás párosított t próba":
                 self.mu.hide()
+                self.sigma.show()
+                self.sigma.setPlaceholderText("alpha")
+                self.lineEdit_2.setPlaceholderText("X Y értékek ',' elválasztva új sorban")
         elif distribution in ["Egymintás u próba"]:
             self.mu.setPlaceholderText("m")
             self.alpha.show()
         else:
-            self.mu.setPlaceholderText("mu")
             self.alpha.hide()
+            self.sigma.show()
+            self.mu.show()
+            self.lineEdit_2.setPlaceholderText("Feltétel: X < 12")
+            self.mu.setPlaceholderText("μ")
+            self.sigma.setPlaceholderText("σ2")
 
     def handle_combobox_change(self):
         text = self.comboBox.currentText()
@@ -685,9 +691,9 @@ class Ui_Probability_and_statistics(object):
         self.comboBox_2.setItemText(4, _translate("Ui_Prob_and_Stat", "Erlang"))
         self.comboBox_2.setItemText(5, _translate("Ui_Prob_and_Stat", "Pareto"))
         self.label.setText(_translate("Ui_Prob_and_Stat", "Eloszlás:"))
-        self.mu.setPlaceholderText(_translate("Ui_Prob_and_Stat", "mu"))
+        self.mu.setPlaceholderText(_translate("Ui_Prob_and_Stat", "μ"))
         self.alpha.setPlaceholderText(_translate("Ui_Prob_and_Stat", "alpha"))
-        self.sigma.setPlaceholderText(_translate("Ui_Prob_and_Stat", "sigma"))
+        self.sigma.setPlaceholderText(_translate("Ui_Prob_and_Stat", "σ2"))
 
 
 if __name__ == "__main__":

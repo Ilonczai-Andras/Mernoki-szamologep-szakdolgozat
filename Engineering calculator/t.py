@@ -34,3 +34,4 @@ log_value_base2 = calculator.log_from_decimal('1234', base=2)
 
 print(f"Logarithm in base 10: {log_value_base10}")
 print(f"Logarithm in base 2: {log_value_base2}")
+a
