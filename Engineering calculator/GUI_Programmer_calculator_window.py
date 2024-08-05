@@ -161,7 +161,6 @@ class Ui_Programmer_calculator(object):
                 i.setEnabled(False)
 
             self.pi.setEnabled(False)
-            self.dot.setEnabled(False)
 
             for i in range(2, len(numbers)):
                 numbers[i].setEnabled(False)
@@ -954,7 +953,6 @@ class Ui_Programmer_calculator(object):
                 answer = int(self.evaluate_octal_logical_expression(screen))
             elif "FACT" in screen:
                 answer = self.convert_and_factorize("0o" + screen.split("FACT")[1])
-            print(answer)
             if answer is not None:
                 self.Result.setText(str(answer))
 
@@ -988,13 +986,42 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen kettes komlemens!")
+            elif self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen):
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "binary")
+                    print(answer)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
             elif "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1], "binary")
+                    answer = self.round_down_number(screen.split("int")[1], "binary").strip()
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
                     self.Result.setText("Helytelen kerekítés egészre!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_binary(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_binary(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmus!")
+            elif "ABS" in screen:
+                try:
+                    
+                    answer = self.abs_binary(screen.split(" ")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")       
             elif "ones" in screen:
                 try:
                     answer = self.ones_complement(screen.split("ones")[1], 2)
@@ -1002,18 +1029,50 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
+            elif "<<" in screen or ">>" in screen:
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        number = screen.split("<<")[0]
+                        shift_amount = screen.split("<<")[1]
+                        answer = self.shift_binary_custom('<<', shift_amount, number)
+                    if ">>" in screen:
+                        number = screen.split(">>")[0]
+                        shift_amount = screen.split(">>")[1]
+                        answer = self.shift_binary_custom('>>', shift_amount, number)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
             elif not self.contain_logical(screen) and self.contains_sqrt(screen):
-                answer = self.sqrt_func(screen, "binary")
+                try:
+                    answer = self.sqrt_func(screen, "binary")
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen gyökvonás!")
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                answer = self.evaluate_binary_expression(screen)
+                try:
+                    answer = self.evaluate_binary_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen aritmetikai!")
             elif "FACT" in screen:
-                answer = self.convert_and_factorize("0b" + screen.split("FACT")[1])
+                try:
+                    answer = self.convert_and_factorize("0b" + screen.split("FACT")[1])
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen faktorizálás!")
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                answer = self.evaluate_binary_logical_expression(screen)
+                try:
+                    answer = self.evaluate_binary_logical_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("ERROR: helytelen logikai kifejezés!")
             else:
-                answer = eval(screen)
-            self.Result.setText(str(answer))
-            if answer is not None:
+                try:
+                    answer = self.evaluate_binary_expression(screen)
+                except:
+                    self.Result.setText("ERROR nem bináris érték!")
+            if answer is not None and answer is not False:
                 self.Result.setText(str(answer))
 
                 self.operations.append(f"{operation}")
@@ -1021,13 +1080,13 @@ class Ui_Programmer_calculator(object):
 
                 self.operations2.append(f"{answer}")
                 self.update_operations_display2()
-            try:
+            if type(answer) is str and not '.' in answer:
                 binary_segments = self.binary_tobinary_64bit_segments(answer)
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
                 self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
-            except:
+            else:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
                 self.t6_31.setText(f"")
@@ -1572,6 +1631,60 @@ class Ui_Programmer_calculator(object):
 
         return sign + octal_integer + ("." + octal_fraction if octal_fraction else "")
     
+    def log_from_binary(self, binary_str, base=10):
+        """
+        Calculate the logarithm of a binary number and return the result in binary format.
+
+        Parameters:
+        binary_str (str): The binary string representing the binary number.
+        base (int): The base of the logarithm (default is 10, can also be 2).
+
+        Returns:
+        str: The logarithm of the binary number in binary format, limited to 8 decimal places.
+        """
+        def binary_to_decimal(binary_str):
+            """Convert a binary string to a decimal float."""
+            return int(binary_str, 2)
+
+        def float_to_binary(value):
+            """Convert a float to a binary string limited to 8 decimal places."""
+            if value == 0:
+                return "0.0"
+            
+            int_part = int(value)
+            frac_part = value - int_part
+            
+            int_bin = bin(int_part).lstrip("0b") + "."
+            
+            frac_bin = ""
+            for _ in range(8):
+                frac_part *= 2
+                bit = int(frac_part)
+                frac_part -= bit
+                frac_bin += str(bit)
+                if frac_part == 0:
+                    break
+            
+            return int_bin + frac_bin
+
+        try:
+            # Convert the binary string to a decimal number
+            decimal_value = binary_to_decimal(binary_str)
+            
+            # Check for valid base
+            if base not in [2, 10]:
+                return "Invalid base. Only base 2 and base 10 are supported."
+            
+            # Calculate the logarithm of the decimal value
+            log_value = math.log(decimal_value, base)
+            
+            # Convert the result to a binary string
+            log_binary = float_to_binary(log_value)
+            
+            return log_binary
+        except ValueError:
+            return False
+
     def log_from_decimal(self, decimal_str, base=10):
         """
         Calculate the logarithm of a decimal number and return the result.
@@ -1624,23 +1737,55 @@ class Ui_Programmer_calculator(object):
             return "Invalid octal number"
     
     def binary_tobinary_64bit_segments(self, binary_number):
-        # Ensure the binary number is represented in 64 bits
-        padded_binary = format(int(str(binary_number), 2), "064b")
-        # Split the padded binary into four 16-bit chunks
-        return [padded_binary[i : i + 16] for i in range(0, 64, 16)]
+        """
+        Ensure the binary number is represented in 64 bits and split it into four 16-bit chunks.
+        Manage negative numbers using two's complement.
 
+        Parameters:
+        binary_number (str): The binary number as a string.
+
+        Returns:
+        list: A list containing four 16-bit chunks.
+        """
+        if not isinstance(binary_number, str):
+            return "Error: Input must be a binary string."
+        
+        try:
+            if binary_number[0] == '-':
+                # Handle negative binary numbers
+                binary_value = int(binary_number, 2)
+                if binary_value >= 0:
+                    raise ValueError("Invalid input: expected a negative number for two's complement representation.")
+                # Calculate the two's complement for a 64-bit representation
+                padded_binary = format((1 << 64) + binary_value, "064b")
+            else:
+                # Handle positive binary numbers
+                binary_value = int(binary_number, 2)
+                padded_binary = format(binary_value, "064b")
+            
+            # Split the padded binary into four 16-bit chunks
+            chunks = [padded_binary[i : i + 16] for i in range(0, 64, 16)]
+
+            return chunks
+        except:
+            return "ERROR nem ábrázolható binárisan"
+        
     def evaluate_binary_expression(self, expression):
         # Define a helper function to convert binary to decimal
         def bin_to_dec(bin_str):
+            if bin_str.startswith('-'):
+                return -int(bin_str[1:], 2)
             return int(bin_str, 2)
 
         # Define a helper function to convert decimal to binary
         def dec_to_bin(dec_int):
-            return bin(dec_int)[2:]
+            if dec_int < 0:
+                return '-' + bin(-int(dec_int))[2:]
+            return bin(int(dec_int))[2:]
 
         # Replace binary numbers with their decimal equivalents in the expression
         def replace_binary_with_decimal(expr):
-            binary_numbers = re.findall(r"[01]+", expr)
+            binary_numbers = re.findall(r"-?[01]+", expr)
             for bin_num in binary_numbers:
                 expr = expr.replace(bin_num, str(bin_to_dec(bin_num)), 1)
             return expr
@@ -1652,21 +1797,36 @@ class Ui_Programmer_calculator(object):
         try:
             result = eval(decimal_expression)
         except ZeroDivisionError:
-            return "Error: Division by zero"
+            return False
         except Exception as e:
-            return f"Error: {e}"
+            return False
 
-        # Convert the result back to binary
+        # Convert the result back to binary, including handling of fractions
+        if isinstance(result, float):
+            sign = '-' if result < 0 else ''
+            integer_part = abs(int(result))
+            fractional_part = abs(result) - integer_part
+            binary_result = dec_to_bin(integer_part)
+            if fractional_part > 0:
+                binary_fraction = []
+                while fractional_part and len(binary_fraction) < 10:  # Limit to 10 fractional bits for simplicity
+                    fractional_part *= 2
+                    bit = int(fractional_part)
+                    binary_fraction.append(str(bit))
+                    fractional_part -= bit
+                binary_result += '.' + ''.join(binary_fraction)
+            return sign + binary_result
+
         return dec_to_bin(result)
 
-    def evaluate_binary_logical_expression(self, expression):
+    def evaluate_binary_logical_expression(self,expression):
         # Define a helper function to convert binary to decimal
         def bin_to_dec(bin_str):
             return int(bin_str, 2)
 
         # Define a helper function to convert decimal to binary
         def dec_to_bin(dec_int):
-            return bin(dec_int)[2:]
+            return bin(dec_int & 0xFFFFFFFFFFFFFFFF)[2:].zfill(64)  # Ensure 64-bit representation
 
         # Replace binary numbers with their decimal equivalents in the expression
         def replace_binary_with_decimal(expr):
@@ -1680,7 +1840,7 @@ class Ui_Programmer_calculator(object):
             "AND": lambda a, b: a & b,
             "OR": lambda a, b: a | b,
             "XOR": lambda a, b: a ^ b,
-            "NOT": lambda a: ~a,
+            "NOT": lambda a: ~a & 0xFFFFFFFFFFFFFFFF  # Ensure 64-bit representation
         }
 
         # Replace binary numbers with decimal equivalents
@@ -1688,6 +1848,7 @@ class Ui_Programmer_calculator(object):
 
         # Tokenize the expression into numbers and operators
         tokens = re.split(r"(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b)", decimal_expression)
+        tokens = [token.strip() for token in tokens if token.strip()]
 
         # Process the tokens to handle logical operations
         def process_tokens(tokens):
@@ -1707,16 +1868,19 @@ class Ui_Programmer_calculator(object):
 
             i = 0
             while i < len(tokens):
-                token = tokens[i].strip()
+                token = tokens[i]
                 if token in logical_ops:
-                    while (
-                        op_stack
-                        and op_stack[-1] in logical_ops
-                        and logical_ops[op_stack[-1]]
-                        in [logical_ops["AND"], logical_ops["OR"], logical_ops["XOR"]]
-                    ):
-                        apply_operator()
-                    op_stack.append(token)
+                    if token == "NOT":
+                        op_stack.append(token)
+                    else:
+                        while (
+                            op_stack
+                            and op_stack[-1] in logical_ops
+                            and logical_ops[op_stack[-1]]
+                            in [logical_ops["AND"], logical_ops["OR"], logical_ops["XOR"]]
+                        ):
+                            apply_operator()
+                        op_stack.append(token)
                 else:
                     num_stack.append(int(token))
                 i += 1
@@ -1729,13 +1893,93 @@ class Ui_Programmer_calculator(object):
         # Evaluate the expression
         try:
             result = process_tokens(tokens)
-        except ZeroDivisionError:
-            return "Error: Division by zero"
         except Exception as e:
             return f"Error: {e}"
 
         # Convert the result back to binary
         return dec_to_bin(result)
+
+    def abs_binary(self, binary_str):
+        """
+        Return the absolute value of a binary number given as a string.
+
+        Parameters:
+        binary_str (str): The binary string representing the number.
+
+        Returns:
+        str: The absolute value of the binary number in binary format.
+        """
+        def binary_to_decimal(binary_str):
+            """Convert a binary string to a decimal float."""
+            if '.' in binary_str:
+                int_part, frac_part = binary_str.split('.')
+                int_value = int(int_part, 2)
+                frac_value = sum(int(bit) * 2**-i for i, bit in enumerate(frac_part, 1))
+                return int_value + frac_value
+            else:
+                return int(binary_str, 2)
+
+        def decimal_to_binary(decimal_num):
+            """Convert a decimal number to a binary string."""
+            if decimal_num == 0:
+                return "0.0"
+
+            int_part = int(decimal_num)
+            frac_part = decimal_num - int_part
+
+            int_bin = bin(int_part).lstrip("0b") + "."
+            
+            frac_bin = ""
+            while frac_part:
+                frac_part *= 2
+                bit = int(frac_part)
+                frac_part -= bit
+                frac_bin += str(bit)
+                if len(frac_bin) > 8:  # limiting the length of the fractional part to 8 digits
+                    break
+
+            return int_bin + frac_bin if frac_bin else int_bin.rstrip('.')
+
+        # Remove the negative sign if it exists
+        if binary_str.startswith('-'):
+            binary_str = binary_str[1:]
+
+        # Convert binary string to decimal
+        decimal_value = binary_to_decimal(binary_str)
+
+        # Get the absolute value
+        abs_value = abs(decimal_value)
+
+        # Convert the absolute decimal value back to a binary string
+        return decimal_to_binary(abs_value)
+
+    def shift_binary_custom(self, direction, shift_amount_bin, number):
+        """
+        Shifts a binary number to the left or right by a specified amount given in binary.
+
+        Parameters:
+        direction (str): '<<' for left shift, '>>' for right shift.
+        shift_amount_bin (str): The number of positions to shift as a binary string.
+        number (str): The binary number to shift as a string.
+
+        Returns:
+        str: The shifted binary number as a string.
+        """
+        # Convert binary strings to integers
+        shift_amount = int(shift_amount_bin, 2)
+        number_int = int(number, 2)
+        
+        # Perform the shift operation
+        if direction == '<<':
+            shifted_number = number_int << shift_amount
+        elif direction == '>>':
+            shifted_number = number_int >> shift_amount
+        else:
+            raise ValueError("Invalid direction. Use '<<' for left shift or '>>' for right shift.")
+        
+        # Convert the shifted number back to binary string
+        shifted_binary = bin(shifted_number)[2:]  # Remove the '0b' prefix
+        return shifted_binary
 
     def evaluate_hex_expression(self, expression):
         # Regular expression to find hexadecimal numbers (e.g., A, FF)
