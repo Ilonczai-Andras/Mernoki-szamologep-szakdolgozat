@@ -311,7 +311,7 @@ class Ui_Probability_and_statistics(object):
             # Two-tailed test
             z_critical_two = norm.ppf(1 - Alpha / 2)
             p_value_two = 2 * (1 - norm.cdf(abs(z_value)))
-            accept_null_two = "igen" if p_value_two > alpha else "nem"
+            accept_null_two = "igen" if p_value_two > Alpha else "nem"
             two_test_result = f"Kétoldali próba: Kritikus Z-érték: ±{z_critical_two}, \nP-érték: {p_value_two}, HO elfogadása: {accept_null_two}"
 
             # Right-tailed test
@@ -617,13 +617,14 @@ class Ui_Probability_and_statistics(object):
                 self.mu.setPlaceholderText("m")
                 self.sigma.show()
                 self.sigma.setPlaceholderText("alpha")
-                self.lineEdit_2.setPlaceholderText("X értékek ',' elválasztva")
+                self.lineEdit_2.setPlaceholderText("X értékek , elválasztva")
             if distribution == "Kétmintás t próba" or distribution == "Kétmintás párosított t próba":
                 self.mu.hide()
                 self.sigma.show()
                 self.sigma.setPlaceholderText("alpha")
-                self.lineEdit_2.setPlaceholderText("X Y értékek ',' elválasztva új sorban")
+                self.lineEdit_2.setPlaceholderText("X Y értékek , elválasztva új sorban")
         elif distribution in ["Egymintás u próba"]:
+            self.lineEdit_2.setPlaceholderText("X Y értékek , elválasztva új sorban")
             self.mu.setPlaceholderText("m")
             self.alpha.show()
         else:
