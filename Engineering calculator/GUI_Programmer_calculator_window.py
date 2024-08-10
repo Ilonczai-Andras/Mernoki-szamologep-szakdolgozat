@@ -181,7 +181,6 @@ class Ui_Programmer_calculator(object):
             self.set_to_null(hex_buttons, numbers)
             self.pi.setEnabled(False)
             self.sqrt.setEnabled(False)
-            self.dot.setEnabled(False)
 
     def setupUi(self, Programmer_calc, MainWindow):
         self.applyStylesheet(Programmer_calc)
@@ -491,12 +490,6 @@ class Ui_Programmer_calculator(object):
         )
         self.abs.setObjectName("abs")
         self.gridLayout_for_special_buttons.addWidget(self.abs, 3, 2, 1, 1)
-        self.NOT = QtWidgets.QPushButton(
-            self.centralwidget,
-            clicked=lambda: self.press_it(" NOT "),
-        )
-        self.NOT.setObjectName("NOT")
-        self.gridLayout_for_special_buttons.addWidget(self.NOT, 1, 2, 1, 1)
         self.log = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.press_it("log "),
@@ -538,7 +531,7 @@ class Ui_Programmer_calculator(object):
             self.centralwidget, clicked=lambda: self.press_it(" AND ")
         )
         self.AND.setObjectName("AND")
-        self.gridLayout_for_special_buttons.addWidget(self.AND, 1, 3, 1, 1)
+        self.gridLayout_for_special_buttons.addWidget(self.AND, 1, 2, 1, 2)
         self.log2 = QtWidgets.QPushButton(
             self.centralwidget,
             clicked=lambda: self.press_it("log2 "),
@@ -673,7 +666,7 @@ class Ui_Programmer_calculator(object):
         if base == 2:
             factors_str = "*".join(bin(f)[2:] for f in factors)
         elif base == 16:
-            factors_str = "*".join(hex(f)[2:] for f in factors)
+            factors_str = "*".join(hex(f)[2:] for f in factors).upper()
         elif base == 8:
             factors_str = "*".join(oct(f)[2:] for f in factors)
         else:
@@ -1104,9 +1097,38 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen kettes komlemens!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_hex(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_hex(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmus!")
+            elif "ABS" in screen:
+                try:
+                    
+                    answer = self.abs_hex(screen.split(" ")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen):
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "hexadecimal")
+                    print(answer)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
             elif "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1], "hex")
+                    answer = self.evaluate_hex_expression(self.round_down_number(screen.split("int")[1], "hex").strip() )
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -1114,18 +1136,32 @@ class Ui_Programmer_calculator(object):
             elif "ones" in screen:
                 try:
                     number = screen.split(" ")[1]
-                    print(number)
                     answer = self.ones_complement(number, 16)
                     print("#LOG: egyes komlemens")
                 except:
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                answer = self.evaluate_hex_expression(screen)
+                try:
+                    answer = self.evaluate_hex_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen artimetikai!")
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                answer = self.logical_ops(screen)
+                try:
+                    answer = self.evaluate_logical_hex_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logikai!")
             elif "FACT" in screen:
-                answer = self.convert_and_factorize("0x" + screen.split("FACT")[1])
+                try:
+                    if screen.split("FACT")[1] != "0":
+                        answer = self.convert_and_factorize("0x" + screen.split("FACT")[1])
+                    else:
+                        answer =  "0"
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktorizáció!")
             elif "<<" in screen or ">>" in screen:
                 if "<<" in screen:
                     num = screen.split("<<")[0]
@@ -1136,7 +1172,10 @@ class Ui_Programmer_calculator(object):
                     cnt = screen.split(">>")[1]
                     answer = self.hex_shift_right_func(cnt, num)
             else:
-                answer = screen
+                try:
+                    answer = self.evaluate_hex_expression(screen)
+                except:
+                    self.Result.setText("ERROR nem hexa érték!")
             
             if answer is not None:
                 self.Result.setText(str(answer))
@@ -1147,8 +1186,7 @@ class Ui_Programmer_calculator(object):
                 self.operations2.append(f"{answer}")
                 self.update_operations_display2()
 
-            self.Result.setText(str(answer))
-            if isinstance(answer, str):
+            if isinstance(answer, str) and not '.' in answer and not '*' in answer and answer != "0":
                 binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
                     str(answer)
                 )
@@ -1276,6 +1314,135 @@ class Ui_Programmer_calculator(object):
         # Return the new number as a string
         return new_number
 
+    def abs_hex(self, hex_str):
+        """
+        Return the absolute value of a hexadecimal number given as a string.
+
+        Parameters:
+        hex_str (str): The hexadecimal string representing the number.
+
+        Returns:
+        str: The absolute value of the hexadecimal number in hexadecimal format.
+        """
+        def hex_to_decimal(hex_str):
+            """Convert a hexadecimal string to a decimal float."""
+            if '.' in hex_str:
+                int_part, frac_part = hex_str.split('.')
+                int_value = int(int_part, 16)
+                frac_value = sum(int(digit, 16) * 16**-i for i, digit in enumerate(frac_part, 1))
+                return int_value + frac_value
+            else:
+                return int(hex_str, 16)
+
+        def decimal_to_hex(decimal_num):
+            """Convert a decimal number to a hexadecimal string."""
+            if decimal_num == 0:
+                return "0.0"
+
+            int_part = int(decimal_num)
+            frac_part = decimal_num - int_part
+
+            int_hex = hex(int_part).lstrip("0x").upper() + "."
+
+            frac_hex = ""
+            while frac_part:
+                frac_part *= 16
+                digit = int(frac_part)
+                frac_part -= digit
+                frac_hex += hex(digit).lstrip("0x").upper()
+                if len(frac_hex) > 8:  # limiting the length of the fractional part to 8 digits
+                    break
+
+            return int_hex + frac_hex if frac_hex else int_hex.rstrip('.')
+
+            # Remove the negative sign if it exists
+        if hex_str.startswith('-'):
+            hex_str = hex_str[1:]
+
+        # Convert hexadecimal string to decimal
+        decimal_value = hex_to_decimal(hex_str)
+
+        # Get the absolute value
+        abs_value = abs(decimal_value)
+
+        # Convert the absolute decimal value back to a hexadecimal string
+        return decimal_to_hex(abs_value)
+
+    def log_from_hex(self, hex_str, base=10):
+        """
+        Calculate the logarithm of a hexadecimal number and return the result in binary and hexadecimal formats.
+
+        Parameters:
+        hex_str (str): The hexadecimal string representing the number.
+        base (int): The base of the logarithm (default is 10, can also be 2).
+
+        Returns:
+        tuple: The logarithm of the hexadecimal number in binary and hexadecimal formats, limited to 8 decimal places.
+        """
+        def hex_to_decimal(hex_str):
+            """Convert a hexadecimal string to a decimal float."""
+            return int(hex_str, 16)
+
+        def float_to_binary(value):
+            """Convert a float to a binary string limited to 8 decimal places."""
+            if value == 0:
+                return "0.0"
+            
+            int_part = int(value)
+            frac_part = value - int_part
+            
+            int_bin = bin(int_part).lstrip("0b") + "."
+            
+            frac_bin = ""
+            for _ in range(8):
+                frac_part *= 2
+                bit = int(frac_part)
+                frac_part -= bit
+                frac_bin += str(bit)
+                if frac_part == 0:
+                    break
+            
+            return int_bin + frac_bin
+
+        def float_to_hex(value):
+            """Convert a float to a hexadecimal string limited to 8 decimal places."""
+            if value == 0:
+                return "0.0"
+            
+            int_part = int(value)
+            frac_part = value - int_part
+            
+            int_hex = hex(int_part).lstrip("0x").upper() + "."
+            
+            frac_hex = ""
+            for _ in range(8):
+                frac_part *= 16
+                digit = int(frac_part)
+                frac_part -= digit
+                frac_hex += hex(digit).lstrip("0x").upper()
+                if frac_part == 0:
+                    break
+            
+            return int_hex + frac_hex
+
+        try:
+            # Convert the hexadecimal string to a decimal number
+            decimal_value = hex_to_decimal(hex_str)
+            
+            # Check for valid base
+            if base not in [2, 10]:
+                return "Invalid base. Only base 2 and base 10 are supported."
+            
+            # Calculate the logarithm of the decimal value
+            log_value = math.log(decimal_value, base)
+            
+            # Convert the result to binary and hexadecimal strings
+            log_hex = float_to_hex(log_value)
+            
+            return log_hex
+        except ValueError:
+            return False
+
     def is_valid_hex(self, number: str) -> bool:
         try:
             int(number, 16)
@@ -1288,11 +1455,9 @@ class Ui_Programmer_calculator(object):
         if not self.is_valid_hex(hex_number):
             raise ValueError("The provided number is not a valid hexadecimal")
 
-        # Calculate the new number by shifting to the left
         new_number = int(hex_number, 16) << int(num)
-
-        # Return the new number as a hexadecimal string
-        return int(str(hex(new_number))[2:])
+    
+        return hex(new_number)[2:].upper()
 
     def hex_shift_right_func(self, num: str, hex_number: str) -> str:
         # Ensure the input hex number is valid
@@ -1303,7 +1468,32 @@ class Ui_Programmer_calculator(object):
         new_number = int(hex_number, 16) >> int(num)
 
         # Return the new number as a hexadecimal string
-        return int(str(hex(new_number))[2:])
+        return (hex(new_number))[2:].upper()
+
+    def evaluate_logical_hex_expression(self, expression: str) -> str:
+        # Split the expression into parts
+        tokens = expression.split()
+
+        # Convert the first hex number to an integer
+        result = int(tokens[0], 16)
+
+        # Iterate over the tokens and perform operations
+        i = 1
+        while i < len(tokens):
+            operator = tokens[i]
+            next_num = int(tokens[i + 1], 16)
+
+            if operator == 'OR':
+                result |= next_num
+            elif operator == 'XOR':
+                result ^= next_num
+            elif operator == 'AND':
+                result &= next_num
+
+            i += 2
+
+        # Convert the result back to a hexadecimal string and return it
+        return hex(result).upper()[2:]
 
     def contains_sqrt(self, string):
         for i in string:
@@ -1999,8 +2189,17 @@ class Ui_Programmer_calculator(object):
             return f"Error evaluating expression: {e}"
 
         if isinstance(result, int):
-            # Convert the integer result back to hexadecimal
-            hex_result = hex(result).upper()[2:]
+            # Handle negative results by converting to two's complement if necessary
+            if result < 0:
+                # Assume a fixed 64-bit representation for all negative numbers
+                bits = 64
+                
+                # Convert to two's complement form
+                result = (1 << bits) + result
+                hex_result = hex(result).upper()[2:]
+            else:
+                # Convert the integer result back to hexadecimal
+                hex_result = hex(result).upper()[2:]
         elif isinstance(result, float):
             # Handle float result
             # Extract the integer and fractional parts
@@ -2017,9 +2216,7 @@ class Ui_Programmer_calculator(object):
                 hex_digit = int(fractional_part)
                 hex_fractional_part.append(hex(hex_digit).upper()[2:])
                 fractional_part -= hex_digit
-                if (
-                    len(hex_fractional_part) > 12
-                ):  # Limit precision to avoid infinite loops
+                if len(hex_fractional_part) > 12:  # Limit precision to avoid infinite loops
                     break
             hex_fractional_part = "".join(hex_fractional_part)
 
@@ -2215,7 +2412,6 @@ class Ui_Programmer_calculator(object):
         self.fakt.setText(_translate("Programmer_calc", "x!"))
         self.XOR.setText(_translate("Programmer_calc", "XOR"))
         self.abs.setText(_translate("Programmer_calc", "|x|"))
-        self.NOT.setText(_translate("Programmer_calc", "NOT"))
         self.log.setText(_translate("Programmer_calc", "log"))
         self.x_xx_y.setText(_translate("Programmer_calc", "x^y"))
         self.ones.setText(_translate("Programmer_calc", "ones"))
