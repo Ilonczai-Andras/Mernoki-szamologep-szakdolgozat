@@ -15,6 +15,7 @@ from sympy import (
     Sum,
     Symbol,
     Interval,
+    pretty,
     sympify,
     limit,
     integrate,
@@ -113,66 +114,77 @@ class Ui_Calculus(object):
 
         return func_str
 
+    def is_valid_float(self, value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
     def combobox_selector(self):
         also = 0
         felso = 0
 
-        # pi
-        if "pi" in self.lineEdit_2.text() or "pi" in self.lineEdit_3.text():
-            print("#LOG PI")
-            try:
-                if "pi" in self.lineEdit_2.text() and " " in self.lineEdit_2.text():
-                    also = int(int(self.lineEdit_2.text().split(" ")[0]) * pi)
-                    print("also if:", also)
-                elif "pi" in self.lineEdit_2.text() and not " " in self.lineEdit_2.text():
-                    also = int(int(self.lineEdit_2.text().split("pi")[0]) * pi)
-                    print("also else:", also)
-                else:
-                    also = int(self.lineEdit_2.text())
+        try:
+            if "pi" in self.lineEdit_2.text() or "pi" in self.lineEdit_3.text():
+                print("#LOG PI")
+                try:
+                    if "pi" in self.lineEdit_2.text() and " " in self.lineEdit_2.text():
+                        also = int(int(self.lineEdit_2.text().split(" ")[0]) * pi)
+                        print("also if:", also)
+                    elif "pi" in self.lineEdit_2.text() and not " " in self.lineEdit_2.text():
+                        also = int(int(self.lineEdit_2.text().split("pi")[0]) * pi)
+                        print("also else:", also)
+                    else:
+                        also = int(self.lineEdit_2.text())
 
-                if "pi" in self.lineEdit_3.text() and " " in self.lineEdit_3.text():
-                    felso = int(int(self.lineEdit_3.text().split("pi")[0]) * pi)
-                    print("felso if:", felso)
-                elif "pi" in self.lineEdit_3.text() and not " " in self.lineEdit_3.text():
-                    felso = int(int(self.lineEdit_3.text().split("pi")[0]) * pi)
-                    print("felso else:", felso)
-                else:
-                    felso = int(self.lineEdit_3.text())
-            except:
-                self.label_2.setText("ERROR rossz határ megadás pi-vel")
+                    if "pi" in self.lineEdit_3.text() and " " in self.lineEdit_3.text():
+                        felso = int(int(self.lineEdit_3.text().split("pi")[0]) * pi)
+                        print("felso if:", felso)
+                    elif "pi" in self.lineEdit_3.text() and not " " in self.lineEdit_3.text():
+                        felso = int(int(self.lineEdit_3.text().split("pi")[0]) * pi)
+                        print("felso else:", felso)
+                    else:
+                        felso = int(self.lineEdit_3.text())
+                except:
+                    self.label_2.setText("ERROR rossz határ megadás pi-vel")
+                    self.lineEdit_2.setText("-10")
+                    self.lineEdit_3.setText("10")
+                interval = (also, felso)
+            elif (self.is_valid_float(self.lineEdit_2.text().replace("-", "")) and self.is_valid_float(self.lineEdit_3.text().replace("-", ""))):
+                print("#LOG Másik ág")
+                also = sympify(self.lineEdit_2.text())
+                felso = sympify(self.lineEdit_3.text())
+                # inf
+                if sympify(self.lineEdit_2.text()) == -oo:
+                    also = -1000000000
+
+                if sympify(self.lineEdit_3.text()) == oo:
+                    felso = 1000000000
+
+                # zero
+                if sympify(self.lineEdit_2.text()) == 0:
+                    also = 0
+
+                if sympify(self.lineEdit_3.text()) == 0:
+                    felso = 0
+
+                # not zero
+                if sympify(self.lineEdit_2.text()) != 0:
+                    also = float(also)
+
+                if sympify(self.lineEdit_3.text()) != 0:
+                    felso = float(felso)
+                interval = (also, felso)
+            else:
+                self.label_2.setText("ERROR: nem jó határok")
                 self.lineEdit_2.setText("-10")
-                self.lineEdit_2.setText("10")
-            interval = (also, felso)
-        elif self.lineEdit_2.text().replace("-", "").isdigit() and self.lineEdit_3.text().isdigit():
-            print("#LOG Másik ág")
-            also = sympify(self.lineEdit_2.text())
-            felso = sympify(self.lineEdit_3.text())
-            # inf
-            if sympify(self.lineEdit_2.text()) == -oo:
-                also = -1000000000
-
-            if sympify(self.lineEdit_3.text()) == oo:
-                felso = 1000000000
-
-            # zero
-            if sympify(self.lineEdit_2.text()) == 0:
-                also = 0
-
-            if sympify(self.lineEdit_3.text()) == 0:
-                felso = 0
-
-            # not zero
-            if sympify(self.lineEdit_2.text()) != 0:
-                also = float(also)
-
-            if sympify(self.lineEdit_3.text()) != 0:
-                felso = float(felso)
-            interval = (also, felso)
-        else:
-            self.label_2.setText("ERROR: nem jó határok")
-            self.lineEdit_2.setText("-10")
-            self.lineEdit_3.setText("10")
-            self.canvas.clear(interval_x=interval, interval_y=interval)
+                self.lineEdit_3.setText("10")
+                also = -10
+                felso = 10
+                self.canvas.clear(interval_x=interval, interval_y=interval)
+        except:  
+            interval = (-10,10)
         input = self.comboBox.currentText()
         text = self.lineEdit.text()
         x = Symbol("x", real=True)
@@ -182,8 +194,10 @@ class Ui_Calculus(object):
                 res = is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
                 if res == True:
                     self.label_2.setText(text + " növekvő")
-                else:
+                elif res == False:
                     self.label_2.setText(text + " nem növekvő")
+                else:
+                    self.label_2.setText("Nem végrehajtható müvelet!")
                 result = self.canvas.plot_function(func_str=text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -199,8 +213,10 @@ class Ui_Calculus(object):
                 )
                 if res == True:
                     self.label_2.setText(text + " szigorúan növekvő")
-                else:
+                elif res == False:
                     self.label_2.setText(text + " szigorúan nem növekvő")
+                else:
+                    self.label_2.setText("Nem végrehajtható müvelet!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -216,8 +232,10 @@ class Ui_Calculus(object):
                 )
                 if res == True:
                     self.label_2.setText(text + " Csökkenő")
-                else:
+                elif res == False:
                     self.label_2.setText(text + " nem csökkenő")
+                else:
+                    self.label_2.setText("Nem végrehajtható müvelet!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -231,10 +249,13 @@ class Ui_Calculus(object):
                 res = is_strictly_decreasing(
                     sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
                 )
+                print(res)
                 if res == True:
                     self.label_2.setText(text + " szigorúan csökkenő")
-                else:
+                elif res == False:
                     self.label_2.setText(text + " szigorúan nem csökkenő")
+                else:
+                    self.label_2.setText("Nem végrehajtható müvelet!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -250,8 +271,10 @@ class Ui_Calculus(object):
                 )
                 if res == True:
                     self.label_2.setText(text + " Monoton")
-                else:
+                elif res == False:
                     self.label_2.setText(text + " nem monoton")
+                else:
+                    self.label_2.setText("Nem végrehajtható müvelet!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -262,8 +285,10 @@ class Ui_Calculus(object):
 
         if input == "Divergens":
             try:
-                res = limit(sympify(text), x, oo)
-                if res == oo:
+                exp = sympify(text)
+                x = Symbol("x")
+                res = limit(exp, x, oo)
+                if res == oo or res == -oo:
                     self.label_2.setText(text + " Divergens")
                 else:
                     self.label_2.setText(text + " Nem divergens")
@@ -280,8 +305,13 @@ class Ui_Calculus(object):
                 if self.has_no_variables(text):
                     self.label_2.setText(text + " -> " + str(eval(text)))
                 else:
+                    x = Symbol("x")
                     res = limit(sympify(text), x, oo)
-                    self.label_2.setText(text + " -> " + str(res))
+                    if "AccumBounds" not in str(res):
+                        print(res)
+                        self.label_2.setText(text + " -> " + str(res))
+                    else:
+                        self.label_2.setText(text + " -> " + str(res).replace("AccumBounds", ""))
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
                     self.label_2.setText("ERROR: hibás függvény!")
@@ -289,10 +319,11 @@ class Ui_Calculus(object):
             except Exception as e:
                 print(e)
                 self.label_2.setText("ERROR helytelen Határérték függvény!")
-
+        #javít
         if input == "Konvergens":
             try:
-                res = Sum(self.replace_sympy_funcs(text), (x, also, felso)).is_convergent()
+                res = Sum(self.replace_sympy_funcs(text), (x, -oo, oo)).is_convergent()
+                print(res)
                 if res:
                     self.label_2.setText(text + " a sorozat konvergál.")
                 else:
@@ -308,9 +339,8 @@ class Ui_Calculus(object):
         if input == "Deriválás":
             try:
                 tmp = eval(self.replace_sympy_funcs(text))
-                print(tmp)
                 res = diff((tmp), x)
-                self.label_2.setText(str(res).replace("E", "e"))
+                self.label_2.setText(str(pretty(res)).replace("E", "e"))
                 res_str = str(res).replace("E", "e")
                 result = self.canvas.plot_function(res_str, interval_x=interval, interval_y=interval)
                 if result == False:
@@ -318,25 +348,25 @@ class Ui_Calculus(object):
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Deriválás!")
-            
+                self.label_2.setText("ERROR helytelen Deriválás!")           
 
         if input == "Integrálás":
             try:
+                self.canvas.show()
                 x = Symbol("x")
                 res = integrate(self.replace_sympy_funcs(text), x)
                 self.label_2.setText(str(res).replace("**", "^").replace("E", "e") + " + C")
                 res_str = str(res).replace("E", "e")
                 result = self.canvas.plot_function(res_str, interval_x=interval, interval_y=interval)
+                print(result)
                 if result == False:
-                    #self.label_2.setText("ERROR: hibás függvény!")
-                    self.lineEdit.setText("")
+                    self.canvas.hide()
+                    self.label_2.setText("ERROR: nem ábrázolható integrált függvény!")
+                    pass
             except Exception as e:
-                print(e)
-                self.label_2.setText("ERROR helytelen Integrálás!")
+                self.canvas.hide()
+                self.label_2.setText("Nem számolható integrált függvény!")
         self.pushButton.setEnabled(False)
-        # except:
-        #     self.label_2.setText("ERROR helytelen függvény!")
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
         Egyenlet.close()
@@ -383,7 +413,7 @@ class Ui_Calculus(object):
         self.comboBox.addItem("Monoton")
         self.comboBox.addItem("Divergens")
         self.comboBox.addItem("Határérték")
-        self.comboBox.addItem("Konvergens")
+        #self.comboBox.addItem("Konvergens")
         self.comboBox.addItem("Deriválás")
         self.comboBox.addItem("Integrálás")
 

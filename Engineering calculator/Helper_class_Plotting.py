@@ -7,11 +7,13 @@ import matplotlib as mpl
 import re
 import numpy as np
 import math
+import scipy.special as sp
 
-mpl.rcParams['path.simplify_threshold'] = 1.0
-mpl.rcParams['path.simplify'] = True
-mpl.rcParams['agg.path.chunksize'] = 0
-mplstyle.use('fast')
+mpl.rcParams["path.simplify_threshold"] = 1.0
+mpl.rcParams["path.simplify"] = True
+mpl.rcParams["agg.path.chunksize"] = 0
+mplstyle.use("fast")
+
 
 class Canvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -44,6 +46,10 @@ class Canvas(FigureCanvas):
             return math.factorial(int(x))
         else:
             return np.array([math.factorial(int(i)) for i in x])
+
+    def fresnelc(self, x):
+        # Extracts the cosine integral from the Fresnel function
+        return sp.fresnel(x)[1]
 
     def replace_numpy_funcs(self, func_str):
         replacements = {
@@ -80,6 +86,7 @@ class Canvas(FigureCanvas):
             r"\bpi\b": "np.pi",
             r"\be\b": "math.e",
             r"\bfactorial\b": "self.fact",
+            r"\bgamma\b": "sp.gamma"
         }
 
         for pattern, replacement in replacements.items():
@@ -97,7 +104,16 @@ class Canvas(FigureCanvas):
         self.ax.set_xlim(interval_x[0], interval_x[1])
         self.ax.set_ylim(interval_y[0], interval_y[1])
 
-    def plot_function(self, func_str, interval_x=None, interval_y=None, clear=True, C=None, df=False, df_func=""):
+    def plot_function(
+        self,
+        func_str,
+        interval_x=None,
+        interval_y=None,
+        clear=True,
+        C=None,
+        df=False,
+        df_func="",
+    ):
         if interval_x is None:
             interval_x = self.interval_x
         if interval_y is None:
@@ -107,8 +123,14 @@ class Canvas(FigureCanvas):
         self.interval_y = [interval_y[0], interval_y[1]]
 
         self.func = func_str.replace("A", "a").replace("E", "e")
-        func_str = self.replace_numpy_funcs(func_str.replace("^", "**")).replace("A", "a").replace("E", "e")
-        print(f"func_Str: '{func_str}'")
+        func_str = (
+            self.replace_numpy_funcs(func_str.replace("^", "**"))
+            .replace("A", "a")
+            .replace("E", "e")
+            .replace("Si(x)", "np.sin(x)/x")
+            .replace("fresnelc", "self.fresnelc")
+        )
+        print(func_str)
         self.text = func_str
         self.df = df
         self.df_func = df_func
@@ -146,13 +168,13 @@ class Canvas(FigureCanvas):
         if clear:
             self.ax.clear()
 
-        self.ax.plot(x_vals, y_vals, color = 'black', label=f"y = {self.func}")
+        self.ax.plot(x_vals, y_vals, color="black", label=f"y = {self.func}")
         self.ax.set_xlabel("x")
         self.ax.set_xlim(interval_x[0], interval_x[1])
         self.ax.set_ylim(interval_y[0], interval_y[1])
         self.ax.set_ylabel("f(x)")
         self.ax.grid(True)
-        self.ax.legend(loc='lower right')
+        self.ax.legend(loc="lower right")
         self.fig.canvas.draw()
         if df:
             self.direction_field(df_func, clear=False)
@@ -176,31 +198,56 @@ class Canvas(FigureCanvas):
         if clear:
             self.ax.clear()
 
-        self.ax.quiver(x, y, dt, dv, color="b", label=f"y'(t) = {text}", scale=arrow_scale, width=arrow_width)
+        self.ax.quiver(
+            x,
+            y,
+            dt,
+            dv,
+            color="b",
+            label=f"y'(t) = {text}",
+            scale=arrow_scale,
+            width=arrow_width,
+        )
         self.ax.set_xlabel("x")
         self.ax.set_ylabel("y")
         self.ax.set_ylim(self.interval_y[0], self.interval_y[1])
         self.ax.set_xlim(self.interval_x[0], self.interval_x[1])
         self.ax.set_title("Íránymező " + text)
-        self.ax.legend(loc='lower right')
+        self.ax.legend(loc="lower right")
         self.fig.canvas.draw()
 
-    def store_function(self, func_str, interval_x, interval_y, C=None, df=False, df_func=""):
+    def store_function(
+        self, func_str, interval_x, interval_y, C=None, df=False, df_func=""
+    ):
         # Check if the function is already in the list
         for existing_func in self.plotted_functions:
             if existing_func[0] == func_str:
                 print(f"Function {func_str} is already plotted.")
                 return
 
-        self.plotted_functions.append((func_str, interval_x, interval_y, C, df, df_func))
+        self.plotted_functions.append(
+            (func_str, interval_x, interval_y, C, df, df_func)
+        )
 
     def wheelEvent(self, event):
         if event.angleDelta().y() > 0:  # Scroll up
-            self.interval_x = [self.interval_x[0] * (1 + self.zoom_factor), self.interval_x[1] * (1 + self.zoom_factor)]
-            self.interval_y = [self.interval_y[0] * (1 + self.zoom_factor), self.interval_y[1] * (1 + self.zoom_factor)]
+            self.interval_x = [
+                self.interval_x[0] * (1 + self.zoom_factor),
+                self.interval_x[1] * (1 + self.zoom_factor),
+            ]
+            self.interval_y = [
+                self.interval_y[0] * (1 + self.zoom_factor),
+                self.interval_y[1] * (1 + self.zoom_factor),
+            ]
         else:  # Scroll down
-            self.interval_x = [self.interval_x[0] / (1 + self.zoom_factor), self.interval_x[1] / (1 + self.zoom_factor)]
-            self.interval_y = [self.interval_y[0] / (1 + self.zoom_factor), self.interval_y[1] / (1 + self.zoom_factor)]
+            self.interval_x = [
+                self.interval_x[0] / (1 + self.zoom_factor),
+                self.interval_x[1] / (1 + self.zoom_factor),
+            ]
+            self.interval_y = [
+                self.interval_y[0] / (1 + self.zoom_factor),
+                self.interval_y[1] / (1 + self.zoom_factor),
+            ]
 
         self.ax.set_xlim(self.interval_x)
         self.ax.set_ylim(self.interval_y)
@@ -263,10 +310,15 @@ class Canvas(FigureCanvas):
             end = x_intervals[i + 1]
             mask = (x_vals >= start) & (x_vals <= end)
 
-            self.ax.fill_between(x_vals, y_vals_func1, y_vals_func2, where=mask, color='red', alpha=0.5, label=f"Terület az {func1_str} és a {func2_str} között.")
+            self.ax.fill_between(
+                x_vals,
+                y_vals_func1,
+                y_vals_func2,
+                where=mask,
+                color="red",
+                alpha=0.5,
+                label=f"Terület az {func1_str} és a {func2_str} között.",
+            )
 
-        self.ax.legend(loc='lower right')
+        self.ax.legend(loc="lower right")
         self.fig.canvas.draw()
-
-
-
