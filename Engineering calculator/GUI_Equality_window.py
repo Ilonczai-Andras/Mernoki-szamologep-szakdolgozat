@@ -114,54 +114,49 @@ class Ui_Equation(object):
                 numbers.add(rhs)
 
     def system_of_equations(self, funcs):
-        try:
-            print("#LOG egyenlet rendszerek")
-            number_of_rows = funcs.pop()
+        print("#LOG egyenlet rendszerek")
+        number_of_rows = funcs.pop()
 
-            symbols_set = set()
-            equations = []
+        symbols_set = set()
+        equations = []
 
-            for eq_str in funcs:
-                # Split the equation into left-hand side and right-hand side
-                lhs, rhs = eq_str.split("=")
-                lhs_sympy = sympify(lhs.strip())
-                rhs_sympy = sympify(rhs.strip())
+        for eq_str in funcs:
+            # Split the equation into left-hand side and right-hand side
+            lhs, rhs = eq_str.split("=")
+            lhs_sympy = sympify(lhs.strip())
+            rhs_sympy = sympify(rhs.strip())
 
-                # Replace trigonometric functions and extract variables
-                lhs_vars = self.extract_variable(self.replace_trigonometric_funcs(lhs))
-                rhs_vars = self.extract_variable(self.replace_trigonometric_funcs(rhs))
-                symbols_in_eq = lhs_vars + rhs_vars
+            # Replace trigonometric functions and extract variables
+            lhs_vars = self.extract_variable(self.replace_trigonometric_funcs(lhs))
+            rhs_vars = self.extract_variable(self.replace_trigonometric_funcs(rhs))
+            symbols_in_eq = lhs_vars + rhs_vars
 
-                # Update the set of symbols with variables found in this equation
-                symbols_set.update(symbols_in_eq)
+            # Update the set of symbols with variables found in this equation
+            symbols_set.update(symbols_in_eq)
 
-                # Create a sympy Eq object and add it to the equations list
-                equations.append(Eq(lhs_sympy, rhs_sympy))
+            # Create a sympy Eq object and add it to the equations list
+            equations.append(Eq(lhs_sympy, rhs_sympy))
 
-            # Convert the set of symbols into a list and then into sympy symbols
-            symbols_list = list(symbols_set)
-            symbol_objects = symbols(" ".join(symbols_list))
+        # Convert the set of symbols into a list and then into sympy symbols
+        symbols_list = list(symbols_set)
+        symbol_objects = symbols(" ".join(symbols_list))
 
-            # Solve the system of equations
-            solution = solve(equations, symbol_objects)
+        # Solve the system of equations
+        solution = solve(equations, symbol_objects)
 
-            # Check if the solution is a dictionary and format it
-            if isinstance(solution, dict):
-                formatted_solution = "\n".join(
-                    [f"{str(key)} = {str(value)}" for key, value in solution.items()]
-                )
-            if isinstance(solution, list) and all(isinstance(item, tuple) for item in solution):
-                formatted_solution = "\n".join(
-                    [f"({', '.join(map(str, item))})" for item in solution]
-                )
-            else:
-                formatted_solution = str(solution)
+        # Check if the solution is a dictionary and format it
+        if isinstance(solution, dict):
+            formatted_solution = "\n".join(
+                [f"{str(key)} = {str(value)}" for key, value in solution.items()]
+            )
+        if isinstance(solution, list) and all(isinstance(item, tuple) for item in solution):
+            formatted_solution = "\n".join(
+                [f"({', '.join(map(str, item))})" for item in solution]
+            )
+        else:
+            formatted_solution = str(solution)
 
-            return formatted_solution
-        except:
-            print("#LOG egyenlet rendszerek")
-            self.label_2.setText(f"ERROR: Helytelen egyenletrendszerek!")
-            self.text_edit.setText(f"")
+        return formatted_solution
 
     def one_func(self, one_func, replaced_func):
         inequality = ["<=", ">=", "<", ">"]
@@ -257,12 +252,15 @@ class Ui_Equation(object):
                 self.canvas.hide()
         if input_text == "Egyenletrendszerek":
             self.canvas.hide()
-            if len(number_of_rows)-1 >= 2:
-                formatted_solution = self.system_of_equations(number_of_rows)
-                self.label_2.setText(formatted_solution)
-            else:
-                self.label_2.setText("Több egyenletet adj meg!")
-                self.text_edit.setText("")
+            try:
+                if len(number_of_rows)-1 >= 2:
+                    formatted_solution = self.system_of_equations(number_of_rows)
+                    self.label_2.setText(formatted_solution)
+                else:
+                    self.label_2.setText("Több egyenletet adj meg!")
+                    self.text_edit.setText("")
+            except Exception as e:
+                self.label_2.setText("ERROR: helytelen egyenletrendszer, adj meg újat!")
         if input_text == "Fourier transzformált":
             if len(number_of_rows) == 2:
                 t, x = symbols("t x")
