@@ -34,6 +34,7 @@ class Ui_Differential_Equation(object):
 
     def show_diff_equation_result(self, string):
         replaced = self.replace_nth_derivative(string)
+        self.canvas.show()
         
         initial_value_problem = ""
 
@@ -61,7 +62,9 @@ class Ui_Differential_Equation(object):
             self.label_4.setText(f"{solution.rhs}")
             self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         except:
+            self.canvas.hide()
             self.label_2.setText("ERROR: helytelen differenciál egyenlet")
+            self.label_4.setText("")
 
     def replace_nth_derivative(self, eq_string):
         # Handle third-order derivatives first
@@ -123,7 +126,7 @@ class Ui_Differential_Equation(object):
         }
         QLabel#label_3{
             color: #FFFFFF;
-            font-size: 14pt;
+            font-size: 10pt;
             font-family: 'Courier New', Courier, monospace;
             qproperty-alignment: 'AlignLeft;
         }
