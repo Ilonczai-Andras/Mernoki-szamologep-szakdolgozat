@@ -434,6 +434,7 @@ class Ui_Calculus(object):
         self.label_2.setObjectName("label_2")
         self.label_2.setText("Erdemény")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.label_2.setMaximumHeight(71)
 
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName("lineEdit")

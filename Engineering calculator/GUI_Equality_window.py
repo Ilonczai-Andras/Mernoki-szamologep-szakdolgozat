@@ -150,6 +150,10 @@ class Ui_Equation(object):
                 formatted_solution = "\n".join(
                     [f"{str(key)} = {str(value)}" for key, value in solution.items()]
                 )
+            if isinstance(solution, list) and all(isinstance(item, tuple) for item in solution):
+                formatted_solution = "\n".join(
+                    [f"({', '.join(map(str, item))})" for item in solution]
+                )
             else:
                 formatted_solution = str(solution)
 
@@ -158,68 +162,59 @@ class Ui_Equation(object):
             print("#LOG egyenlet rendszerek")
             self.label_2.setText(f"ERROR: Helytelen egyenletrendszerek!")
             self.text_edit.setText(f"")
-            return "ERROR: Helytelen egyenletrendszerek!"
 
     def one_func(self, one_func, replaced_func):
-        try:
-            inequality = ["<=", ">=", "<", ">"]
-            inequality_type = None
+        inequality = ["<=", ">=", "<", ">"]
+        inequality_type = None
 
-            for ineq in inequality:
-                if ineq in one_func:
-                    inequality_type = ineq
-                    break
+        for ineq in inequality:
+            if ineq in one_func:
+                inequality_type = ineq
+                break
 
-            if inequality_type:
-                symbs = self.extract_variable(replaced_func)
-                result = solve(one_func, tuple(symbs))
+        if inequality_type:
+            symbs = self.extract_variable(replaced_func)
+            result = solve(one_func, tuple(symbs))
 
-                inequality_results = self.from_OrAnd_to_set(result)
-                x_intervals = sorted(list(inequality_results))
+            inequality_results = self.from_OrAnd_to_set(result)
+            x_intervals = sorted(list(inequality_results))
 
-                for i in inequality_results:
-                    self.common_area.append(i)
+            for i in inequality_results:
+                self.common_area.append(i)
 
-                self.label_2.setText(pretty(result))
+            self.label_2.setText(pretty(result))
 
-                self.canvas.plot_area_between_functions(x_intervals)
-            else:
-                splitted_func = one_func.replace(" ", "").split("=")
-                symbs = self.extract_variable(replaced_func)
+            self.canvas.plot_area_between_functions(x_intervals)
+        else:
+            splitted_func = one_func.replace(" ", "").split("=")
+            symbs = self.extract_variable(replaced_func)
 
-                equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
+            equation = Eq(sympify(splitted_func[0]), sympify(splitted_func[1]))
 
-                rearranged_equation = equation.lhs - equation.rhs
-                result = solve(rearranged_equation, tuple(symbs))
+            rearranged_equation = equation.lhs - equation.rhs
+            result = solve(rearranged_equation, tuple(symbs))
 
-                numerical_results = [sol.evalf() for sol in result]
-                rounded_results = [
-                    complex(
-                        round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)
-                    )
-                    for sol in numerical_results
-                ]
+            numerical_results = [sol.evalf() for sol in result]
+            rounded_results = [
+                complex(
+                    round(sol.as_real_imag()[0], 2), round(sol.as_real_imag()[1], 2)
+                )
+                for sol in numerical_results
+            ]
 
-                formatted_results = [
-                    (
-                        f"{sol.real:.2f} + {sol.imag:.2f}i"
-                        if sol.imag >= 0
-                        else f"{sol.real:.2f} - {abs(sol.imag):.2f}i"
-                    )
-                    for sol in rounded_results
-                ]
-                for i in numerical_results:
-                    self.common_area.append(i)
-                result_text = "\n".join(formatted_results)
+            formatted_results = [
+                (
+                    f"{sol.real:.2f} + {sol.imag:.2f}i"
+                    if sol.imag >= 0
+                    else f"{sol.real:.2f} - {abs(sol.imag):.2f}i"
+                )
+                for sol in rounded_results
+            ]
+            for i in numerical_results:
+                self.common_area.append(i)
+            result_text = "\n".join(formatted_results)
 
-                self.label_2.setText(result_text.replace("**", "^"))
-
-        except SympifyError as e:
-            print("Sympify error:", e)
-            self.label_2.setText("ERROR hibás egyenlet!")
-        except Exception as x:
-            print(x)
-            self.label_2.setText("ERROR hibás egyenlet!")
+            self.label_2.setText(result_text.replace("**", "^"))
 
     def combobox_selector(self):
         input_text = self.comboBox.currentText()
@@ -228,43 +223,50 @@ class Ui_Equation(object):
         inequality = ["<=", ">=", "<", ">", "="]
 
         if input_text == "Egyenlet":
-            self.canvas.show()
-            if len(number_of_rows) == 2:
-                self.common_area = []
-                self.one_func(function_text,self.replace_trigonometric_funcs(function_text).replace("sqrt", ""),)
-                for ineq in inequality:
-                    if ineq in function_text:
-                        self.canvas.clear((-10, 10), (-10, 10))
-                        self.canvas.plotted_functions = []
-                        lhs, rhs = function_text.split(ineq)
-                        self.canvas.plot_function(lhs, (-10, 10), clear=False)
-                        self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
-                        self.canvas.plot_function(rhs, (-10, 10), clear=False)
-                        self.canvas.store_function( rhs, (-10, 10), self.canvas.interval_y, None, False, "" )
+            try:
+                self.canvas.show()
+                if len(number_of_rows) == 2:
+                    self.common_area = []
+                    self.one_func(
+                        function_text, self.replace_trigonometric_funcs(function_text).replace("sqrt", "")
+                    )
+                    for ineq in inequality:
+                        if ineq in function_text:
+                            self.canvas.clear((-10, 10), (-10, 10))
+                            self.canvas.plotted_functions = []
+                            lhs, rhs = function_text.split(ineq)
+                            self.canvas.plot_function(lhs, (-10, 10), clear=False)
+                            self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
+                            self.canvas.plot_function(rhs, (-10, 10), clear=False)
+                            self.canvas.store_function(rhs, (-10, 10), self.canvas.interval_y, None, False, "")
 
-                        # Separate real and complex numbers
-                        real_common_area = [float(val) for val in self.common_area if val.is_real]
-                        complex_common_area = [val for val in self.common_area if not val.is_real]
+                            # Separate real and complex numbers
+                            # real_common_area = [float(val) for val in self.common_area if val.is_real]
+                            # complex_common_area = [val for val in self.common_area if not val.is_real]
 
-                        print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
-                        self.canvas.plot_area_between_functions(real_common_area)
-                        if complex_common_area:
-                            print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
-                        break
-            else:
-                self.label_2.setText("Egy sort adj meg")
-                self.text_edit.setText("")
+                            # print(f"Calling plot_area_between_functions with {real_common_area}")  # Debug statement
+                            # self.canvas.plot_area_between_functions(real_common_area)
+                            # if complex_common_area:
+                            #     print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
+                            # break
+                else:
+                    self.label_2.setText("Egy sort adj meg")
+                    self.text_edit.setText("")
+            except Exception as e:
+                self.label_2.setText("ERROR: helytelen egyenlet, adj meg újat!")
+                self.canvas.hide()
         if input_text == "Egyenletrendszerek":
             self.canvas.hide()
-            if len(number_of_rows) >= 2:
+            if len(number_of_rows)-1 >= 2:
                 formatted_solution = self.system_of_equations(number_of_rows)
                 self.label_2.setText(formatted_solution)
             else:
-                self.label_2.setText("Egy sort adj meg")
+                self.label_2.setText("Több egyenletet adj meg!")
                 self.text_edit.setText("")
         if input_text == "Fourier transzformált":
             if len(number_of_rows) == 2:
                 t, x = symbols("t x")
+                self.canvas.hide()
                 try:
                     input_function = sympify(function_text)
                     ft = fourier_transform(input_function, t, x)
@@ -285,26 +287,26 @@ class Ui_Equation(object):
                     self.label_2.setText("Invalid function for Fourier transform")
                     print(f"Sympify error: {e}")
             else:
+                self.canvas.hide()
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
         if input_text == "Fourier sor":
             self.canvas.show()
             if len(number_of_rows) == 2:
-                
-                input_function = sympify(function_text)
-                series = fourier_series(input_function)
-                result = str(series.truncate())
-                print(result)
-                self.label_2.setText(result)
-                self.canvas.clear((-10, 10), (-10, 10))
                 try:
+                    input_function = sympify(function_text)
+                    series = fourier_series(input_function)
+                    result = str(series.truncate())
+                    print(result)
+                    self.label_2.setText(result)
+                    self.canvas.clear((-10, 10), (-10, 10))
+                
                     self.canvas.plotted_functions = []
                     self.canvas.plot_function(result, (-10, 10), clear=False)
                     self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
-
-                except SympifyError as e:
-                    self.label_2.setText("Invalid function for Fourier transform")
-                    print(f"Sympify error: {e}")
+                except:
+                    self.label_2.setText("Invalid függvény a fourier sornak")
+                    self.text_edit.setText("")
             else:
                 self.label_2.setText("Egy sort adj meg")
                 self.text_edit.setText("")
