@@ -160,7 +160,7 @@ class Ui_Probability_and_statistics(object):
         }
         QPushButton {
             background-color: #1C1C1C;
-            font-size: 14pt;
+            font-size: 10pt;
             font-family: 'Courier New', Courier, monospace; /* Monospaced font */
             color: #FFFFFF;
             border: 1px solid #555555;
@@ -169,7 +169,7 @@ class Ui_Probability_and_statistics(object):
         }
         QPushButton#pushButton_2 {
         
-            font-size: 10pt;
+            font-size: 8pt;
 
         }
         QTextEdit, QLineEdit {
@@ -202,7 +202,7 @@ class Ui_Probability_and_statistics(object):
     def string_to_S(self, string):
 
         return string.replace(" ", "").replace("1/", "S.One/")
-    
+
     def number_of_lines(self, expression):
         res = []
         number = 0
@@ -231,25 +231,28 @@ class Ui_Probability_and_statistics(object):
             Alpha = 1 - alpha
             df = n - 1
 
-
-            t = (avg - m) / (stan_dev / sqrt(n)) 
+            t = (avg - m) / (stan_dev / sqrt(n))
             t = float(t)  # Ensure numerical evaluation
 
-            t_p = stats.t.ppf(q=1- Alpha/2,df= df)
+            t_p = stats.t.ppf(q=1 - Alpha / 2, df=df)
             p_value = 2 * (1 - stats.t.sf(abs(float(t)), df))
 
             if abs(t) >= t_p:
-                
-                result_string += f"\nH0-t elutasítjuk t: {t}\n{abs(t)} >= {t_p}\np: {2 - p_value}\n"
+
+                result_string += (
+                    f"\nH0-t elutasítjuk t: {t}\n{abs(t)} >= {t_p}\np: {2 - p_value}\n"
+                )
                 # result_string += f"two tail  t:{abs(stats.t.ppf(q= Alpha/2,df= df) )}" +"\n"
                 # result_string += f"one tail  t:{abs(stats.t.ppf(q= Alpha,df= df) )}" +"\n"
             elif abs(t) < t_p:
-                result_string += f"\nH0-t elfogadjuk t: {t}\n{abs(t)} < {t_p}\np: {2 - p_value}\n"
+                result_string += (
+                    f"\nH0-t elfogadjuk t: {t}\n{abs(t)} < {t_p}\np: {2 - p_value}\n"
+                )
                 # result_string += f"two tail  t:{abs(stats.t.ppf(q= Alpha/2,df= df) )}" +"\n"
                 # result_string += f"one tail  t:{abs(stats.t.ppf(q= Alpha,df= df) )}" +"\n"
 
             return result_string
-        elif x is not None and y is not None and alpha is not None and paired is not None:
+        elif (x is not None and y is not None and alpha is not None and paired is not None):
             print("#LOG kétmintás párosított t próba")
             result_string = ""
 
@@ -264,17 +267,17 @@ class Ui_Probability_and_statistics(object):
 
             # Determine if we reject or accept the null hypothesis
             if p_value < Alpha:
-                result_string += 'H0-t elutasítjuk\n'  # We reject H0
+                result_string += "H0-t elutasítjuk\n"  # We reject H0
             else:
-                result_string += 'H0-t elfogadjuk\n'  # We accept H0
+                result_string += "H0-t elfogadjuk\n"  # We accept H0
 
             result_string += f"t: {t_stat} p: {p_value}\n"
 
             return result_string
-        elif (x is not None and y is not None and alpha is not None):
+        elif x is not None and y is not None and alpha is not None:
             print("#LOG kétmintás t")
             result_string = ""
-            
+
             t_statistic, p_value = stats.ttest_ind(x, y)
 
             Alpha = 1 - alpha
@@ -295,7 +298,7 @@ class Ui_Probability_and_statistics(object):
             n = len(X)
             if n == 0:
                 raise ValueError("Sample data X cannot be empty.")
-                
+
             sample_mean = np.mean(X)
             Alpha = 1 - alpha
 
@@ -320,22 +323,32 @@ class Ui_Probability_and_statistics(object):
             accept_null_right = "igen" if p_value_right > Alpha else "nem"
             right_test_result = f"Jobb oldali próba: Kritikus Z-érték: {z_critical_right}, \nP-érték: {p_value_right}, HO elfogadása: {accept_null_right}"
 
-            return (f"Z-érték: {z_value}\n\n"
-                    f"{left_test_result}\n\n"
-                    f"{two_test_result}\n\n"
-                    f"{right_test_result}")
+            return (
+                f"Z-érték: {z_value}\n\n"
+                f"{left_test_result}\n\n"
+                f"{two_test_result}\n\n"
+                f"{right_test_result}"
+            )
+
+    def logarithmic_entropy(self, p, k_max=1000):
+        entropy = 0
+        for k in range(1, k_max + 1):
+            pk = -(p**k) / (k * np.log(1 - p))
+            if pk > 0:
+                entropy += pk * np.log(pk)
+        return -entropy
 
     def combobox_selector(self):
         distribution = self.comboBox_2.currentText()
         operation_type = self.comboBox.currentText()
-        self.canvas.clear(interval_x=(0,10), interval_y=(0,5))
+        self.canvas.clear(interval_x=(0, 10), interval_y=(0, 5))
 
         m = 0
         s = 0
 
         text = self.lineEdit_2.toPlainText()
         lines = self.number_of_lines(text)
-    
+
         if operation_type in ["T próba", "U próba"]:
             if operation_type == "T próba":
                 if distribution == "Egymintás t próba":
@@ -409,7 +422,9 @@ class Ui_Probability_and_statistics(object):
                     if self.lineEdit_2.toPlainText() == "":
                         self.label_2.setText("Adjon meg feltételt!")
                     else:
-                        condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                        condition = sympify(
+                            self.lineEdit_2.toPlainText(), locals={"X": X}
+                        )
                         self.label_2.setText(str(N(P(condition))))
 
                 elif operation_type == "Várható érték":
@@ -429,10 +444,12 @@ class Ui_Probability_and_statistics(object):
                 elif operation_type == "Sűrűség függvény":
                     self.label_2.setText(str(density(X)(x)))
                     func_str = self.label_2.text()
-                    self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
+                    self.canvas.plot_function(
+                        func_str, interval_x=(-5, 5), interval_y=(0, 1)
+                    )
                 #
             except:
-                self.label_2.setText("ERROR helytelen input!")
+                self.label_2.setText("ERROR helytelen Normál-érték!")
 
         elif distribution == "Geometriai":
             try:
@@ -443,7 +460,9 @@ class Ui_Probability_and_statistics(object):
                     self.label_2.setText("ERROR helytelen input!")
                 else:
                     if p <= 0.0 or p >= 1.0:
-                        self.label_2.setText("A valószínűségnek 0 és 1 között kell lennie")
+                        self.label_2.setText(
+                            "A valószínűségnek 0 és 1 között kell lennie"
+                        )
                     else:
                         X = Geometric("X", p)
                         x = symbols("x")
@@ -451,7 +470,9 @@ class Ui_Probability_and_statistics(object):
                             if self.lineEdit_2.toPlainText() == "":
                                 self.label_2.setText("Adjon meg feltételt!")
                             else:
-                                condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                                condition = sympify(
+                                    self.lineEdit_2.toPlainText(), locals={"X": X}
+                                )
                                 self.label_2.setText(str(P(condition)))
                         if operation_type == "Várható érték":
                             self.label_2.setText(str(E(X)))
@@ -460,11 +481,13 @@ class Ui_Probability_and_statistics(object):
                         elif operation_type == "Variancia":
                             self.label_2.setText(str(variance(X)))
                         elif operation_type == "Sűrűség függvény":
-                            self.label_2.setText(str(density(X)(x)))
+                            self.label_2.setText(str((1 - p) ** x * p))
                             func_str = self.label_2.text()
-                            self.canvas.plot_function(func_str, interval_x=(-5, 5), interval_y=(0,1))
+                            self.canvas.plot_function(
+                                func_str, interval_x=(-5, 5), interval_y=(0, 1)
+                            )
             except:
-                self.label_2.setText("ERROR helytelen input!")
+                self.label_2.setText("ERROR helytelen Geometriai-érték!")
 
         elif distribution == "Poisson":
             try:
@@ -479,21 +502,30 @@ class Ui_Probability_and_statistics(object):
                         if self.lineEdit_2.toPlainText() == "":
                             self.label_2.setText("Adjon meg feltételt!")
                         else:
-                            condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                            condition = sympify(
+                                self.lineEdit_2.toPlainText(), locals={"X": X}
+                            )
                             self.label_2.setText(str(N(P(condition))))
                     if operation_type == "Várható érték":
                         self.label_2.setText(str(E(X)))
                     elif operation_type == "Entrópia":
-                        self.label_2.setText(str(entropy(X).evalf()))
+                        self.label_2.setText(
+                            str(
+                                0.5 * np.log(2 * np.pi * np.e * λ_value)
+                                - 1 / (12 * λ_value)
+                            )
+                        )
                     elif operation_type == "Variancia":
                         self.label_2.setText(str(variance(X)))
                     elif operation_type == "Sűrűség függvény":
                         self.label_2.setText(str(density(X)(x)))
-                        #JAVÍT vlmi nem jó
+                        # JAVÍT vlmi nem jó
                         func_str = self.label_2.text()
-                        self.canvas.plot_function(func_str, interval_x=(0, 15), interval_y=(0,1))
+                        self.canvas.plot_function(
+                            func_str, interval_x=(0, 15), interval_y=(0, 1)
+                        )
             except:
-                self.label_2.setTextInteractionFlags("ERROR helytelen poisson!")
+                self.label_2.setText("ERROR: helytelen Poisson-érték!")
 
         elif distribution == "Logaritmikus":
             self.label_2.setText("")
@@ -509,22 +541,25 @@ class Ui_Probability_and_statistics(object):
                         if self.lineEdit_2.toPlainText() == "":
                             self.label_2.setText("Adjon meg feltételt!")
                         else:
-                            condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                            condition = sympify(
+                                self.lineEdit_2.toPlainText(), locals={"X": X}
+                            )
                             self.label_2.setText(str(P(condition).evalf()))
                     if operation_type == "Várható érték":
                         self.label_2.setText(str(E(X).evalf()))
-                    # elif operation_type == "Entrópia":
-                    #     self.label_2.setText(str(entropy(X).evalf()))
+                    elif operation_type == "Entrópia":
+                        self.label_2.setText(str(self.logarithmic_entropy(p)))
                     elif operation_type == "Variancia":
                         self.label_2.setText(str(variance(X).evalf()))
                     elif operation_type == "Sűrűség függvény":
-                        result = density(X)(x) 
-                        #JAVÍT vlmi nem jó
+                        result = density(X)(x)
+                        # JAVÍT vlmi nem jó
                         self.label_2.setText(str(result))
                         func_str = self.label_2.text()
-                        self.canvas.plot_function(func_str, (-15, 15))
-            except:
-                self.label_2.setText("ERROR helytelen poisson!")
+                        self.canvas.plot_function(func_str, (0, 15))
+            except Exception as x:
+                print(x)
+                self.label_2.setText("ERROR helytelen Logaritmikus-érték!")
 
         elif distribution == "Erlang":
             self.label_2.setText("")
@@ -538,7 +573,9 @@ class Ui_Probability_and_statistics(object):
                     if self.lineEdit_2.text() == "":
                         self.label_2.setText("Adjon meg feltételt!")
                     else:
-                        condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                        condition = sympify(
+                            self.lineEdit_2.toPlainText(), locals={"X": X}
+                        )
                         self.label_2.setText(str(P(condition)))
 
                 elif operation_type == "Várható érték":
@@ -551,7 +588,7 @@ class Ui_Probability_and_statistics(object):
                     except:
                         self.label_2.setText("Hiba")
                     else:
-                        self.label_2.setText(str(round(e.evalf(), 4)))
+                        self.label_2.setText(str(e.evalf(), 4))
 
                 elif operation_type == "Variancia":
                     self.label_2.setText(str(variance(X)))
@@ -561,12 +598,12 @@ class Ui_Probability_and_statistics(object):
                     func_str = self.label_2.text()
                     self.canvas.plot_function(func_str, (0, 15))
             except:
-                self.label_2.setText("ERROR helytelen erlang!")
+                self.label_2.setText("ERROR helytelen Erlang-érték!")
 
         elif distribution == "Pareto":
             try:
-                xm = int(self.mu.toPlainText())
-                alpha = int(self.sigma.toPlainText())
+                xm = float(self.mu.toPlainText())
+                alpha = float(self.sigma.toPlainText())
                 X = Pareto("X", xm, alpha)
                 x = symbols("x")
 
@@ -574,14 +611,16 @@ class Ui_Probability_and_statistics(object):
                     if self.lineEdit_2.toPlainText() == "":
                         self.label_2.setText("Adjon meg feltételt!")
                     else:
-                        condition = sympify(self.lineEdit_2.toPlainText(), locals={"X": X})
+                        condition = sympify(
+                            self.lineEdit_2.toPlainText(), locals={"X": X}
+                        )
                         self.label_2.setText(str(N(P(condition))))
 
                 elif operation_type == "Várható érték":
                     self.label_2.setText(str(E(X)))
 
                 elif operation_type == "Entrópia":
-                    self.label_2.setText(str(math.log(xm/alpha) + 1/alpha + 1) )
+                    self.label_2.setText(str(math.log(xm / alpha) + 1 / alpha + 1))
 
                 elif operation_type == "Variancia":
                     self.label_2.setText(str(variance(X)))
@@ -590,13 +629,20 @@ class Ui_Probability_and_statistics(object):
                     self.label_2.setText(str(density(X)(x)))
                     func_str = self.label_2.text()
                     self.canvas.plot_function(func_str, (xm, 15))
-            except:
-                self.label_2.setText("ERROR helytelen pareto!")
+            except Exception as x:
+                print(x)
+                self.label_2.setText("ERROR helytelen Pareto-érték!")
 
     def handle_combobox2_change(self):
         distribution = self.comboBox_2.currentText()
 
-        if distribution in ["Geometriai", "Poisson", "Logaritmikus", "Erlang", "Pareto"]:
+        if distribution in [
+            "Geometriai",
+            "Poisson",
+            "Logaritmikus",
+            "Erlang",
+            "Pareto",
+        ]:
             self.sigma.hide()
             if distribution == "Geometriai" or distribution == "Logaritmikus":
                 self.mu.setPlaceholderText("p")
@@ -611,18 +657,27 @@ class Ui_Probability_and_statistics(object):
                 self.sigma.show()
                 self.mu.setPlaceholderText("xm")
                 self.sigma.setPlaceholderText("alpha")
-        elif distribution in ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]:
+        elif distribution in [
+            "Egymintás t próba",
+            "Kétmintás párosított t próba",
+            "Kétmintás t próba",
+        ]:
             if distribution == "Egymintás t próba":
                 self.mu.show()
                 self.mu.setPlaceholderText("m")
                 self.sigma.show()
                 self.sigma.setPlaceholderText("alpha")
                 self.lineEdit_2.setPlaceholderText("X értékek , elválasztva")
-            if distribution == "Kétmintás t próba" or distribution == "Kétmintás párosított t próba":
+            if (
+                distribution == "Kétmintás t próba"
+                or distribution == "Kétmintás párosított t próba"
+            ):
                 self.mu.hide()
                 self.sigma.show()
                 self.sigma.setPlaceholderText("alpha")
-                self.lineEdit_2.setPlaceholderText("X Y értékek , elválasztva új sorban")
+                self.lineEdit_2.setPlaceholderText(
+                    "X Y értékek , elválasztva új sorban"
+                )
         elif distribution in ["Egymintás u próba"]:
             self.lineEdit_2.setPlaceholderText("X Y értékek , elválasztva új sorban")
             self.mu.setPlaceholderText("m")
@@ -637,8 +692,17 @@ class Ui_Probability_and_statistics(object):
 
     def handle_combobox_change(self):
         text = self.comboBox.currentText()
-        current_distribution = self.comboBox_2.currentText()  # Save the current selection
-        eloszlások = ["Normál", "Geometriai", "Poisson", "Logaritmikus", "Erlang", "Pareto"]
+        current_distribution = (
+            self.comboBox_2.currentText()
+        )  # Save the current selection
+        eloszlások = [
+            "Normál",
+            "Geometriai",
+            "Poisson",
+            "Logaritmikus",
+            "Erlang",
+            "Pareto",
+        ]
         t = ["Egymintás t próba", "Kétmintás párosított t próba", "Kétmintás t próba"]
         u = ["Egymintás u próba"]
 
@@ -662,7 +726,7 @@ class Ui_Probability_and_statistics(object):
             self.comboBox_2.clear()
             self.comboBox_2.addItems(eloszlások)
             self.sigma.setPlaceholderText("sigma")
-        
+
         # Restore the previous selection
         index = self.comboBox_2.findText(current_distribution)
         if index != -1:
