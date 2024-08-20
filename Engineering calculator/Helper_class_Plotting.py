@@ -115,7 +115,13 @@ class Canvas(FigureCanvas):
         df_func="",
     ):
         if interval_x is None:
+            print(interval_x)
             interval_x = self.interval_x
+            x_vals = np.linspace(-100, 100, 100000)
+            
+        else:
+            print(interval_x)
+            x_vals = np.linspace(interval_x[0], interval_x[1], 100000)
         if interval_y is None:
             interval_y = self.interval_y
 
@@ -139,8 +145,6 @@ class Canvas(FigureCanvas):
             self.text = self.text.replace("C1", str(C[0]))
             self.text = self.text.replace("C2", str(C[1]))
             self.text = self.text.replace("C3", str(C[2]))
-
-        x_vals = np.linspace(-100, 100, 100000)
 
         if "fact" in func_str:
             x_vals = np.linspace(0, 15, 100)
