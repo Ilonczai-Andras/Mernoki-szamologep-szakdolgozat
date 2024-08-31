@@ -176,7 +176,11 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen egyes komlemens!")
-            elif (not self.contain_logical(screen) and self.contains_sqrt(screen) and self.only_one_fact(screen) == 0):
+            elif (
+                not self.contain_logical(screen)
+                and self.contains_sqrt(screen)
+                and self.only_one_fact(screen) == 0
+            ):
                 try:
                     answer = self.sqrt_func(screen, "decimal")
                     print("#LOG: csak gyökvonás")
@@ -197,7 +201,11 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen shiftelés!")
-            elif (self.contain_arithmetic(screen)and not self.contain_logical(screen)and self.only_one_fact(screen) == 0):
+            elif (
+                self.contain_arithmetic(screen)
+                and not self.contain_logical(screen)
+                and self.only_one_fact(screen) == 0
+            ):
                 try:
                     answer = eval(screen)
                     print("#LOG: csak aritmetikai")
@@ -394,7 +402,11 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen kettes komlemens!")
-            elif (self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen)):
+            elif (
+                self.only_one_fact(screen) == 1
+                and "!" in screen
+                and not self.contain_arithmetic(screen)
+            ):
                 try:
                     print("#LOG: factorial")
                     answer = self.factorial(screen.split("!")[0], "binary")
@@ -403,7 +415,9 @@ class Ui_Programmer_calculator(object):
                     self.Result.setText("Helytelen faktoriális!")
             elif "int" in screen:
                 try:
-                    answer = self.round_down_number(screen.split("int")[1], "binary").strip()
+                    answer = self.round_down_number(
+                        screen.split("int")[1], "binary"
+                    ).strip()
                     print("#LOG: kerekítés egészre")
                 except:
                     answer = None
@@ -498,22 +512,31 @@ class Ui_Programmer_calculator(object):
                     try:
                         binary_segments = self.binary_tobinary_64bit_segments(answer)
                         if binary_segments is False:
-                            raise ValueError("Error: Invalid binary input for 64-bit segmentation.")
+                            raise ValueError(
+                                "Error: Invalid binary input for 64-bit segmentation."
+                            )
                     except Exception as e:
                         print(e)
                         self.Result.setText("Nem ábrázolható 64 bit-en!")
                     else:
-                        self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
-                        self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
-                        self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-                        self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
+                        self.n8_63.setText(
+                            f"64 {self.format_binary(binary_segments[0])} 48"
+                        )
+                        self.h2_47.setText(
+                            f"47 {self.format_binary(binary_segments[1])} 32"
+                        )
+                        self.t6_31.setText(
+                            f"31 {self.format_binary(binary_segments[2])} 16"
+                        )
+                        self.nulla_15.setText(
+                            f"15 {self.format_binary(binary_segments[3])}  0"
+                        )
             else:
                 self.n8_63.setText(f"")
                 self.h2_47.setText(f"")
                 self.t6_31.setText(f"")
                 self.nulla_15.setText(f"")
         elif self.comboBox_3.currentText() == "Hexadecimális":
-
             answer = 0
             if "twos" in screen:
                 try:
@@ -529,7 +552,7 @@ class Ui_Programmer_calculator(object):
                     answer = self.log_from_hex(screen.split(" ")[1], 2)
                 except:
                     answer = None
-                    self.Result.setText("Helytelen faktoriális!")
+                    self.Result.setText("Helytelen logaritmus!")
             elif "log" in screen:
                 try:
                     print("#LOG: log")
@@ -539,16 +562,12 @@ class Ui_Programmer_calculator(object):
                     self.Result.setText("Helytelen logaritmus!")
             elif "ABS" in screen:
                 try:
-
                     answer = self.abs_hex(screen.split(" ")[1])
+                    print("#LOG: abs")
                 except:
                     answer = None
                     self.Result.setText("Helytelen abs!")
-            elif (
-                self.only_one_fact(screen) == 1
-                and "!" in screen
-                and not self.contain_arithmetic(screen)
-            ):
+            elif (self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen)):
                 try:
                     print("#LOG: factorial")
                     answer = self.factorial(screen.split("!")[0], "hexadecimal")
@@ -575,17 +594,20 @@ class Ui_Programmer_calculator(object):
             elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
                 try:
                     answer = self.evaluate_hex_expression(screen)
+                    print("#LOG: artimetikai")
                 except:
                     answer = None
                     self.Result.setText("Helytelen artimetikai!")
             elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
                 try:
                     answer = self.evaluate_logical_hex_expression(screen)
+                    print("#LOG: logikai")
                 except:
                     answer = None
                     self.Result.setText("Helytelen logikai!")
             elif "FACT" in screen:
                 try:
+                    print("#LOG: faktorizáció")
                     if screen.split("FACT")[1] != "0":
                         answer = self.convert_and_factorize(
                             "0x" + screen.split("FACT")[1]
@@ -596,38 +618,34 @@ class Ui_Programmer_calculator(object):
                     answer = None
                     self.Result.setText("Helytelen faktorizáció!")
             elif "<<" in screen or ">>" in screen:
-                if "<<" in screen:
-                    num = screen.split("<<")[0]
-                    cnt = screen.split("<<")[1]
-                    answer = self.hex_shift_left_func(cnt, num)
-                if ">>" in screen:
-                    num = screen.split(">>")[0]
-                    cnt = screen.split(">>")[1]
-                    answer = self.hex_shift_right_func(cnt, num)
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        num = screen.split("<<")[0]
+                        cnt = screen.split("<<")[1]
+                        answer = self.hex_shift_left_func(cnt, num)
+                    if ">>" in screen:
+                        num = screen.split(">>")[0]
+                        cnt = screen.split(">>")[1]
+                        answer = self.hex_shift_right_func(cnt, num)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
             else:
                 try:
                     answer = self.evaluate_hex_expression(screen)
+                    print("#LOG else")
                 except:
                     self.Result.setText("ERROR nem hexa érték!")
-
             if answer is not None:
                 self.Result.setText(str(answer))
-
                 self.operations.append(f"{operation}")
                 self.update_operations_display()
 
                 self.operations2.append(f"{answer}")
                 self.update_operations_display2()
-
-            if (
-                isinstance(answer, str)
-                and not "." in answer
-                and not "*" in answer
-                and answer != "0"
-            ):
-                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
-                    str(answer)
-                )
+            if (isinstance(answer, str) and not "." in answer and not "*" in answer and answer != "0"):
+                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(str(answer))
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
@@ -1263,29 +1281,41 @@ class Ui_Programmer_calculator(object):
 
         # Calculate two's complement by adding one to the one's complement result
         twos_complement_int = ones_complement_int + 1
-        if '-' in number:
+        if "-" in number:
             if base == 2:
-                result = bin(twos_complement_int)[3:].zfill(64)  # Remove the '0b' prefix and pad with zeros
+                result = bin(twos_complement_int)[3:].zfill(
+                    64
+                )  # Remove the '0b' prefix and pad with zeros
             elif base == 8:
-                result = oct(twos_complement_int)[3:].zfill(64 // 3)  # Remove the '0o' prefix and pad with zeros
+                result = oct(twos_complement_int)[3:].zfill(
+                    64 // 3
+                )  # Remove the '0o' prefix and pad with zeros
             elif base == 10:
-                result = str(twos_complement_int)[1:] # No prefix for decimal
+                result = str(twos_complement_int)[1:]  # No prefix for decimal
             elif base == 16:
-                result = hex(twos_complement_int)[3:].upper().zfill(64 // 4)  # Remove the '0x' prefix and pad with zeros
+                result = (
+                    hex(twos_complement_int)[3:].upper().zfill(64 // 4)
+                )  # Remove the '0x' prefix and pad with zeros
         else:
             if base == 2:
-                result = bin(twos_complement_int)[2:].zfill(64)  # Remove the '0b' prefix and pad with zeros
+                result = bin(twos_complement_int)[2:].zfill(
+                    64
+                )  # Remove the '0b' prefix and pad with zeros
             elif base == 8:
-                result = oct(twos_complement_int)[2:].zfill(64 // 3)  # Remove the '0o' prefix and pad with zeros
+                result = oct(twos_complement_int)[2:].zfill(
+                    64 // 3
+                )  # Remove the '0o' prefix and pad with zeros
             elif base == 10:
                 result = str(twos_complement_int)  # No prefix for decimal
             elif base == 16:
-                result = hex(twos_complement_int)[2:].upper().zfill(64 // 4)  # Remove the '0x' prefix and pad with zeros
-        
+                result = (
+                    hex(twos_complement_int)[2:].upper().zfill(64 // 4)
+                )  # Remove the '0x' prefix and pad with zeros
+
         return result
 
     def ones_complement(self, number: str, base: int) -> str:
-        if '-' in number:
+        if "-" in number:
             number = number.replace("-", "")
         # Convert the input number to an integer
         if base == 2:
@@ -1324,7 +1354,9 @@ class Ui_Programmer_calculator(object):
     def round_down_number(self, number: str, mode: str) -> str:
         # Check if the input number is valid
         if number.replace("-", "").replace(".", "").isdigit():
-            raise ValueError("Invalid input: number must contain only digits and at most one decimal point.")
+            raise ValueError(
+                "Invalid input: number must contain only digits and at most one decimal point."
+            )
 
         negative = number.startswith("-")
         if negative:
@@ -1472,23 +1504,18 @@ class Ui_Programmer_calculator(object):
 
             return int_hex + frac_hex
 
-        try:
-            # Convert the hexadecimal string to a decimal number
-            decimal_value = hex_to_decimal(hex_str)
+        # Convert the hexadecimal string to a decimal number
+        decimal_value = hex_to_decimal(hex_str)
 
-            # Check for valid base
-            if base not in [2, 10]:
-                return "Invalid base. Only base 2 and base 10 are supported."
+        # Check for valid base
+        if base not in [2, 10]:
+            return "Invalid base. Only base 2 and base 10 are supported."
 
-            # Calculate the logarithm of the decimal value
-            log_value = math.log(decimal_value, base)
+        # Calculate the logarithm of the decimal value
+        log_value = math.log(decimal_value, base)
 
-            # Convert the result to binary and hexadecimal strings
-            log_hex = float_to_hex(log_value)
-
-            return log_hex
-        except ValueError:
-            return False
+        # Convert the result to binary and hexadecimal strings
+        return float_to_hex(log_value)
 
     def is_valid_hex(self, number: str) -> bool:
         try:
@@ -1760,26 +1787,27 @@ class Ui_Programmer_calculator(object):
         return int(str(oct(shifted_value))[2:])
 
     def absolute_octal(self, octal_str: str) -> str:
-        if '.' in octal_str:
+        if "." in octal_str:
             # Handle both integer and fractional parts separately
-            integer_part, fractional_part = octal_str.split('.')
-            
+            integer_part, fractional_part = octal_str.split(".")
+
             # Convert integer part from octal to decimal
             decimal_integer = int(integer_part, 8)
             abs_decimal_integer = abs(decimal_integer)
-            
+
             # Convert fractional part from octal to decimal
             decimal_fractional = sum(
-                int(digit, 8) * (8 ** -(index + 1)) for index, digit in enumerate(fractional_part)
+                int(digit, 8) * (8 ** -(index + 1))
+                for index, digit in enumerate(fractional_part)
             )
             abs_decimal_fractional = abs(decimal_fractional)
-            
+
             # Combine the integer and fractional parts back into a single decimal number
             abs_decimal_number = abs_decimal_integer + abs_decimal_fractional
-            
+
             # Convert the absolute decimal number back to octal
             abs_octal_integer = oct(abs_decimal_integer)[2:]
-            
+
             # Convert the fractional part back to octal
             abs_octal_fractional = []
             fractional = abs_decimal_fractional
@@ -1790,9 +1818,9 @@ class Ui_Programmer_calculator(object):
                 fractional -= digit
                 if fractional == 0:
                     break
-            
+
             # Return the combined absolute octal string
-            return abs_octal_integer + '.' + ''.join(abs_octal_fractional)
+            return abs_octal_integer + "." + "".join(abs_octal_fractional)
         else:
             # Handle the integer-only case
             decimal_number = int(octal_str, 8)
@@ -1845,7 +1873,7 @@ class Ui_Programmer_calculator(object):
         Returns:
         str: The octal representation of the result after exponentiation.
         """
-        
+
         # Convert the octal string to a decimal number
         decimal_value = int(octal_str, 8)
 
@@ -2068,7 +2096,9 @@ class Ui_Programmer_calculator(object):
 
         # Define a helper function to convert decimal to binary
         def dec_to_bin(dec_int):
-            return bin(dec_int)[2:]  # Convert to binary without leading '0b' and remove padding
+            return bin(dec_int)[
+                2:
+            ]  # Convert to binary without leading '0b' and remove padding
 
         # Replace binary numbers with their decimal equivalents in the expression
         def replace_binary_with_decimal(expr):
@@ -2082,7 +2112,8 @@ class Ui_Programmer_calculator(object):
             "AND": lambda a, b: a & b,
             "OR": lambda a, b: a | b,
             "XOR": lambda a, b: a ^ b,
-            "NOT": lambda a: ~a & 0xFFFFFFFFFFFFFFFF,  # Ensure 64-bit representation for NOT
+            "NOT": lambda a: ~a
+            & 0xFFFFFFFFFFFFFFFF,  # Ensure 64-bit representation for NOT
         }
 
         # Replace binary numbers with decimal equivalents
@@ -2229,6 +2260,7 @@ class Ui_Programmer_calculator(object):
         return shifted_binary
 
     def evaluate_hex_expression(self, expression):
+        print("evaluate_hex_expression")
         # Regular expression to find hexadecimal numbers (e.g., A, FF)
         hex_pattern = re.compile(r"\b[0-9a-fA-F]+\b")
 
@@ -2239,21 +2271,12 @@ class Ui_Programmer_calculator(object):
         # Replace all hexadecimal numbers in the expression with their decimal equivalents
         decimal_expression = hex_pattern.sub(hex_to_dec, expression)
 
-        try:
-            # Evaluate the decimal expression
-            result = eval(decimal_expression)
-        except Exception as e:
-            return f"Error evaluating expression: {e}"
+        result = eval(decimal_expression)
 
         if isinstance(result, int):
-            # Handle negative results by converting to two's complement if necessary
             if result < 0:
-                # Assume a fixed 64-bit representation for all negative numbers
-                bits = 64
-
-                # Convert to two's complement form
-                result = (1 << bits) + result
-                hex_result = hex(result).upper()[2:]
+                # Convert the positive value to hexadecimal and add a negative sign
+                hex_result = '-' + hex(-result).upper()[2:]
             else:
                 # Convert the integer result back to hexadecimal
                 hex_result = hex(result).upper()[2:]
@@ -2264,7 +2287,7 @@ class Ui_Programmer_calculator(object):
             fractional_part = result - integer_part
 
             # Convert the integer part to hexadecimal
-            hex_integer_part = hex(integer_part).upper()[2:]
+            hex_integer_part = hex(abs(integer_part)).upper()[2:]
 
             # Convert the fractional part to hexadecimal
             hex_fractional_part = []
@@ -2273,30 +2296,36 @@ class Ui_Programmer_calculator(object):
                 hex_digit = int(fractional_part)
                 hex_fractional_part.append(hex(hex_digit).upper()[2:])
                 fractional_part -= hex_digit
-                if (
-                    len(hex_fractional_part) > 12
-                ):  # Limit precision to avoid infinite loops
+                if len(hex_fractional_part) > 12:  # Limit precision to avoid infinite loops
                     break
             hex_fractional_part = "".join(hex_fractional_part)
 
             # Combine both parts
-            hex_result = f"{hex_integer_part}.{hex_fractional_part}"
+            if hex_fractional_part:
+                hex_result = f"{hex_integer_part}.{hex_fractional_part}"
+            else:
+                hex_result = f"{hex_integer_part}"
+
+            if result < 0:
+                hex_result = '-' + hex_result
 
         return hex_result
 
     def hexidecimal_to_hexidecimal_64bit_segments(self, hex_number):
-        if not isinstance(hex_number, str):
-            return "Error: Input must be a hexadecimal string."
+        # Convert hex to integer
+        number = int(hex_number, 16)
 
-        try:
-            number = int(hex_number, 16)
-        except ValueError:
-            return "Error: Input must be a valid hexadecimal string."
+        # Handle negative numbers by calculating two's complement for 64 bits
+        if number < 0:
+            # Calculate two's complement for 64-bit numbers
+            number = (1 << 64) + number
 
+        # Special case for zero, with a single 16-bit segment
         if number == 0:
-            return ["0" * 16]  # Special case for zero, with a single 16-bit segment
+            return ["0" * 16]
 
-        binary_result = bin(number)[2:]  # Get binary representation without '0b' prefix
+        # Get binary representation without '0b' prefix
+        binary_result = bin(number)[2:]
 
         # Pad with leading zeros to make it 64 bits
         binary_result = binary_result.zfill(64)
