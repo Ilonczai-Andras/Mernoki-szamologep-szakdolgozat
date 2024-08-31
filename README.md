@@ -10,6 +10,9 @@ This project is an engineering calculator designed to help engineering universit
 
 It can be installed by running the installer file in the Engineering calculator folder. 
 But it requires python so you may want to install it first. The recommended version of python is 3.12.2.
+After installation, the exe is located in the Engineering calculator\build\exe.win-amd64-3.12 folder.
+![image](https://github.com/user-attachments/assets/6b3b23ed-f4db-4e8a-974a-80a54f4f5c39)
+
 
 ## Usage
 
