@@ -121,6 +121,523 @@ class Ui_Programmer_calculator(object):
         Programmer_calc.close()
         MainWindow.show()
 
+    def evaluate_expression(self):
+        screen = self.Result.text()
+        operation = screen  # Store the current operation
+
+        if self.comboBox_3.currentText() == "Decimális":
+            if "twos" in screen:
+                try:
+                    number = screen.split("twos ")[1]
+                    answer = self.twos_complement(number, 10)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log2")
+                    answer = self.log_from_decimal(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmikus!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_decimal(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmikus!")
+            elif "ABS" in screen:
+                try:
+                    print("#LOG: abs")
+                    if "." in screen:
+                        answer = abs(float((screen.split(" ")[1])))
+                    else:
+                        answer = abs(int((screen.split(" ")[1])))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif "int" in screen:
+                try:
+                    answer = int(
+                        self.round_down_number(
+                            screen.split("int")[1], "decimal"
+                        ).strip()
+                    )
+                    print("#LOG: kerekítés egészre")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kerekítés egészre!")
+            elif "ones" in screen:
+                try:
+                    answer = self.ones_complement(screen.split("ones")[1], 10)
+                    print("#LOG: egyes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen egyes komlemens!")
+            elif (not self.contain_logical(screen) and self.contains_sqrt(screen) and self.only_one_fact(screen) == 0):
+                try:
+                    answer = self.sqrt_func(screen, "decimal")
+                    print("#LOG: csak gyökvonás")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen gyökvonás!")
+            elif "<<" in screen or ">>" in screen:
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        num = screen.split("<<")[0]
+                        cnt = screen.split("<<")[1]
+                        answer = self.shift_left_func(cnt, num)
+                    if ">>" in screen:
+                        num = screen.split(">>")[0]
+                        cnt = screen.split(">>")[1]
+                        answer = self.shift_right_func(cnt, num)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
+            elif (self.contain_arithmetic(screen)and not self.contain_logical(screen)and self.only_one_fact(screen) == 0):
+                try:
+                    answer = eval(screen)
+                    print("#LOG: csak aritmetikai")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen aritmetikai müvelet!")
+            elif "FACT" in screen:
+                try:
+                    print("#LOG: FACT")
+                    answer = self.convert_and_factorize(screen.split("FACT")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen factorizáció!")
+            elif self.only_one_fact(screen) == 1 and "!" in screen:
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "decimal")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                try:
+                    print("#LOG: csak logikai")
+                    answer = self.logical_ops(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logikai!")
+            else:
+                try:
+                    print("#LOG: egyébként")
+                    answer = eval(screen)
+                except:
+                    self.Result.setText("ERROR!")
+                    answer = None
+            if answer is not None:
+                if isinstance(answer, float) and answer.is_integer():
+                    answer = int(answer)
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
+            if type(answer) is int:
+                binary_segments = self.decimal_to_decimal_64bit_segments(answer)
+                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
+            else:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
+        elif self.comboBox_3.currentText() == "Oktális":
+            answer = 0
+            if "twos" in screen:
+                print("#LOG: kettes komlemens")
+                try:
+                    number = screen.split(" ")[1]
+                    answer = self.twos_complement(number, 8)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "**-" in screen:
+                try:
+                    print("#LOG: negatív kitevőjű")
+                    number = screen.split("**")[0]
+                    kitevő = int(screen.split("**")[1])
+                    answer = self.power_octal(number, kitevő)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen negatív kitevőjű!")
+            elif "<<" in screen or ">>" in screen:
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        number = screen.split("<<")[0]
+                        shift_amount = int(screen.split("<<")[1])
+                        answer = self.shift_octal_custom("<<", shift_amount, number)
+                    if ">>" in screen:
+                        number = screen.split(">>")[0]
+                        shift_amount = int(screen.split(">>")[1])
+                        answer = self.shift_octal_custom(">>", shift_amount, number)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
+            elif "ABS" in screen:
+                try:
+                    print("#LOG: abs")
+                    answer = float(self.absolute_octal(screen.split(" ")[1]))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_octal(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen 2 alapú logaritmikus!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_octal(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen 10 alapú logaritmikus!")
+            elif self.only_one_fact(screen) == 1 and "!" in screen:
+                try:
+                    print("#LOG: faktoriális")
+                    answer = int(self.factorial(screen.split("!")[0], "octal"))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "int" in screen:
+                print("#LOG: kerekítés egészre")
+                try:
+                    answer = int(
+                        self.round_down_number(screen.split("int")[1], "octal").strip()
+                    )
+
+                    print("#LOG: kerekítés egészre")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kerekítés egészre!")
+            elif "ones" in screen:
+                try:
+                    number = screen.split(" ")[1]
+                    answer = self.ones_complement(number, 8)
+                    print("#LOG: egyes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen egyes komlemens!")
+            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                print("# Aritmetikus oktál")
+                try:
+                    if not "." in self.evaluate_octal_expression(screen):
+                        answer = int(self.evaluate_octal_expression(screen))
+                    else:
+                        answer = self.evaluate_octal_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen aritmetikai müvelet!")
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                print("#LOG: logikai oktál")
+                try:
+                    answer = int(self.evaluate_octal_logical_expression(screen))
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logikai müvelet!")
+            elif "FACT" in screen:
+                print("#LOG: faktorizáció")
+                try:
+                    answer = self.convert_and_factorize("0o" + screen.split("FACT")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktorizáció!")
+            else:
+                print("#LOG: egyéb")
+                try:
+                    answer = int(self.evaluate_octal_expression(screen))
+                except:
+                    self.Result.setText("ERROR nem oktális érték!")
+            if answer is not None:
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
+            if type(answer) is int:
+                octal_segments = self.octal_octal_to_64bit_segments(answer)
+                self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
+                self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
+            else:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
+        elif self.comboBox_3.currentText() == "Bináris":
+
+            answer = 0
+            if "twos" in screen:
+                try:
+                    number = screen.split(" ")[1]
+                    answer = self.twos_complement(number, 2)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif (self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen)):
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "binary")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "int" in screen:
+                try:
+                    answer = self.round_down_number(screen.split("int")[1], "binary").strip()
+                    print("#LOG: kerekítés egészre")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kerekítés egészre!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_binary(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_binary(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmus!")
+            elif "ABS" in screen:
+                print("#LOG: abszolut érték")
+                try:
+
+                    answer = self.abs_binary(screen.split(" ")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif "ones" in screen:
+                try:
+                    answer = self.ones_complement(screen.split("ones")[1], 2)
+                    print("#LOG: egyes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen egyes komlemens!")
+            elif "<<" in screen or ">>" in screen:
+                print("#LOG: shiftelés")
+                try:
+                    if "<<" in screen:
+                        number = screen.split("<<")[0]
+                        shift_amount = screen.split("<<")[1]
+                        answer = self.shift_binary_custom("<<", shift_amount, number)
+                    if ">>" in screen:
+                        number = screen.split(">>")[0]
+                        shift_amount = screen.split(">>")[1]
+                        answer = self.shift_binary_custom(">>", shift_amount, number)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen shiftelés!")
+            elif not self.contain_logical(screen) and self.contains_sqrt(screen):
+                print("#LOG: gyökvonás")
+                try:
+                    answer = self.sqrt_func(screen, "binary")
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen gyökvonás!")
+            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                print("#LOG: aritmetikai müvelet")
+                try:
+                    answer = self.evaluate_binary_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen aritmetikai!")
+            elif "FACT" in screen:
+                print("#LOG: faktorizáció")
+                try:
+                    answer = self.convert_and_factorize("0b" + screen.split("FACT")[1])
+                except:
+                    answer = None
+                    self.Result.setText("ERROR helytelen faktorizálás!")
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                print("#LOG: logikai")
+                try:
+                    answer = self.evaluate_binary_logical_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("ERROR: helytelen logikai kifejezés!")
+            else:
+                print("#LOG: egyéb")
+                try:
+                    answer = self.evaluate_binary_expression(screen)
+                except:
+                    self.Result.setText("ERROR nem bináris érték!")
+            if answer is not None and answer is not False:
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
+            if type(answer) is str and not "." in answer and answer is not False:
+                if type(answer) is str and not "." in answer and answer is not False:
+                    try:
+                        binary_segments = self.binary_tobinary_64bit_segments(answer)
+                        if binary_segments is False:
+                            raise ValueError("Error: Invalid binary input for 64-bit segmentation.")
+                    except Exception as e:
+                        print(e)
+                        self.Result.setText("Nem ábrázolható 64 bit-en!")
+                    else:
+                        self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                        self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                        self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                        self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
+            else:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
+        elif self.comboBox_3.currentText() == "Hexadecimális":
+
+            answer = 0
+            if "twos" in screen:
+                try:
+                    number = screen.split("twos ")[1]
+                    answer = self.twos_complement(number, 16)
+                    print("#LOG: kettes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kettes komlemens!")
+            elif "log2" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_hex(screen.split(" ")[1], 2)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "log" in screen:
+                try:
+                    print("#LOG: log")
+                    answer = self.log_from_hex(screen.split(" ")[1], 10)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logaritmus!")
+            elif "ABS" in screen:
+                try:
+
+                    answer = self.abs_hex(screen.split(" ")[1])
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen abs!")
+            elif (
+                self.only_one_fact(screen) == 1
+                and "!" in screen
+                and not self.contain_arithmetic(screen)
+            ):
+                try:
+                    print("#LOG: factorial")
+                    answer = self.factorial(screen.split("!")[0], "hexadecimal")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktoriális!")
+            elif "int" in screen:
+                try:
+                    answer = self.evaluate_hex_expression(
+                        self.round_down_number(screen.split("int")[1], "hex").strip()
+                    )
+                    print("#LOG: kerekítés egészre")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen kerekítés egészre!")
+            elif "ones" in screen:
+                try:
+                    number = screen.split(" ")[1]
+                    answer = self.ones_complement(number, 16)
+                    print("#LOG: egyes komlemens")
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen egyes komlemens!")
+            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
+                try:
+                    answer = self.evaluate_hex_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen artimetikai!")
+            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
+                try:
+                    answer = self.evaluate_logical_hex_expression(screen)
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen logikai!")
+            elif "FACT" in screen:
+                try:
+                    if screen.split("FACT")[1] != "0":
+                        answer = self.convert_and_factorize(
+                            "0x" + screen.split("FACT")[1]
+                        )
+                    else:
+                        answer = "0"
+                except:
+                    answer = None
+                    self.Result.setText("Helytelen faktorizáció!")
+            elif "<<" in screen or ">>" in screen:
+                if "<<" in screen:
+                    num = screen.split("<<")[0]
+                    cnt = screen.split("<<")[1]
+                    answer = self.hex_shift_left_func(cnt, num)
+                if ">>" in screen:
+                    num = screen.split(">>")[0]
+                    cnt = screen.split(">>")[1]
+                    answer = self.hex_shift_right_func(cnt, num)
+            else:
+                try:
+                    answer = self.evaluate_hex_expression(screen)
+                except:
+                    self.Result.setText("ERROR nem hexa érték!")
+
+            if answer is not None:
+                self.Result.setText(str(answer))
+
+                self.operations.append(f"{operation}")
+                self.update_operations_display()
+
+                self.operations2.append(f"{answer}")
+                self.update_operations_display2()
+
+            if (
+                isinstance(answer, str)
+                and not "." in answer
+                and not "*" in answer
+                and answer != "0"
+            ):
+                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
+                    str(answer)
+                )
+                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
+                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
+                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
+                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
+            else:
+                self.n8_63.setText(f"")
+                self.h2_47.setText(f"")
+                self.t6_31.setText(f"")
+                self.nulla_15.setText(f"")
+
     def set_to_null(self, list1, list2):
         for i in list1:
             i.setEnabled(True)
@@ -727,531 +1244,6 @@ class Ui_Programmer_calculator(object):
 
         return cnt
 
-    def evaluate_expression(self):
-        screen = self.Result.text()
-        operation = screen  # Store the current operation
-
-        if self.comboBox_3.currentText() == "Decimális":
-            if "twos" in screen:
-                try:
-                    number = screen.split("twos ")[1]
-                    answer = self.twos_complement(number, 10)
-                    print("#LOG: kettes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kettes komlemens!")
-            elif "log2" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_decimal(screen.split(" ")[1], 2)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "log" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_decimal(screen.split(" ")[1], 10)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "ABS" in screen:
-                try:
-                    print("#LOG: abs")
-                    if "." in screen:
-                        answer = abs(float((screen.split(" ")[1])))
-                    else:
-                        answer = abs(int((screen.split(" ")[1])))
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen abs!")
-            elif "int" in screen:
-                try:
-                    answer = int(
-                        self.round_down_number(
-                            screen.split("int")[1], "decimal"
-                        ).strip()
-                    )
-                    print("#LOG: kerekítés egészre")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kerekítés egészre!")
-            elif "ones" in screen:
-                try:
-                    answer = self.ones_complement(screen.split("ones")[1], 10)
-                    print("#LOG: egyes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen egyes komlemens!")
-            elif (
-                not self.contain_logical(screen)
-                and self.contains_sqrt(screen)
-                and self.only_one_fact(screen) == 0
-            ):
-                try:
-                    answer = self.sqrt_func(screen, "decimal")
-                    print("#LOG: csak gyökvonás")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen gyökvonás!")
-            elif "<<" in screen or ">>" in screen:
-                print("#LOG: shiftelés")
-                try:
-                    if "<<" in screen:
-                        num = screen.split("<<")[0]
-                        cnt = screen.split("<<")[1]
-                        answer = self.shift_left_func(cnt, num)
-                    if ">>" in screen:
-                        num = screen.split(">>")[0]
-                        cnt = screen.split(">>")[1]
-                        answer = self.shift_right_func(cnt, num)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen shiftelés!")
-            elif (
-                self.contain_arithmetic(screen)
-                and not self.contain_logical(screen)
-                and self.only_one_fact(screen) == 0
-            ):
-                try:
-                    answer = eval(screen)
-                    print("#LOG: csak aritmetikai")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen aritmetikai müvelet!")
-            elif "FACT" in screen:
-                try:
-                    print("#LOG: FACT")
-                    answer = self.convert_and_factorize(screen.split("FACT")[1])
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen factorizáció!")
-            elif self.only_one_fact(screen) == 1 and "!" in screen:
-                try:
-                    print("#LOG: factorial")
-                    answer = self.factorial(screen.split("!")[0], "decimal")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                try:
-                    print("#LOG: csak logikai")
-                    answer = self.logical_ops(screen)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen logikai!")
-            else:
-                try:
-                    print("#LOG: egyébként")
-                    answer = eval(screen)
-                except:
-                    self.Result.setText("ERROR!")
-                    answer = None
-
-            if answer is not None:
-                self.Result.setText(str(answer))
-
-                self.operations.append(f"{operation}")
-                self.update_operations_display()
-
-                self.operations2.append(f"{answer}")
-                self.update_operations_display2()
-
-            if type(answer) is int:
-                binary_segments = self.decimal_to_decimal_64bit_segments(answer)
-                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
-                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
-                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
-            else:
-                self.n8_63.setText(f"")
-                self.h2_47.setText(f"")
-                self.t6_31.setText(f"")
-                self.nulla_15.setText(f"")
-        elif self.comboBox_3.currentText() == "Oktális":
-            answer = 0
-            if "twos" in screen:
-                print("#LOG: kettes komlemens")
-                try:
-                    number = screen.split(" ")[1]
-                    answer = self.twos_complement(number, 8)
-                    print("#LOG: kettes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kettes komlemens!")
-            elif "**-" in screen:
-                try:
-                    print("#LOG: negatív kitevőjű")
-                    number = screen.split("**")[0]
-                    kitevő = int(screen.split("**")[1])
-                    answer = self.power_octal(number, kitevő)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen negatív kitevőjű!")
-            elif "<<" in screen or ">>" in screen:
-                print("#LOG: shiftelés")
-                try:
-                    if "<<" in screen:
-                        number = screen.split("<<")[0]
-                        shift_amount = int(screen.split("<<")[1])
-                        answer = self.shift_octal_custom("<<", shift_amount, number)
-                    if ">>" in screen:
-                        number = screen.split(">>")[0]
-                        shift_amount = int(screen.split(">>")[1])
-                        answer = self.shift_octal_custom(">>", shift_amount, number)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen shiftelés!")
-            elif "ABS" in screen:
-                try:
-                    print("#LOG: abs")
-                    answer = float(self.absolute_octal(screen.split(" ")[1]))
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen abs!")
-            elif "log2" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_octal(screen.split(" ")[1], 2)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen 2 alapú logaritmikus!")
-            elif "log" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_octal(screen.split(" ")[1], 10)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen 10 alapú logaritmikus!")
-            elif self.only_one_fact(screen) == 1 and "!" in screen:
-                try:
-                    print("#LOG: faktoriális")
-                    answer = int(self.factorial(screen.split("!")[0], "octal"))
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "int" in screen:
-                print("#LOG: kerekítés egészre")
-                try:
-                    answer = int(
-                        self.round_down_number(screen.split("int")[1], "octal").strip()
-                    )
-
-                    print("#LOG: kerekítés egészre")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kerekítés egészre!")
-            elif "ones" in screen:
-                try:
-                    number = screen.split(" ")[1]
-                    answer = self.ones_complement(number, 8)
-                    print("#LOG: egyes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen egyes komlemens!")
-            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                print("# Aritmetikus oktál")
-                try:
-                    if not "." in self.evaluate_octal_expression(screen):
-                        answer = int(self.evaluate_octal_expression(screen))
-                    else:
-                        answer = self.evaluate_octal_expression(screen)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen aritmetikai müvelet!")
-            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                print("#LOG: logikai oktál")
-                try:
-                    answer = int(self.evaluate_octal_logical_expression(screen))
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen logikai müvelet!")
-            elif "FACT" in screen:
-                print("#LOG: faktorizáció")
-                try:
-                    answer = self.convert_and_factorize("0o" + screen.split("FACT")[1])
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktorizáció!")
-            else:
-                print("#LOG: egyéb")
-                try:
-                    answer = int(self.evaluate_octal_expression(screen))
-                except:
-                    self.Result.setText("ERROR nem oktális érték!")
-            if answer is not None:
-                self.Result.setText(str(answer))
-
-                self.operations.append(f"{operation}")
-                self.update_operations_display()
-
-                self.operations2.append(f"{answer}")
-                self.update_operations_display2()
-            if type(answer) is int:
-                octal_segments = self.octal_octal_to_64bit_segments(answer)
-                self.n8_63.setText(f"64 {self.format_binary(octal_segments[1])} 48")
-                self.h2_47.setText(f"47 {self.format_binary(octal_segments[2])} 32")
-                self.t6_31.setText(f"31 {self.format_binary(octal_segments[2])} 16")
-                self.nulla_15.setText(f"15 {self.format_binary(octal_segments[3])} 0")
-            else:
-                self.n8_63.setText(f"")
-                self.h2_47.setText(f"")
-                self.t6_31.setText(f"")
-                self.nulla_15.setText(f"")
-        elif self.comboBox_3.currentText() == "Bináris":
-
-            answer = 0
-            if "twos" in screen:
-                try:
-                    number = screen.split(" ")[1]
-                    answer = self.twos_complement(number, 2)
-                    print("#LOG: kettes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kettes komlemens!")
-            elif (self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen)):
-                try:
-                    print("#LOG: factorial")
-                    answer = self.factorial(screen.split("!")[0], "binary")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "int" in screen:
-                try:
-                    answer = self.round_down_number(screen.split("int")[1], "binary").strip()
-                    print("#LOG: kerekítés egészre")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kerekítés egészre!")
-            elif "log2" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_binary(screen.split(" ")[1], 2)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "log" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_binary(screen.split(" ")[1], 10)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen logaritmus!")
-            elif "ABS" in screen:
-                print("#LOG: abszolut érték")
-                try:
-
-                    answer = self.abs_binary(screen.split(" ")[1])
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen abs!")
-            elif "ones" in screen:
-                try:
-                    answer = self.ones_complement(screen.split("ones")[1], 2)
-                    print("#LOG: egyes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen egyes komlemens!")
-            elif "<<" in screen or ">>" in screen:
-                print("#LOG: shiftelés")
-                try:
-                    if "<<" in screen:
-                        number = screen.split("<<")[0]
-                        shift_amount = screen.split("<<")[1]
-                        answer = self.shift_binary_custom("<<", shift_amount, number)
-                    if ">>" in screen:
-                        number = screen.split(">>")[0]
-                        shift_amount = screen.split(">>")[1]
-                        answer = self.shift_binary_custom(">>", shift_amount, number)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen shiftelés!")
-            elif not self.contain_logical(screen) and self.contains_sqrt(screen):
-                print("#LOG: gyökvonás")
-                try:
-                    answer = self.sqrt_func(screen, "binary")
-                except:
-                    answer = None
-                    self.Result.setText("ERROR helytelen gyökvonás!")
-            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                print("#LOG: aritmetikai müvelet")
-                try:
-                    answer = self.evaluate_binary_expression(screen)
-                except:
-                    answer = None
-                    self.Result.setText("ERROR helytelen aritmetikai!")
-            elif "FACT" in screen:
-                print("#LOG: faktorizáció")
-                try:
-                    answer = self.convert_and_factorize("0b" + screen.split("FACT")[1])
-                except:
-                    answer = None
-                    self.Result.setText("ERROR helytelen faktorizálás!")
-            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                print("#LOG: logikai")
-                try:
-                    answer = self.evaluate_binary_logical_expression(screen)
-                except:
-                    answer = None
-                    self.Result.setText("ERROR: helytelen logikai kifejezés!")
-            else:
-                print("#LOG: egyéb")
-                try:
-                    answer = self.evaluate_binary_expression(screen)
-                except:
-                    self.Result.setText("ERROR nem bináris érték!")
-            if answer is not None and answer is not False:
-                self.Result.setText(str(answer))
-
-                self.operations.append(f"{operation}")
-                self.update_operations_display()
-
-                self.operations2.append(f"{answer}")
-                self.update_operations_display2()
-            if type(answer) is str and not "." in answer and answer is not False:
-                if type(answer) is str and not "." in answer and answer is not False:
-                    try:
-                        binary_segments = self.binary_tobinary_64bit_segments(answer)
-                        if binary_segments is False:
-                            raise ValueError("Error: Invalid binary input for 64-bit segmentation.")
-                    except Exception as e:
-                        print(e)
-                        self.Result.setText("Nem ábrázolható 64 bit-en!")
-                    else:
-                        self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
-                        self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
-                        self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-                        self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
-            else:
-                self.n8_63.setText(f"")
-                self.h2_47.setText(f"")
-                self.t6_31.setText(f"")
-                self.nulla_15.setText(f"")
-        elif self.comboBox_3.currentText() == "Hexadecimális":
-
-            answer = 0
-            if "twos" in screen:
-                try:
-                    number = screen.split("twos ")[1]
-                    answer = self.twos_complement(number, 16)
-                    print("#LOG: kettes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kettes komlemens!")
-            elif "log2" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_hex(screen.split(" ")[1], 2)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "log" in screen:
-                try:
-                    print("#LOG: log")
-                    answer = self.log_from_hex(screen.split(" ")[1], 10)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen logaritmus!")
-            elif "ABS" in screen:
-                try:
-
-                    answer = self.abs_hex(screen.split(" ")[1])
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen abs!")
-            elif (
-                self.only_one_fact(screen) == 1
-                and "!" in screen
-                and not self.contain_arithmetic(screen)
-            ):
-                try:
-                    print("#LOG: factorial")
-                    answer = self.factorial(screen.split("!")[0], "hexadecimal")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktoriális!")
-            elif "int" in screen:
-                try:
-                    answer = self.evaluate_hex_expression(
-                        self.round_down_number(screen.split("int")[1], "hex").strip()
-                    )
-                    print("#LOG: kerekítés egészre")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen kerekítés egészre!")
-            elif "ones" in screen:
-                try:
-                    number = screen.split(" ")[1]
-                    answer = self.ones_complement(number, 16)
-                    print("#LOG: egyes komlemens")
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen egyes komlemens!")
-            elif self.contain_arithmetic(screen) and not self.contain_logical(screen):
-                try:
-                    answer = self.evaluate_hex_expression(screen)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen artimetikai!")
-            elif not self.contain_arithmetic(screen) and self.contain_logical(screen):
-                try:
-                    answer = self.evaluate_logical_hex_expression(screen)
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen logikai!")
-            elif "FACT" in screen:
-                try:
-                    if screen.split("FACT")[1] != "0":
-                        answer = self.convert_and_factorize(
-                            "0x" + screen.split("FACT")[1]
-                        )
-                    else:
-                        answer = "0"
-                except:
-                    answer = None
-                    self.Result.setText("Helytelen faktorizáció!")
-            elif "<<" in screen or ">>" in screen:
-                if "<<" in screen:
-                    num = screen.split("<<")[0]
-                    cnt = screen.split("<<")[1]
-                    answer = self.hex_shift_left_func(cnt, num)
-                if ">>" in screen:
-                    num = screen.split(">>")[0]
-                    cnt = screen.split(">>")[1]
-                    answer = self.hex_shift_right_func(cnt, num)
-            else:
-                try:
-                    answer = self.evaluate_hex_expression(screen)
-                except:
-                    self.Result.setText("ERROR nem hexa érték!")
-
-            if answer is not None:
-                self.Result.setText(str(answer))
-
-                self.operations.append(f"{operation}")
-                self.update_operations_display()
-
-                self.operations2.append(f"{answer}")
-                self.update_operations_display2()
-
-            if (
-                isinstance(answer, str)
-                and not "." in answer
-                and not "*" in answer
-                and answer != "0"
-            ):
-                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
-                    str(answer)
-                )
-                self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
-                self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
-                self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
-                self.nulla_15.setText(f"15 {self.format_binary(binary_segments[3])}  0")
-            else:
-                self.n8_63.setText(f"")
-                self.h2_47.setText(f"")
-                self.t6_31.setText(f"")
-                self.nulla_15.setText(f"")
-
     def twos_complement(self, number: str, base: int) -> str:
         # Convert the input number to an integer
         if base == 2:
@@ -1277,7 +1269,7 @@ class Ui_Programmer_calculator(object):
             elif base == 8:
                 result = oct(twos_complement_int)[3:].zfill(64 // 3)  # Remove the '0o' prefix and pad with zeros
             elif base == 10:
-                result = str(twos_complement_int)  # No prefix for decimal
+                result = str(twos_complement_int)[1:] # No prefix for decimal
             elif base == 16:
                 result = hex(twos_complement_int)[3:].upper().zfill(64 // 4)  # Remove the '0x' prefix and pad with zeros
         else:
@@ -1330,10 +1322,9 @@ class Ui_Programmer_calculator(object):
         return result
 
     def round_down_number(self, number: str, mode: str) -> str:
-        if mode not in {"binary", "decimal", "octal", "hex"}:
-            raise ValueError(
-                "Invalid mode. Choose from 'binary', 'decimal', 'octal', or 'hex'."
-            )
+        # Check if the input number is valid
+        if number.replace("-", "").replace(".", "").isdigit():
+            raise ValueError("Invalid input: number must contain only digits and at most one decimal point.")
 
         negative = number.startswith("-")
         if negative:
@@ -1350,10 +1341,6 @@ class Ui_Programmer_calculator(object):
         return integer_part
 
     def shift_left_func(self, num: str, number: str):
-        # Ensure the input number is an integer
-        if not number.isdigit():
-            return f"{number}: a megadott érték nem egész szám"
-
         # Calculate the new number by shifting to the left
         new_number = int(number) << int(num)
 
@@ -1361,10 +1348,6 @@ class Ui_Programmer_calculator(object):
         return new_number
 
     def shift_right_func(self, num: str, number: str):
-        # Ensure the input number is an integer
-        if not number.isdigit():
-            return f"{number}: a megadott érték nem egész szám"
-
         # Calculate the new number by shifting to the right
         new_number = int(number) >> int(num)
 
@@ -1974,20 +1957,16 @@ class Ui_Programmer_calculator(object):
         Returns:
         float: The logarithm of the decimal number.
         """
-        try:
-            # Convert the decimal string to a float
-            decimal_value = float(decimal_str)
+        # Convert the decimal string to a float
+        decimal_value = float(decimal_str)
 
-            # Check for valid base
-            if base not in [2, 10]:
-                return "Invalid base. Only base 2 and base 10 are supported."
+        # Check for valid base
+        if base not in [2, 10]:
+            return "Invalid base. Only base 2 and base 10 are supported."
 
-            # Calculate the logarithm of the decimal value
-            log_value = math.log(decimal_value, base)
-
-            return log_value
-        except ValueError:
-            return "Helytelen decimális logaritmus számolás!"
+        # Calculate the logarithm of the decimal value
+        log_value = math.log(decimal_value, base)
+        return log_value
 
     def log_from_octal(self, octal_str, base=10):
         """
@@ -2352,14 +2331,6 @@ class Ui_Programmer_calculator(object):
             .replace("AND", "&")
             .replace("NOT", "~")
         )
-
-        # Final check to ensure the string contains only integers and allowed operators
-        if not re.fullmatch(r"[0-9&|^~() ]+", string):
-            return (
-                string
-                + ": The string contains invalid characters or floating-point numbers."
-            )
-
         return eval(string)
 
     def bin_to_dec(self, binary_str):
