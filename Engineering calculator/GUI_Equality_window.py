@@ -61,9 +61,9 @@ class Ui_Equation(object):
             r"\babs\b": "",
             # sign(x)
             r"\bsign\b": "",
-            # gyok
+            # sqrt
             r"\bsqrt\b": "",
-            # szekánsok
+            # secant and cosecant
             r"\bsec\b": "",
             r"\bcsc\b": "",
         }
@@ -74,13 +74,13 @@ class Ui_Equation(object):
         return func_str
 
     def extract_variable(self, expression):
-        valtozok = []
+        variables = []
 
         for i in expression:
-            if i not in valtozok and i.isalpha():
-                valtozok.append(i.lower())
+            if i not in variables and i.isalpha():
+                variables.append(i.lower())
 
-        return valtozok
+        return variables
 
     def number_of_lines(self, expression):
         res = []
@@ -114,7 +114,7 @@ class Ui_Equation(object):
                 numbers.add(rhs)
 
     def system_of_equations(self, funcs):
-        print("#LOG egyenlet rendszerek")
+        print("#LOG system of equations")
         number_of_rows = funcs.pop()
 
         symbols_set = set()
@@ -146,10 +146,12 @@ class Ui_Equation(object):
 
         # Check if the solution is a dictionary and format it
         if isinstance(solution, dict):
+            print("Solution is a dictionary")
             formatted_solution = "\n".join(
                 [f"{str(key)} = {str(value)}" for key, value in solution.items()]
             )
         if isinstance(solution, list) and all(isinstance(item, tuple) for item in solution):
+            print("Solution is a list")
             formatted_solution = "\n".join(
                 [f"({', '.join(map(str, item))})" for item in solution]
             )
@@ -217,7 +219,8 @@ class Ui_Equation(object):
         number_of_rows = self.number_of_lines(function_text)
         inequality = ["<=", ">=", "<", ">", "="]
 
-        if input_text == "Egyenlet":
+        if input_text == "Equation":
+            print("#LOG Equation")
             try:
                 self.canvas.show()
                 if len(number_of_rows) == 2:
@@ -230,10 +233,10 @@ class Ui_Equation(object):
                             self.canvas.clear((-10, 10), (-10, 10))
                             self.canvas.plotted_functions = []
                             lhs, rhs = function_text.split(ineq)
-                            self.canvas.plot_function(lhs, (-10, 10), clear=False)
-                            self.canvas.store_function(lhs, (-10, 10), self.canvas.interval_y, None, False, "")
-                            self.canvas.plot_function(rhs, (-10, 10), clear=False)
-                            self.canvas.store_function(rhs, (-10, 10), self.canvas.interval_y, None, False, "")
+                            self.canvas.plot_function(lhs, (-10, 10), (-10, 10), clear=False)
+                            self.canvas.store_function(lhs, (-10, 10), (-10, 10), None, False, "")
+                            self.canvas.plot_function(rhs, (-10, 10), (-10, 10), clear=False)
+                            self.canvas.store_function(rhs, (-10, 10), (-10, 10), None, False, "")
 
                             # Separate real and complex numbers
                             # real_common_area = [float(val) for val in self.common_area if val.is_real]
@@ -243,25 +246,27 @@ class Ui_Equation(object):
                             # self.canvas.plot_area_between_functions(real_common_area)
                             # if complex_common_area:
                             #     print(f"Complex solutions: {complex_common_area}")  # Handle complex solutions if needed
-                            # break
+                            break
                 else:
-                    self.label_2.setText("Egy sort adj meg")
+                    self.label_2.setText("Provide a single line")
                     self.text_edit.setText("")
             except Exception as e:
-                self.label_2.setText("ERROR: helytelen egyenlet, adj meg újat!")
+                self.label_2.setText("ERROR: incorrect equation, please provide a new one!")
                 self.canvas.hide()
-        if input_text == "Egyenletrendszerek":
+        if input_text == "System of Equations":
+            print("#LOG System of Equations")
             self.canvas.hide()
             try:
                 if len(number_of_rows)-1 >= 2:
                     formatted_solution = self.system_of_equations(number_of_rows)
                     self.label_2.setText(formatted_solution)
                 else:
-                    self.label_2.setText("Több egyenletet adj meg!")
+                    self.label_2.setText("Provide more equations!")
                     self.text_edit.setText("")
             except Exception as e:
-                self.label_2.setText("ERROR: helytelen egyenletrendszer, adj meg újat!")
-        if input_text == "Fourier transzformált":
+                self.label_2.setText("ERROR: incorrect system of equations, please provide a new one!")
+        if input_text == "Fourier Transform":
+            print("#LOG Fourier Transform")
             if len(number_of_rows) == 2:
                 t, x = symbols("t x")
                 self.canvas.hide()
@@ -269,51 +274,50 @@ class Ui_Equation(object):
                     input_function = sympify(function_text)
                     ft = fourier_transform(input_function, t, x)
                     result = str(ft)
-                    print(result)
                     if not isinstance(ft, FourierTransform) and result != "0":
                         self.label_2.setText(result)
                         self.label_2.setText(result)
                         self.canvas.clear((-10, 10), (-10, 10))
                         self.canvas.plotted_functions = []
-                        self.canvas.plot_function(result, (-10, 10), clear=False)
+                        self.canvas.plot_function(result, (-10, 10), (-10, 10), clear=False)
                         self.canvas.store_function(
                             result, (-10, 10), self.canvas.interval_y, None, False, ""
                         )
                     else:
-                        self.label_2.setText("Nem számolható fourier")
+                        self.label_2.setText("Fourier transform cannot be computed")
                 except SympifyError as e:
                     self.label_2.setText("Invalid function for Fourier transform")
                     print(f"Sympify error: {e}")
             else:
                 self.canvas.hide()
-                self.label_2.setText("Egy sort adj meg")
+                self.label_2.setText("Provide a single line")
                 self.text_edit.setText("")
-        if input_text == "Fourier sor":
+        if input_text == "Fourier Series":
+            print("#LOG Fourier Series")
             self.canvas.show()
             if len(number_of_rows) == 2:
                 try:
                     input_function = sympify(function_text)
                     series = fourier_series(input_function)
                     result = str(series.truncate())
-                    print(result)
                     self.label_2.setText(result)
                     self.canvas.clear((-10, 10), (-10, 10))
                 
                     self.canvas.plotted_functions = []
-                    self.canvas.plot_function(result, (-10, 10), clear=False)
-                    self.canvas.store_function(result, (-10, 10), self.canvas.interval_y, None, False, "")
+                    self.canvas.plot_function(result, (-10, 10), (-10, 10), clear=False)
+                    self.canvas.store_function(result, (-10, 10),(-10, 10), self.canvas.interval_y, None, False, "")
                 except:
-                    self.label_2.setText("Invalid függvény a fourier sornak")
+                    self.label_2.setText("Invalid function for Fourier series")
                     self.text_edit.setText("")
             else:
-                self.label_2.setText("Egy sort adj meg")
+                self.label_2.setText("Provide a single line")
                 self.text_edit.setText("")
 
-    def back_to_mainwindow(self, Egyenlet, MainWindow):
-        Egyenlet.close()
+    def back_to_mainwindow(self, Equation, MainWindow):
+        Equation.close()
         MainWindow.show()
 
-    def applyStylesheet(self, Egyenlet):
+    def applyStylesheet(self, Equation):
         stylesheet = """
         QMainWindow {
             background-color: #2E2E2E;
@@ -361,15 +365,15 @@ class Ui_Equation(object):
             background-color: #6E6E6E;
         }
         """
-        Egyenlet.setStyleSheet(stylesheet)
+        Equation.setStyleSheet(stylesheet)
 
-    def setupUi(self, Egyenlet, MainWindow):
-        self.applyStylesheet(Egyenlet)
-        Egyenlet.setObjectName("Egyenlet")
-        Egyenlet.resize(800, 760)
-        Egyenlet.setMinimumSize(QtCore.QSize(800, 760))
-        Egyenlet.setMaximumSize(QtCore.QSize(800, 760))
-        self.centralwidget = QtWidgets.QWidget(Egyenlet)
+    def setupUi(self, Equation, MainWindow):
+        self.applyStylesheet(Equation)
+        Equation.setObjectName("Equation")
+        Equation.resize(800, 760)
+        Equation.setMinimumSize(QtCore.QSize(800, 760))
+        Equation.setMaximumSize(QtCore.QSize(800, 760))
+        self.centralwidget = QtWidgets.QWidget(Equation)
         self.centralwidget.setObjectName("centralwidget")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setGeometry(QtCore.QRect(10, 10, 291, 51))
@@ -406,7 +410,7 @@ class Ui_Equation(object):
 
         self.pushButton_2 = QtWidgets.QPushButton(
             self.centralwidget,
-            clicked=lambda: self.back_to_mainwindow(Egyenlet, MainWindow),
+            clicked=lambda: self.back_to_mainwindow(Equation, MainWindow),
         )
         self.pushButton_2.setGeometry(QtCore.QRect(714, 690, 75, 51))
         self.pushButton_2.setObjectName("pushButton_2")
@@ -415,37 +419,37 @@ class Ui_Equation(object):
         self.text_edit.setGeometry(310, 10, 391, 102)
         self.text_edit.setObjectName("text_edit")
 
-        Egyenlet.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(Egyenlet)
+        Equation.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(Equation)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
-        Egyenlet.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(Egyenlet)
+        Equation.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(Equation)
         self.statusbar.setObjectName("statusbar")
-        Egyenlet.setStatusBar(self.statusbar)
+        Equation.setStatusBar(self.statusbar)
 
-        self.retranslateUi(Egyenlet)
-        QtCore.QMetaObject.connectSlotsByName(Egyenlet)
+        self.retranslateUi(Equation)
+        QtCore.QMetaObject.connectSlotsByName(Equation)
 
-    def retranslateUi(self, Egyenlet):
+    def retranslateUi(self, Equation):
         _translate = QtCore.QCoreApplication.translate
-        Egyenlet.setWindowTitle(_translate("Egyenlet", "Egyenletek"))
-        self.comboBox.setItemText(0, _translate("Egyenlet", "Egyenlet"))
-        self.comboBox.setItemText(1, _translate("Egyenlet", "Egyenletrendszerek"))
-        #self.comboBox.setItemText(2, _translate("Egyenlet", "Fourier transzformált"))
-        self.comboBox.setItemText(2, _translate("Egyenlet", "Fourier sor"))
-        self.label_2.setText(_translate("Egyenlet", "Eredmény"))
-        self.pushButton.setText(_translate("Egyenlet", "Enter"))
-        self.pushButton_2.setText(_translate("Egyenlet", "Vissza"))
-        self.label_2.setText(_translate("Egyenlet", "Eredmény"))
+        Equation.setWindowTitle(_translate("Equation", "Equations"))
+        self.comboBox.setItemText(0, _translate("Equation", "Equation"))
+        self.comboBox.setItemText(1, _translate("Equation", "System of Equations"))
+        #self.comboBox.setItemText(2, _translate("Equation", "Fourier Transform"))
+        self.comboBox.setItemText(2, _translate("Equation", "Fourier Series"))
+        self.label_2.setText(_translate("Equation", "Result"))
+        self.pushButton.setText(_translate("Equation", "Enter"))
+        self.pushButton_2.setText(_translate("Equation", "Back"))
+        self.label_2.setText(_translate("Equation", "Result"))
 
 
 if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    Egyenlet = QtWidgets.QMainWindow()
+    Equation = QtWidgets.QMainWindow()
     ui = Ui_Equation()
-    ui.setupUi(Egyenlet)
-    Egyenlet.show()
+    ui.setupUi(Equation)
+    Equation.show()
     sys.exit(app.exec_())
