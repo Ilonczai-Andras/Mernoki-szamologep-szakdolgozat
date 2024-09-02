@@ -147,7 +147,7 @@ class Ui_Calculus(object):
                     else:
                         felso = int(self.lineEdit_3.text())
                 except:
-                    self.label_2.setText("ERROR rossz határ megadás pi-vel")
+                    self.label_2.setText("ERROR: incorrect boundary provided with pi")
                     self.lineEdit_2.setText("-10")
                     self.lineEdit_3.setText("10")
                 interval = (also, felso)
@@ -177,7 +177,7 @@ class Ui_Calculus(object):
                     felso = float(felso)
                 interval = (also, felso)
             else:
-                self.label_2.setText("ERROR: nem jó határok")
+                self.label_2.setText("ERROR: invalid boundaries")
                 self.lineEdit_2.setText("-10")
                 self.lineEdit_3.setText("10")
                 also = -10
@@ -188,119 +188,128 @@ class Ui_Calculus(object):
         input = self.comboBox.currentText()
         text = self.lineEdit.text()
         x = Symbol("x", real=True)
+
+        print(f"input '{input}' {input == "Strictly increasing"}")
         
-        if input == "Növekvő":
+        if input == "Increasing":
+            print("#LOG Increasing")
             try:
                 res = is_increasing(sympify(self.replace_sympy_funcs(text)), Interval(also,felso))
                 if res == True:
-                    self.label_2.setText(text + " növekvő")
+                    self.label_2.setText(text + " increasing")
                 elif res == False:
-                    self.label_2.setText(text + " nem növekvő")
+                    self.label_2.setText(text + " not increasing")
                 else:
-                    self.label_2.setText("Nem végrehajtható müvelet!")
+                    self.label_2.setText("Operation cannot be performed!")
                 result = self.canvas.plot_function(func_str=text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Növekvő függvény!")
+                self.label_2.setText("ERROR: incorrect increasing function!")
 
-        if input == "Szigorúan növekvő":
+        if input == "Strictly Increasing":
+            print("#LOG Strictly increasing")
             try:
                 res = is_strictly_increasing(
                     sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
                 )
                 if res == True:
-                    self.label_2.setText(text + " szigorúan növekvő")
+                    self.label_2.setText(text + " strictly increasing")
                 elif res == False:
-                    self.label_2.setText(text + " szigorúan nem növekvő")
+                    self.label_2.setText(text + " strictly not increasing")
                 else:
-                    self.label_2.setText("Nem végrehajtható müvelet!")
+                    self.label_2.setText("Operation cannot be performed!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Szigorúan növekvő függvény!")
+                self.label_2.setText("ERROR: incorrect strictly increasing function!")
 
-        if input == "Csökkenő":
+        if input == "Decreasing":
+            print("#LOG Decreasing")
             try:
                 res = is_decreasing(
                     sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
                 )
                 if res == True:
-                    self.label_2.setText(text + " Csökkenő")
+                    self.label_2.setText(text + " decreasing")
                 elif res == False:
-                    self.label_2.setText(text + " nem csökkenő")
+                    self.label_2.setText(text + " not decreasing")
                 else:
-                    self.label_2.setText("Nem végrehajtható müvelet!")
+                    self.label_2.setText("Operation cannot be performed!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Csökkenő függvény!")
+                self.label_2.setText("ERROR: incorrect decreasing function!")
 
-        if input == "Szigorúan csökkenő":
+        if input == "Strictly Decreasing":
+            print("#LOG Strictly decreasing")
             try:
                 res = is_strictly_decreasing(
                     sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
                 )
                 print(res)
                 if res == True:
-                    self.label_2.setText(text + " szigorúan csökkenő")
+                    self.label_2.setText(text + " strictly decreasing")
                 elif res == False:
-                    self.label_2.setText(text + " szigorúan nem csökkenő")
+                    self.label_2.setText(text + " strictly not decreasing")
                 else:
-                    self.label_2.setText("Nem végrehajtható müvelet!")
+                    self.label_2.setText("Operation cannot be performed!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Szigorúan csökkenő függvény!")
+                self.label_2.setText("ERROR: incorrect strictly decreasing function!")
 
-        if input == "Monoton":
+        if input == "Monotonic":
+            print("#LOG Monotonic")
             try:
                 res = is_monotonic(
                     sympify(self.replace_sympy_funcs(text)), Interval(also, felso)
                 )
                 if res == True:
-                    self.label_2.setText(text + " Monoton")
+                    self.label_2.setText(text + " Monotonic")
                 elif res == False:
-                    self.label_2.setText(text + " nem monoton")
+                    self.label_2.setText(text + " not monotonic")
                 else:
-                    self.label_2.setText("Nem végrehajtható müvelet!")
+                    self.label_2.setText("Operation cannot be performed!")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Monoton függvény!")
+                self.label_2.setText("ERROR: incorrect monotonic function!")
 
-        if input == "Divergens":
+        if input == "Divergent":
+            print("#LOG Divergent")
             try:
                 exp = sympify(text)
                 x = Symbol("x")
                 res = limit(exp, x, oo)
                 if res == oo or res == -oo:
-                    self.label_2.setText(text + " Divergens")
+                    self.label_2.setText(text + " Divergent")
                 else:
-                    self.label_2.setText(text + " Nem divergens")
+                    self.label_2.setText(text + " not divergent")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Divergens függvény!")
+                self.label_2.setText("ERROR: incorrect divergent function!")
             
-        if input == "Határérték":
+        if input == "Limit":
+            print("#LOG Limit")
             try:
                 if self.has_no_variables(text):
                     self.label_2.setText(text + " -> " + str(eval(text)))
@@ -314,29 +323,30 @@ class Ui_Calculus(object):
                         self.label_2.setText(text + " -> " + str(res).replace("AccumBounds", ""))
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Határérték függvény!")
+                self.label_2.setText("ERROR: incorrect limit function!")
         #javít
         if input == "Konvergens":
             try:
                 res = Sum(self.replace_sympy_funcs(text), (x, -oo, oo)).is_convergent()
                 print(res)
                 if res:
-                    self.label_2.setText(text + " a sorozat konvergál.")
+                    self.label_2.setText(text + " the series converges")
                 else:
-                    self.label_2.setText(text + " a sorozat nem konvergál.")
+                    self.label_2.setText(text + " the series does not converge")
                 result = self.canvas.plot_function(text, interval_x=interval, interval_y=interval)
                 if result == False:
-                    self.label_2.setText("ERROR: hibás függvény!")
+                    self.label_2.setText("ERROR: invalid function!")
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Konvergens függvény!")
+                self.label_2.setText("ERROR: incorrect convergent function!")
 
-        if input == "Deriválás":
+        if input == "Differentiation":
+            print("#LOG Differentiation")
             try:
                 tmp = eval(self.replace_sympy_funcs(text))
                 res = diff((tmp), x)
@@ -348,9 +358,10 @@ class Ui_Calculus(object):
                     self.lineEdit.setText("")
             except Exception as e:
                 print(e)
-                self.label_2.setText("ERROR helytelen Deriválás!")           
+                self.label_2.setText("ERROR: incorrect differentiation!")           
 
-        if input == "Integrálás":
+        if input == "Integration":
+            print("#LOG Integration")
             try:
                 self.canvas.show()
                 x = Symbol("x")
@@ -361,11 +372,11 @@ class Ui_Calculus(object):
                 print(result)
                 if result == False:
                     self.canvas.hide()
-                    self.label_2.setText("ERROR: nem ábrázolható integrált függvény!")
+                    self.label_2.setText("ERROR: cannot plot integrated function!")
                     pass
             except Exception as e:
                 self.canvas.hide()
-                self.label_2.setText("Nem számolható integrált függvény!")
+                self.label_2.setText("Cannot compute integrated function!")
         self.pushButton.setEnabled(False)
 
     def back_to_mainwindow(self, Egyenlet, MainWindow):
@@ -397,7 +408,7 @@ class Ui_Calculus(object):
             clicked=lambda: self.back_to_mainwindow(Calculus, MainWindow),
         )
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.setText("Vissza")
+        self.pushButton_2.setText("Back")
 
         self.canvas = Canvas(self.centralwidget)
 
@@ -406,16 +417,16 @@ class Ui_Calculus(object):
         font.setPointSize(12)
         self.comboBox.setFont(font)
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("Növekvő")
-        self.comboBox.addItem("Szigorúan növekvő")
-        self.comboBox.addItem("Csökkenő")
-        self.comboBox.addItem("Szigorúan csökkenő")
-        self.comboBox.addItem("Monoton")
-        self.comboBox.addItem("Divergens")
-        self.comboBox.addItem("Határérték")
+        self.comboBox.addItem("Increasing")
+        self.comboBox.addItem("Strictly Increasing")
+        self.comboBox.addItem("Decreasing")
+        self.comboBox.addItem("Strictly Decreasing")
+        self.comboBox.addItem("Monotonic")
+        self.comboBox.addItem("Divergent")
+        self.comboBox.addItem("Limit")
         #self.comboBox.addItem("Konvergens")
-        self.comboBox.addItem("Deriválás")
-        self.comboBox.addItem("Integrálás")
+        self.comboBox.addItem("Differentiation")
+        self.comboBox.addItem("Integration")
 
         self.label = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -424,7 +435,7 @@ class Ui_Calculus(object):
         self.label.setFont(font)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
-        self.label.setText("Válaszd ki a végrehajtandó műveletet")
+        self.label.setText("Select the operation to perform")
 
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         font = QtGui.QFont()
@@ -432,7 +443,7 @@ class Ui_Calculus(object):
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
-        self.label_2.setText("Erdemény")
+        self.label_2.setText("Result")
         self.label_2.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.label_2.setMaximumHeight(71)
 
@@ -519,7 +530,7 @@ class Ui_Calculus(object):
             background-color: #4E4E4E;
             font-family: 'Courier New', Courier, monospace;
             color: #FFFFFF;
-            font-size: 12pt;
+            font-size: 10pt;
             border: 1px solid #555555;
             border-radius: 10px;
             padding: 10px;
