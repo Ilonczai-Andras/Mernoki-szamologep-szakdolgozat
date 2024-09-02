@@ -27,39 +27,39 @@ class Ui_MainWindow(object):
 
     def generateWindow(self, index):
         window_type = self.comboBox.itemText(index)
-        if window_type == "Kalkulus":
-            self.generateKalkulus()
+        if window_type == "Calculus":
+            self.generateCalculus()
             MainWindow.hide()
-        elif window_type == "Egyenletek":
-            self.generateEgyenlet()
+        elif window_type == "Equations":
+            self.generateEquation()
             MainWindow.hide()
-        elif window_type == "Differnciál számitás":
-            self.generateDiff_Egyenlet()
+        elif window_type == "Differential Calculation":
+            self.generateDiff_Equation()
             MainWindow.hide()
-        elif window_type == "Valószínűségszámitás és statisztika":
+        elif window_type == "Probability and Statistics":
             self.generateProb_and_Stat()
             MainWindow.hide()
-        elif window_type == "Programozói számológép":
+        elif window_type == "Programmer Calculator":
             self.generateProgrammer_Calculator()
             MainWindow.hide()
 
         self.comboBox.setCurrentIndex(0)
 
-    def generateKalkulus(self):
+    def generateCalculus(self):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Calculus()
         self.ui.setupUi(self.window, MainWindow)
         self.window.setWindowIcon(QIcon(self.icon_path))  # Ensure this path is correct
         self.window.show()
 
-    def generateEgyenlet(self):
+    def generateEquation(self):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Equation()
         self.ui.setupUi(self.window, MainWindow)
         self.window.setWindowIcon(QIcon(self.icon_path))  # Ensure this path is correct
         self.window.show()
 
-    def generateDiff_Egyenlet(self):
+    def generateDiff_Equation(self):
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Differential_Equation()
         self.ui.setupUi(self.window, MainWindow)
@@ -92,12 +92,12 @@ class Ui_MainWindow(object):
         self.comboBox.setFont(font)
         self.comboBox.addItems(
             [
-                "Válasz egyet:",
-                "Kalkulus",
-                "Egyenletek",
-                "Differnciál számitás",
-                "Valószínűségszámitás és statisztika",
-                "Programozói számológép"
+                "Select one:",
+                "Calculus",
+                "Equations",
+                "Differential Calculation",
+                "Probability and Statistics",
+                "Programmer Calculator"
             ]
         )
         self.comboBox.currentIndexChanged.connect(self.generateWindow)
@@ -324,12 +324,12 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.actionelso = QtWidgets.QAction(MainWindow)
-        self.actionelso.setObjectName("actionelso")
-        self.actionmasodik = QtWidgets.QAction(MainWindow)
-        self.actionmasodik.setObjectName("actionmasodik")
-        self.menuSelect.addAction(self.actionelso)
-        self.menuSelect.addAction(self.actionmasodik)
+        self.actionFirst = QtWidgets.QAction(MainWindow)
+        self.actionFirst.setObjectName("actionFirst")
+        self.actionSecond = QtWidgets.QAction(MainWindow)
+        self.actionSecond.setObjectName("actionSecond")
+        self.menuSelect.addAction(self.actionFirst)
+        self.menuSelect.addAction(self.actionSecond)
         self.menubar.addAction(self.menuSelect.menuAction())
 
         self.retranslateUi(MainWindow)
