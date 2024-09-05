@@ -93,6 +93,7 @@ class Ui_MainWindow(object):
         self.comboBox.addItems(
             [
                 "Select one:",
+                "Basic",
                 "Calculus",
                 "Equations",
                 "Differential Calculation",
