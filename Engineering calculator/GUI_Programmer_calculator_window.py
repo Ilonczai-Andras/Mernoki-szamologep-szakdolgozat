@@ -567,7 +567,11 @@ class Ui_Programmer_calculator(object):
                 except:
                     answer = None
                     self.Result.setText("Helytelen abs!")
-            elif (self.only_one_fact(screen) == 1 and "!" in screen and not self.contain_arithmetic(screen)):
+            elif (
+                self.only_one_fact(screen) == 1
+                and "!" in screen
+                and not self.contain_arithmetic(screen)
+            ):
                 try:
                     print("#LOG: factorial")
                     answer = self.factorial(screen.split("!")[0], "hexadecimal")
@@ -644,8 +648,15 @@ class Ui_Programmer_calculator(object):
 
                 self.operations2.append(f"{answer}")
                 self.update_operations_display2()
-            if (isinstance(answer, str) and not "." in answer and not "*" in answer and answer != "0"):
-                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(str(answer))
+            if (
+                isinstance(answer, str)
+                and not "." in answer
+                and not "*" in answer
+                and answer != "0"
+            ):
+                binary_segments = self.hexidecimal_to_hexidecimal_64bit_segments(
+                    str(answer)
+                )
                 self.n8_63.setText(f"64 {self.format_binary(binary_segments[0])} 48")
                 self.h2_47.setText(f"47 {self.format_binary(binary_segments[1])} 32")
                 self.t6_31.setText(f"31 {self.format_binary(binary_segments[2])} 16")
@@ -2276,7 +2287,7 @@ class Ui_Programmer_calculator(object):
         if isinstance(result, int):
             if result < 0:
                 # Convert the positive value to hexadecimal and add a negative sign
-                hex_result = '-' + hex(-result).upper()[2:]
+                hex_result = "-" + hex(-result).upper()[2:]
             else:
                 # Convert the integer result back to hexadecimal
                 hex_result = hex(result).upper()[2:]
@@ -2296,7 +2307,9 @@ class Ui_Programmer_calculator(object):
                 hex_digit = int(fractional_part)
                 hex_fractional_part.append(hex(hex_digit).upper()[2:])
                 fractional_part -= hex_digit
-                if len(hex_fractional_part) > 12:  # Limit precision to avoid infinite loops
+                if (
+                    len(hex_fractional_part) > 12
+                ):  # Limit precision to avoid infinite loops
                     break
             hex_fractional_part = "".join(hex_fractional_part)
 
@@ -2307,7 +2320,7 @@ class Ui_Programmer_calculator(object):
                 hex_result = f"{hex_integer_part}"
 
             if result < 0:
-                hex_result = '-' + hex_result
+                hex_result = "-" + hex_result
 
         return hex_result
 
@@ -2505,7 +2518,7 @@ class Ui_Programmer_calculator(object):
         self.OR.setText(_translate("Programmer_calc", "OR"))
         self.shift_left.setText(_translate("Programmer_calc", "<<"))
         self.shift_right.setText(_translate("Programmer_calc", ">>"))
-        self.aaaa.setText(_translate("Programmer_calc", "á"))
+        self.aaaa.setText(_translate("Programmer_calc", "aschii"))
         self.fact.setText(_translate("Programmer_calc", "fact"))
 
 
