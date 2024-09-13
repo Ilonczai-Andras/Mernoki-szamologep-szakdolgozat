@@ -9,6 +9,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtGui import QFont
+from GUI_Equality_window import Ui_Equation
+from GUI_Differential_Equation_window import Ui_Differential_Equation
+from GUI_Probability_and_statistics_window import Ui_Probability_and_statistics
+from GUI_Programmer_calculator_window import Ui_Programmer_calculator
 from Helper_class_Plotting import Canvas
 from sympy import (
     oo,
@@ -392,6 +399,23 @@ class Ui_Calculus(object):
 
         Calculus.setObjectName("Calculus")
         Calculus.resize(800, 600)
+        self.toolbar = Calculus.addToolBar("My Toolbar")
+        self.comboBox2 = QComboBox()
+        font = QFont()
+        font.setPointSize(12)
+        self.comboBox2.setFont(font)
+        self.comboBox2.addItems(
+            [
+                "Select one:",
+                "Basic",
+                "Equations",
+                "Differential Calculation",
+                "Probability and Statistics",
+                "Programmer Calculator"
+            ]
+        )
+
+        self.toolbar.addWidget(self.comboBox2)
         self.centralwidget = QtWidgets.QWidget(Calculus)
         self.centralwidget.setObjectName("centralwidget")
 
