@@ -86,7 +86,7 @@ class Canvas(FigureCanvas):
             r"\bpi\b": "np.pi",
             r"\be\b": "math.e",
             r"\bfactorial\b": "self.fact",
-            r"\bgamma\b": "sp.gamma"
+            r"\bgamma\b": "sp.gamma",
         }
 
         for pattern, replacement in replacements.items():
@@ -113,12 +113,13 @@ class Canvas(FigureCanvas):
         C=None,
         df=False,
         df_func="",
+        Color=None,
     ):
         if interval_x is None:
             print(interval_x)
             interval_x = self.interval_x
             x_vals = np.linspace(-100, 100, 100000)
-            
+
         else:
             print(interval_x)
             x_vals = np.linspace(interval_x[0], interval_x[1], 100000)
@@ -172,7 +173,9 @@ class Canvas(FigureCanvas):
         if clear:
             self.ax.clear()
 
-        self.ax.plot(x_vals, y_vals, color="black", label=f"y = {self.func}")
+        color_to_use = Color if Color is not None else "black"
+
+        self.ax.plot(x_vals, y_vals, color=color_to_use, label=f"y = {self.func}")
         self.ax.set_xlabel("x")
         self.ax.set_xlim(interval_x[0], interval_x[1])
         self.ax.set_ylim(interval_y[0], interval_y[1])
