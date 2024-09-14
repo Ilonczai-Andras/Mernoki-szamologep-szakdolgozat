@@ -1,1 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+
+~$*.docx
+.tmp
+
 Engineering calculator/UI_files/__init__.py
+Engineering calculator/UI_files/calculus.ui
