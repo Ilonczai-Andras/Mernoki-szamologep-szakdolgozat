@@ -22,29 +22,6 @@ class Window(
         # Apply the stylesheet
         self.applyStylesheet(self)  # Call applyStylesheet after setting up the UI
 
-        # Create the toolbar
-        self.toolBar = QToolBar("My Toolbar")
-        self.addToolBar(self.toolBar)  # Adds the toolbar to the main window
-
-        # Create the combo box
-        font = QFont()
-        font.setPointSize(12)  # Set the desired font size
-        self.combo = QComboBox()
-        self.combo.setFont(font)
-        self.combo.addItems(
-            [
-                "Basic",
-                "Calculus",
-                "Equations",
-                "Differential Calculation",
-                "Probability and Statistics",
-                "Programmer Calculator",
-            ]
-        )
-
-        # Add the combo box to the toolbar
-        self.toolBar.addWidget(self.combo)
-
         # Connect buttons to their respective functions
         self.plusMinusButton.clicked.connect(lambda: self.plus_minus())
         self.clearButton.clicked.connect(lambda: self.press_it("C"))
@@ -122,6 +99,7 @@ class Window(
         screen = self.outputLabel.text()
         try:
             answer = eval(screen)
+            self.outputLabel.setText(str(answer))
             self.outputLabel.setText(str(answer))
         except:
             self.outputLabel.setText("ERROR")
