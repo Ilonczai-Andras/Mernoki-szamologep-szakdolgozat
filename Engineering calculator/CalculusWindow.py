@@ -11,7 +11,6 @@ from sympy import (
     Sum,
     Symbol,
     Interval,
-    pretty,
     sympify,
     limit,
     integrate,
@@ -315,7 +314,7 @@ class Window(QMainWindow, Calculus_GUI.Ui_Calculus):
             try:
                 tmp = eval(self.replace_sympy_funcs(text))
                 res = diff((tmp), x)
-                self.label_2.setText(str(pretty(res)).replace("E", "e"))
+                self.label_2.setText(str(res).replace("E", "e"))
                 res_str = str(res).replace("E", "e")
                 result = self.canvas.plot_function(res_str, interval_x=interval, interval_y=interval)
                 if result == False:

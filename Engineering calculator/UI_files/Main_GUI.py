@@ -14,172 +14,446 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(550, 800)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 800))
+        MainWindow.resize(765, 818)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        MainWindow.setMinimumSize(QtCore.QSize(0, 0))
+        MainWindow.setStyleSheet("            QMainWindow {\n"
+"                background-color: #2E2E2E;\n"
+"            }")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setMinimumSize(QtCore.QSize(0, 0))
+        self.centralwidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.centralwidget.setStyleSheet("")
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setObjectName("verticalLayout")
         self.outputLabel = QtWidgets.QLabel(self.centralwidget)
-        self.outputLabel.setMinimumSize(QtCore.QSize(0, 0))
+        self.outputLabel.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.outputLabel.sizePolicy().hasHeightForWidth())
+        self.outputLabel.setSizePolicy(sizePolicy)
+        self.outputLabel.setMinimumSize(QtCore.QSize(747, 80))
+        self.outputLabel.setMaximumSize(QtCore.QSize(16777215, 80))
         font = QtGui.QFont()
-        font.setPointSize(35)
+        font.setFamily("Courier New")
+        font.setPointSize(-1)
         self.outputLabel.setFont(font)
+        self.outputLabel.setStyleSheet("            QLabel#outputLabel {\n"
+"                background-color: #1C1C1C;\n"
+"                font-size:40px;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 2px solid #555555;\n"
+"                border-radius: 5px;\n"
+"                padding: 10px;\n"
+"            }")
         self.outputLabel.setFrameShape(QtWidgets.QFrame.Box)
         self.outputLabel.setFrameShadow(QtWidgets.QFrame.Raised)
         self.outputLabel.setLineWidth(2)
         self.outputLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.outputLabel.setObjectName("outputLabel")
-        self.verticalLayout.addWidget(self.outputLabel)
-        self.gridLayout = QtWidgets.QGridLayout()
-        self.gridLayout.setObjectName("gridLayout")
-        self.sqrtButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.sqrtButton.setFont(font)
-        self.sqrtButton.setObjectName("sqrtButton")
-        self.gridLayout.addWidget(self.sqrtButton, 1, 2, 1, 1)
-        self.Button_8 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_8.setFont(font)
-        self.Button_8.setObjectName("Button_8")
-        self.gridLayout.addWidget(self.Button_8, 2, 1, 1, 1)
-        self.clearEntryButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.clearEntryButton.setFont(font)
-        self.clearEntryButton.setObjectName("clearEntryButton")
-        self.gridLayout.addWidget(self.clearEntryButton, 0, 1, 1, 1)
-        self.minusButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.minusButton.setFont(font)
-        self.minusButton.setObjectName("minusButton")
-        self.gridLayout.addWidget(self.minusButton, 3, 3, 1, 1)
-        self.deleteButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.deleteButton.setFont(font)
-        self.deleteButton.setObjectName("deleteButton")
-        self.gridLayout.addWidget(self.deleteButton, 0, 3, 1, 1)
-        self.Button_1 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_1.setFont(font)
-        self.Button_1.setObjectName("Button_1")
-        self.gridLayout.addWidget(self.Button_1, 4, 0, 1, 1)
-        self.Button_5 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_5.setFont(font)
-        self.Button_5.setObjectName("Button_5")
-        self.gridLayout.addWidget(self.Button_5, 3, 1, 1, 1)
-        self.clearButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.clearButton.setFont(font)
-        self.clearButton.setObjectName("clearButton")
-        self.gridLayout.addWidget(self.clearButton, 0, 2, 1, 1)
-        self.Button_9 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_9.setFont(font)
-        self.Button_9.setObjectName("Button_9")
-        self.gridLayout.addWidget(self.Button_9, 2, 2, 1, 1)
-        self.divideButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.divideButton.setFont(font)
-        self.divideButton.setObjectName("divideButton")
-        self.gridLayout.addWidget(self.divideButton, 1, 3, 1, 1)
-        self.Button_3 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_3.setFont(font)
-        self.Button_3.setObjectName("Button_3")
-        self.gridLayout.addWidget(self.Button_3, 4, 2, 1, 1)
+        self.verticalLayout_2.addWidget(self.outputLabel)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setSpacing(6)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.percentageButton = QtWidgets.QPushButton(self.centralwidget)
+        self.percentageButton.setMinimumSize(QtCore.QSize(181, 0))
         font = QtGui.QFont()
+        font.setFamily("Courier New")
         font.setPointSize(26)
         self.percentageButton.setFont(font)
+        self.percentageButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
         self.percentageButton.setObjectName("percentageButton")
-        self.gridLayout.addWidget(self.percentageButton, 0, 0, 1, 1)
-        self.decimalPointButton = QtWidgets.QPushButton(self.centralwidget)
+        self.horizontalLayout_6.addWidget(self.percentageButton)
+        self.clearButton = QtWidgets.QPushButton(self.centralwidget)
+        self.clearButton.setMinimumSize(QtCore.QSize(181, 68))
         font = QtGui.QFont()
+        font.setFamily("Courier New")
         font.setPointSize(26)
-        self.decimalPointButton.setFont(font)
-        self.decimalPointButton.setObjectName("decimalPointButton")
-        self.gridLayout.addWidget(self.decimalPointButton, 5, 2, 1, 1)
-        self.quadratButton = QtWidgets.QPushButton(self.centralwidget)
+        self.clearButton.setFont(font)
+        self.clearButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.clearButton.setObjectName("clearButton")
+        self.horizontalLayout_6.addWidget(self.clearButton)
+        self.deleteButton = QtWidgets.QPushButton(self.centralwidget)
+        self.deleteButton.setMinimumSize(QtCore.QSize(181, 0))
         font = QtGui.QFont()
+        font.setFamily("Courier New")
         font.setPointSize(26)
-        self.quadratButton.setFont(font)
-        self.quadratButton.setObjectName("quadratButton")
-        self.gridLayout.addWidget(self.quadratButton, 1, 1, 1, 1)
-        self.multiplyButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.multiplyButton.setFont(font)
-        self.multiplyButton.setObjectName("multiplyButton")
-        self.gridLayout.addWidget(self.multiplyButton, 2, 3, 1, 1)
-        self.Button_6 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_6.setFont(font)
-        self.Button_6.setObjectName("Button_6")
-        self.gridLayout.addWidget(self.Button_6, 3, 2, 1, 1)
-        self.plusButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.plusButton.setFont(font)
-        self.plusButton.setObjectName("plusButton")
-        self.gridLayout.addWidget(self.plusButton, 4, 3, 1, 1)
-        self.plusMinusButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.plusMinusButton.setFont(font)
-        self.plusMinusButton.setObjectName("plusMinusButton")
-        self.gridLayout.addWidget(self.plusMinusButton, 5, 0, 1, 1)
-        self.Button_4 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_4.setFont(font)
-        self.Button_4.setObjectName("Button_4")
-        self.gridLayout.addWidget(self.Button_4, 3, 0, 1, 1)
-        self.Button_2 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_2.setFont(font)
-        self.Button_2.setObjectName("Button_2")
-        self.gridLayout.addWidget(self.Button_2, 4, 1, 1, 1)
-        self.zeroButton = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.zeroButton.setFont(font)
-        self.zeroButton.setObjectName("zeroButton")
-        self.gridLayout.addWidget(self.zeroButton, 5, 1, 1, 1)
-        self.Button_7 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(26)
-        self.Button_7.setFont(font)
-        self.Button_7.setObjectName("Button_7")
-        self.gridLayout.addWidget(self.Button_7, 2, 0, 1, 1)
+        self.deleteButton.setFont(font)
+        self.deleteButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.deleteButton.setObjectName("deleteButton")
+        self.horizontalLayout_6.addWidget(self.deleteButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.onePerXButton = QtWidgets.QPushButton(self.centralwidget)
+        self.onePerXButton.setMinimumSize(QtCore.QSize(181, 0))
         font = QtGui.QFont()
+        font.setFamily("Courier New")
         font.setPointSize(26)
         self.onePerXButton.setFont(font)
+        self.onePerXButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
         self.onePerXButton.setObjectName("onePerXButton")
-        self.gridLayout.addWidget(self.onePerXButton, 1, 0, 1, 1)
-        self.equalButton = QtWidgets.QPushButton(self.centralwidget)
+        self.horizontalLayout_5.addWidget(self.onePerXButton)
+        self.quadratButton = QtWidgets.QPushButton(self.centralwidget)
+        self.quadratButton.setMinimumSize(QtCore.QSize(182, 0))
         font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.quadratButton.setFont(font)
+        self.quadratButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.quadratButton.setObjectName("quadratButton")
+        self.horizontalLayout_5.addWidget(self.quadratButton)
+        self.sqrtButton = QtWidgets.QPushButton(self.centralwidget)
+        self.sqrtButton.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.sqrtButton.setFont(font)
+        self.sqrtButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.sqrtButton.setObjectName("sqrtButton")
+        self.horizontalLayout_5.addWidget(self.sqrtButton)
+        self.divideButton = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.divideButton.setFont(font)
+        self.divideButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.divideButton.setObjectName("divideButton")
+        self.horizontalLayout_5.addWidget(self.divideButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.Button_7 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_7.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_7.setFont(font)
+        self.Button_7.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_7.setObjectName("Button_7")
+        self.horizontalLayout_4.addWidget(self.Button_7)
+        self.Button_8 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_8.setMinimumSize(QtCore.QSize(182, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_8.setFont(font)
+        self.Button_8.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_8.setObjectName("Button_8")
+        self.horizontalLayout_4.addWidget(self.Button_8)
+        self.Button_9 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_9.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_9.setFont(font)
+        self.Button_9.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_9.setObjectName("Button_9")
+        self.horizontalLayout_4.addWidget(self.Button_9)
+        self.multiplyButton = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.multiplyButton.setFont(font)
+        self.multiplyButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.multiplyButton.setObjectName("multiplyButton")
+        self.horizontalLayout_4.addWidget(self.multiplyButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.Button_4 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_4.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_4.setFont(font)
+        self.Button_4.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_4.setObjectName("Button_4")
+        self.horizontalLayout_3.addWidget(self.Button_4)
+        self.Button_5 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_5.setMinimumSize(QtCore.QSize(182, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_5.setFont(font)
+        self.Button_5.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_5.setObjectName("Button_5")
+        self.horizontalLayout_3.addWidget(self.Button_5)
+        self.Button_6 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_6.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_6.setFont(font)
+        self.Button_6.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_6.setObjectName("Button_6")
+        self.horizontalLayout_3.addWidget(self.Button_6)
+        self.minusButton = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.minusButton.setFont(font)
+        self.minusButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.minusButton.setObjectName("minusButton")
+        self.horizontalLayout_3.addWidget(self.minusButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.Button_1 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_1.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_1.setFont(font)
+        self.Button_1.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_1.setObjectName("Button_1")
+        self.horizontalLayout_2.addWidget(self.Button_1)
+        self.Button_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_2.setMinimumSize(QtCore.QSize(182, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_2.setFont(font)
+        self.Button_2.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_2.setObjectName("Button_2")
+        self.horizontalLayout_2.addWidget(self.Button_2)
+        self.Button_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.Button_3.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.Button_3.setFont(font)
+        self.Button_3.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.Button_3.setObjectName("Button_3")
+        self.horizontalLayout_2.addWidget(self.Button_3)
+        self.plusButton = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.plusButton.setFont(font)
+        self.plusButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.plusButton.setObjectName("plusButton")
+        self.horizontalLayout_2.addWidget(self.plusButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.plusMinusButton = QtWidgets.QPushButton(self.centralwidget)
+        self.plusMinusButton.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.plusMinusButton.setFont(font)
+        self.plusMinusButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.plusMinusButton.setObjectName("plusMinusButton")
+        self.horizontalLayout.addWidget(self.plusMinusButton)
+        self.zeroButton = QtWidgets.QPushButton(self.centralwidget)
+        self.zeroButton.setMinimumSize(QtCore.QSize(182, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.zeroButton.setFont(font)
+        self.zeroButton.setStyleSheet("\n"
+"            QPushButton {\n"
+"               background-color: #ff7300;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.zeroButton.setObjectName("zeroButton")
+        self.horizontalLayout.addWidget(self.zeroButton)
+        self.decimalPointButton = QtWidgets.QPushButton(self.centralwidget)
+        self.decimalPointButton.setMinimumSize(QtCore.QSize(181, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(26)
+        self.decimalPointButton.setFont(font)
+        self.decimalPointButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
+        self.decimalPointButton.setObjectName("decimalPointButton")
+        self.horizontalLayout.addWidget(self.decimalPointButton)
+        self.equalButton = QtWidgets.QPushButton(self.centralwidget)
+        self.equalButton.setMinimumSize(QtCore.QSize(181, 68))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
         font.setPointSize(26)
         self.equalButton.setFont(font)
+        self.equalButton.setStyleSheet("            QPushButton {\n"
+"                background-color: #4E4E4E;\n"
+"                font-family: \'Courier New\', Courier, monospace; /* Monospaced font */\n"
+"                color: #FFFFFF;\n"
+"                border: 1px solid #555555;\n"
+"                border-radius: 10px;\n"
+"                padding: 10px;\n"
+"            }")
         self.equalButton.setObjectName("equalButton")
-        self.gridLayout.addWidget(self.equalButton, 5, 3, 1, 1)
-        self.verticalLayout.addLayout(self.gridLayout)
+        self.horizontalLayout.addWidget(self.equalButton)
+        self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout_2.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -190,29 +464,28 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.outputLabel.setText(_translate("MainWindow", "0"))
-        self.sqrtButton.setText(_translate("MainWindow", "sqrt"))
-        self.Button_8.setText(_translate("MainWindow", "8"))
-        self.clearEntryButton.setText(_translate("MainWindow", "CE"))
-        self.minusButton.setText(_translate("MainWindow", "-"))
-        self.deleteButton.setText(_translate("MainWindow", "DEL"))
-        self.Button_1.setText(_translate("MainWindow", "1"))
-        self.Button_5.setText(_translate("MainWindow", "5"))
-        self.clearButton.setText(_translate("MainWindow", "C"))
-        self.Button_9.setText(_translate("MainWindow", "9"))
-        self.divideButton.setText(_translate("MainWindow", "/"))
-        self.Button_3.setText(_translate("MainWindow", "3"))
         self.percentageButton.setText(_translate("MainWindow", "%"))
-        self.decimalPointButton.setText(_translate("MainWindow", "."))
+        self.clearButton.setText(_translate("MainWindow", "C"))
+        self.deleteButton.setText(_translate("MainWindow", "DEL"))
+        self.onePerXButton.setText(_translate("MainWindow", "1/x"))
         self.quadratButton.setText(_translate("MainWindow", "x²"))
+        self.sqrtButton.setText(_translate("MainWindow", "sqrt"))
+        self.divideButton.setText(_translate("MainWindow", "/"))
+        self.Button_7.setText(_translate("MainWindow", "7"))
+        self.Button_8.setText(_translate("MainWindow", "8"))
+        self.Button_9.setText(_translate("MainWindow", "9"))
         self.multiplyButton.setText(_translate("MainWindow", "*"))
+        self.Button_4.setText(_translate("MainWindow", "4"))
+        self.Button_5.setText(_translate("MainWindow", "5"))
         self.Button_6.setText(_translate("MainWindow", "6"))
+        self.minusButton.setText(_translate("MainWindow", "-"))
+        self.Button_1.setText(_translate("MainWindow", "1"))
+        self.Button_2.setText(_translate("MainWindow", "2"))
+        self.Button_3.setText(_translate("MainWindow", "3"))
         self.plusButton.setText(_translate("MainWindow", "+"))
         self.plusMinusButton.setText(_translate("MainWindow", "+/-"))
-        self.Button_4.setText(_translate("MainWindow", "4"))
-        self.Button_2.setText(_translate("MainWindow", "2"))
         self.zeroButton.setText(_translate("MainWindow", "0"))
-        self.Button_7.setText(_translate("MainWindow", "7"))
-        self.onePerXButton.setText(_translate("MainWindow", "1/x"))
+        self.decimalPointButton.setText(_translate("MainWindow", "."))
         self.equalButton.setText(_translate("MainWindow", "="))
 
 

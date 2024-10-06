@@ -21,7 +21,6 @@ class Window(
 
         # Apply the stylesheet
         self.applyStylesheet(self)  # Call applyStylesheet after setting up the UI
-        self.apply_number_button_stylesheet()
 
         # Create the toolbar
         self.toolBar = QToolBar("My Toolbar")
@@ -76,7 +75,7 @@ class Window(
     def press_it(self, pressed):
         if pressed == "C":
             self.outputLabel.setText("0")
-        elif self.outputLabel.text() == "ERROR!" and pressed:
+        elif self.outputLabel.text() == "ERROR":
             self.outputLabel.setText(pressed)
         else:
             # Check to see if it starts with 0 and delete the zero
@@ -123,12 +122,9 @@ class Window(
         screen = self.outputLabel.text()
         try:
             answer = eval(screen)
-            if type(answer) is int:
-                self.outputLabel.setText(str(answer))
-            else:
-                self.outputLabel.setText(str(answer))
+            self.outputLabel.setText(str(answer))
         except:
-            self.outputLabel.setText("Error")
+            self.outputLabel.setText("ERROR")
 
     def quadrat(self):
         try:
@@ -174,23 +170,6 @@ class Window(
             QMainWindow {
                 background-color: #2E2E2E;
             }
-            QLabel#outputLabel {
-                background-color: #1C1C1C;
-                font-size:40px;
-                font-family: 'Courier New', Courier, monospace; /* Monospaced font */
-                color: #FFFFFF;
-                border: 2px solid #555555;
-                border-radius: 5px;
-                padding: 10px;
-            }
-            QPushButton {
-                background-color: #4E4E4E;
-                font-family: 'Courier New', Courier, monospace; /* Monospaced font */
-                color: #FFFFFF;
-                border: 1px solid #555555;
-                border-radius: 10px;
-                padding: 10px;
-            }
             QPushButton:hover {
                 background-color: #5E5E5E;
             }
@@ -218,22 +197,6 @@ class Window(
             }
             """
         MainWindow.setStyleSheet(stylesheet)
-
-    def apply_number_button_stylesheet(self):
-        number_buttons = [
-            self.zeroButton,
-            self.Button_1,
-            self.Button_2,
-            self.Button_3,
-            self.Button_4,
-            self.Button_5,
-            self.Button_6,
-            self.Button_7,
-            self.Button_8,
-            self.Button_9,
-        ]
-        for button in number_buttons:
-            button.setStyleSheet("background-color: #ff7300")
 
     def keyPressEvent(self, event):
         key = event.key()
